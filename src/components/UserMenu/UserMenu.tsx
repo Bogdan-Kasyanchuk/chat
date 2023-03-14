@@ -2,10 +2,11 @@ import { Avatar, Group, Indicator, Menu, Text, UnstyledButton } from '@mantine/c
 import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
 import { MouseEvent, useState } from 'react';
 
-import useStyles from './UserMenu.styles';
-import { dataUser } from '@/data/dataUser';
-import currentStatus from '@/helpers/setCurrentStatus';
 import { TStatusUser } from '@/types';
+
+import { dataUser } from '@/data/dataUser';
+
+import useStyles from './UserMenu.styles';
 
 function Header() {
   const { classes, cx } = useStyles();
@@ -49,7 +50,7 @@ function Header() {
               offset={4}
               position='bottom-end'
               withBorder
-              color={currentStatus(userStatus)}
+              classNames={{ indicator: STATUS[`${userStatus}`] }}
             >
               <Avatar size={32} radius='xl' src={dataUser.image} alt={dataUser.name} />
             </Indicator>
@@ -61,7 +62,7 @@ function Header() {
           <Menu.Item
             key={el}
             icon={<div className={cx(classes.userStatus, STATUS[`${el}`])} />}
-            onClick={(e) => setStatus(e)}
+            onClick={setStatus}
           >
             {el}
           </Menu.Item>
