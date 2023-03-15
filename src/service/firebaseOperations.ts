@@ -1,10 +1,7 @@
 // import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-
-// import db from 'service/firebaseDB';
-
 // import initialData from 'helpers/initialData';
 // import tryCatch from 'helpers/tryCatch';
-
+// import db from 'service/firebaseDB';
 // import { TIdGame } from 'types';
 
 // export async function startGame(idGame: TIdGame) {

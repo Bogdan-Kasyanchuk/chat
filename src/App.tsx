@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import { Button, Container, Flex } from '@mantine/core';
+import { Container, Flex } from '@mantine/core';
 
 import Footer from '@/layouts/Footer';
 import Header from '@/layouts/Header';

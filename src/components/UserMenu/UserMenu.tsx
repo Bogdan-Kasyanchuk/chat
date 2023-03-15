@@ -1,6 +1,8 @@
-import { Avatar, Group, Indicator, Menu, Text, UnstyledButton } from '@mantine/core';
-import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
+import { IconChevronDown, IconHome2, IconLogout, IconSettings } from '@tabler/icons-react';
 import { MouseEvent, useState } from 'react';
+import { Link } from 'react-router-dom';
+
+import { Avatar, Group, Indicator, Menu, Text, UnstyledButton } from '@mantine/core';
 
 import { TStatusUser } from '@/types';
 
@@ -57,6 +59,10 @@ function Header() {
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
+        <Link to='/' className='no-underline'>
+          <Menu.Item icon={<IconHome2 size={16} stroke={1.5} />}>Home</Menu.Item>
+        </Link>
+        <Menu.Divider m={0} className={classes.menuDivider} />
         {Object.keys(STATUS).map((el) => (
           <Menu.Item
             key={el}
@@ -68,7 +74,12 @@ function Header() {
         ))}
         <Menu.Divider m={0} className={classes.menuDivider} />
         <Menu.Item icon={<IconSettings size={16} stroke={1.5} />}>Account settings</Menu.Item>
-        <Menu.Item icon={<IconLogout size={16} stroke={1.5} />}>Logout</Menu.Item>
+        <Menu.Item
+          icon={<IconLogout size={16} stroke={1.5} />}
+          // onClick={userAuth}
+        >
+          Logout
+        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   );
