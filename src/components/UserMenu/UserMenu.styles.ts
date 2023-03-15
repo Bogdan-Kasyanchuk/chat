@@ -41,6 +41,7 @@ const useStyles = createStyles((theme) => ({
 
   menu: {
     borderColor: theme.colors.gray[3],
+    padding: 0,
   },
 
   menuItem: {

@@ -1,19 +1,16 @@
-// import { FC } from 'react';
-// import { Navigate, useLocation } from 'react-router-dom';
+import { FC } from 'react';
+import { Navigate } from 'react-router-dom';
 
-// import useUser from 'hooks/useUser';
+import useUser from '@/hooks/useUser';
 
-// import { IRouteProps } from 'interfaces';
+import { IRouteProps } from '@/interfaces';
 
-// const PublicRoute: FC<IRouteProps> = ({ children, restricted = false }) => {
-//   const { user } = useUser();
-//   const { state } = useLocation();
+const PublicRoute: FC<IRouteProps> = ({ children }) => {
+  // const { user } = useUser();
 
-//   const shouldRedirect = user && restricted;
+  const user = false;
 
-//   if (shouldRedirect && state) return <Navigate to={`/game/${state.id}`} state={state} />;
+  return user ? <Navigate to='/' /> : children;
+};
 
-//   return shouldRedirect ? <Navigate to='/' /> : children;
-// };
-
-// export default PublicRoute;
+export default PublicRoute;

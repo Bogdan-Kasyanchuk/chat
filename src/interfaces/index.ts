@@ -1,3 +1,4 @@
-import { IButtonProps } from '@/interfaces/IButtonProps';
+import { IRouteProps } from '@/interfaces/IRouteProps';
+import { IUseUser } from '@/interfaces/IUseUser';
 
-export type { IButtonProps };
+export type { IRouteProps, IUseUser };

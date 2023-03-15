@@ -1,8 +1,10 @@
-import { Button, Container, Group, Text, rem } from '@mantine/core';
 import { IconMessages } from '@tabler/icons-react';
 
-import useStyles from './Header.styles';
+import { Button, Container, Group, Text, rem } from '@mantine/core';
+
 import MenuUser from '@/components/UserMenu';
+
+import useStyles from './Header.styles';
 
 function Header() {
   const { classes } = useStyles();
@@ -17,14 +19,14 @@ function Header() {
               Chat
             </Text>
           </Group>
-          {true ? (
+          {false ? (
             <MenuUser />
-          ) : true ? (
-            <Button compact size='lg' radius={0} uppercase className={classes.button}>
+          ) : false ? (
+            <Button variant='filled-grey' compact size='lg' uppercase>
               Login
             </Button>
           ) : (
-            <Button compact size='lg' radius={0} uppercase className={classes.button}>
+            <Button variant='filled-grey' compact size='lg' uppercase>
               Home
             </Button>
           )}

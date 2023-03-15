@@ -27,7 +27,6 @@ function Header() {
   return (
     <Menu
       width={200}
-      radius={0}
       position='bottom-end'
       transitionProps={{ transition: 'pop-top-right' }}
       onChange={() => setUserMenuOpened(!userMenuOpened)}
@@ -67,7 +66,7 @@ function Header() {
             {el}
           </Menu.Item>
         ))}
-        <Menu.Divider className={classes.menuDivider} />
+        <Menu.Divider m={0} className={classes.menuDivider} />
         <Menu.Item icon={<IconSettings size={16} stroke={1.5} />}>Account settings</Menu.Item>
         <Menu.Item icon={<IconLogout size={16} stroke={1.5} />}>Logout</Menu.Item>
       </Menu.Dropdown>
