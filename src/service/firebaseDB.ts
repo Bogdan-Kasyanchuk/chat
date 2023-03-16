@@ -1,7 +1,7 @@
-// import { initializeApp } from 'firebase/app';
-// import { getFirestore } from 'firebase/firestore';
-// import firebaseConfig from 'service/firebaseConfig';
+import { getFirestore } from 'firebase/firestore';
 
-// const db = getFirestore(initializeApp(firebaseConfig));
+import firebaseInitApp from '@/service/firebaseInitApp';
 
-// export default db;
+const db = getFirestore(firebaseInitApp);
+
+export default db;

@@ -3,6 +3,8 @@ import { Link, useMatch } from 'react-router-dom';
 
 import { Container, Group, Text, rem } from '@mantine/core';
 
+import useUser from '@/hooks/useUser';
+
 import useStyles from './Header.styles';
 import { ButtonCustom, UserMenu } from '@/components';
 
@@ -10,6 +12,22 @@ function Header() {
   const { classes } = useStyles();
   const matchLogin = useMatch('/login');
   const matchChat = useMatch('/chat');
+
+  const { user, auth, displayName } = useUser();
+
+  console.log(user);
+  console.log(displayName);
+
+  const onLogOut = () => {
+    auth
+      .signOut()
+      .then(() => {
+        console.log(11111);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <div className={classes.header}>
@@ -38,20 +56,14 @@ function Header() {
                     Home
                   </ButtonCustom>
                 </Link>
-              ) : true ? (
+              ) : !user ? (
                 <Link to='/login'>
                   <ButtonCustom variant='filled-grey' compact size='lg' uppercase>
                     Login
                   </ButtonCustom>
                 </Link>
               ) : (
-                <ButtonCustom
-                  variant='filled-grey'
-                  compact
-                  size='lg'
-                  uppercase
-                  // onClick={userAuth}
-                >
+                <ButtonCustom variant='filled-grey' compact size='lg' uppercase onClick={onLogOut}>
                   Logout
                 </ButtonCustom>
               )}

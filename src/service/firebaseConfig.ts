@@ -1,11 +1,10 @@
-// const firebaseConfig = {
-//   apiKey: process.env.REACT_APP_API_KEY,
-//   authDomain: 'tic-tac-toe-30f4b.firebaseapp.com',
-//   projectId: 'tic-tac-toe-30f4b',
-//   storageBucket: 'tic-tac-toe-30f4b.appspot.com',
-//   messagingSenderId: '431614817332',
-//   appId: '1:431614817332:web:6a24320134c47360d28661',
-//   measurementId: 'G-LNML3WXHPS',
-// };
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: 'chat-d5678.firebaseapp.com',
+  projectId: 'chat-d5678',
+  storageBucket: 'chat-d5678.appspot.com',
+  messagingSenderId: '735033328959',
+  appId: '1:735033328959:web:d64fb7121f4bdf12037f8a',
+};
 
-// export default firebaseConfig;
+export default firebaseConfig;
