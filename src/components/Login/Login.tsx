@@ -1,36 +1,38 @@
 import { FC } from 'react';
 
-import { Button, Flex } from '@mantine/core';
+import { Flex } from '@mantine/core';
 
 import { userAuth } from '@/service/firebaseAuth';
+
+import { ButtonCustom } from '@/components';
 
 const Login: FC = () => {
   return (
     <Flex gap='xl' align='center' justify='center' direction='column' h='100%'>
-      <Button
+      <ButtonCustom
         variant='filled-grey'
         size='lg'
         uppercase
         // onClick={userAuth}
       >
         Login with google
-      </Button>
-      <Button
+      </ButtonCustom>
+      <ButtonCustom
         variant='filled-grey'
         size='lg'
         uppercase
         // onClick={userAuth}
       >
         Login with GitHub
-      </Button>
-      <Button
+      </ButtonCustom>
+      <ButtonCustom
         variant='filled-grey'
         size='lg'
         uppercase
         // onClick={userAuth}
       >
         Login with Email
-      </Button>
+      </ButtonCustom>
     </Flex>
   );
 };

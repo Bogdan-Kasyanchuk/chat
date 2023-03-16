@@ -2,15 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { Container, Flex } from '@mantine/core';
 
-import Footer from '@/layouts/Footer';
-import Header from '@/layouts/Header';
-
-import ChatPage from '@/pages/ChatPage';
-import HomePage from '@/pages/HomePage';
-import LoginPage from '@/pages/LoginPage';
-
-import PrivateRoute from '@/routes/PrivateRoute';
-import PublicRoute from '@/routes/PublicRoute';
+import { Footer, Header } from '@/layouts';
+import { ChatPage, HomePage, LoginPage } from '@/pages';
+import { PrivateRoute, PublicRoute } from '@/routes';
 
 function App() {
   return (

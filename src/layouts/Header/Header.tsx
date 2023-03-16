@@ -1,11 +1,10 @@
 import { IconMessages } from '@tabler/icons-react';
 import { Link, useMatch } from 'react-router-dom';
 
-import { Button, Container, Group, Text, rem } from '@mantine/core';
-
-import MenuUser from '@/components/UserMenu';
+import { Container, Group, Text, rem } from '@mantine/core';
 
 import useStyles from './Header.styles';
+import { ButtonCustom, UserMenu } from '@/components';
 
 function Header() {
   const { classes } = useStyles();
@@ -25,28 +24,28 @@ function Header() {
             </Group>
           </Link>
           {matchChat ? (
-            <MenuUser />
+            <UserMenu />
           ) : (
             <>
               <Link to='/chat'>
-                <Button variant='filled-grey' compact size='lg' uppercase>
+                <ButtonCustom variant='filled-grey' compact size='lg' uppercase>
                   Chat
-                </Button>
+                </ButtonCustom>
               </Link>
               {matchLogin ? (
                 <Link to='/'>
-                  <Button variant='filled-grey' compact size='lg' uppercase>
+                  <ButtonCustom variant='filled-grey' compact size='lg' uppercase>
                     Home
-                  </Button>
+                  </ButtonCustom>
                 </Link>
               ) : true ? (
                 <Link to='/login'>
-                  <Button variant='filled-grey' compact size='lg' uppercase>
+                  <ButtonCustom variant='filled-grey' compact size='lg' uppercase>
                     Login
-                  </Button>
+                  </ButtonCustom>
                 </Link>
               ) : (
-                <Button
+                <ButtonCustom
                   variant='filled-grey'
                   compact
                   size='lg'
@@ -54,7 +53,7 @@ function Header() {
                   // onClick={userAuth}
                 >
                   Logout
-                </Button>
+                </ButtonCustom>
               )}
             </>
           )}

@@ -10,7 +10,7 @@ import { dataUser } from '@/data/dataUser';
 
 import useStyles from './UserMenu.styles';
 
-function Header() {
+function UserMenu() {
   const { classes, cx } = useStyles();
   const [userMenuOpened, setUserMenuOpened] = useState<boolean>(false);
   const [userStatus, setUserStatus] = useState<TStatusUser>('Online');
@@ -85,4 +85,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default UserMenu;
