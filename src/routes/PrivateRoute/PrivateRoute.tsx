@@ -6,10 +6,9 @@ import useUser from '@/hooks/useUser';
 import { IRouteProps } from '@/interfaces';
 
 const PrivateRoute: FC<IRouteProps> = ({ children }) => {
-  // const { user } = useUser();
-  const user = true;
+  const { user } = useUser();
 
-  return user ? children : <Navigate to='/login' />;
+  return user ? children : <Navigate to='/' />;
 };
 
 export default PrivateRoute;

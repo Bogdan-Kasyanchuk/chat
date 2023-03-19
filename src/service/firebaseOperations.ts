@@ -1,8 +1,8 @@
-// import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
-// import initialData from 'helpers/initialData';
-// import tryCatch from 'helpers/tryCatch';
-// import db from 'service/firebaseDB';
-// import { TIdGame } from 'types';
+import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+
+// import db from '@/service/firebaseDB';
+
+// import tryCatch from '@/helpers/tryCatch';
 
 // export async function startGame(idGame: TIdGame) {
 //   await tryCatch(setDoc(doc(db, 'games', idGame), initialData()));

@@ -1,8 +1,9 @@
-import { IconChevronDown, IconHome2, IconLogout, IconSettings } from '@tabler/icons-react';
+import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
 import { MouseEvent, useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { Avatar, Group, Indicator, Menu, Text, UnstyledButton } from '@mantine/core';
+
+import useUser from '@/hooks/useUser';
 
 import { TStatusUser } from '@/types';
 
@@ -14,6 +15,7 @@ function UserMenu() {
   const { classes, cx } = useStyles();
   const [userMenuOpened, setUserMenuOpened] = useState<boolean>(false);
   const [userStatus, setUserStatus] = useState<TStatusUser>('Online');
+  const { auth, displayName, photoURL } = useUser();
 
   const STATUS: { [x: string]: string } = {
     Online: classes.userStatusOnline,
@@ -43,7 +45,7 @@ function UserMenu() {
           <Group spacing={10}>
             <IconChevronDown size={24} className={classes.userIcon} stroke={2} />
             <Text fz={18} fw={600}>
-              {dataUser.name}
+              {displayName ?? dataUser.name}
             </Text>
             <Indicator
               inline
@@ -53,16 +55,12 @@ function UserMenu() {
               withBorder
               classNames={{ indicator: STATUS[`${userStatus}`] }}
             >
-              <Avatar size={32} radius='xl' src={dataUser.image} alt={dataUser.name} />
+              <Avatar size={32} radius='xl' src={photoURL ?? dataUser.image} alt={dataUser.name} />
             </Indicator>
           </Group>
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
-        <Link to='/' className='no-underline'>
-          <Menu.Item icon={<IconHome2 size={16} stroke={1.5} />}>Home</Menu.Item>
-        </Link>
-        <Menu.Divider m={0} className={classes.menuDivider} />
         {Object.keys(STATUS).map((el) => (
           <Menu.Item
             key={el}
@@ -74,10 +72,7 @@ function UserMenu() {
         ))}
         <Menu.Divider m={0} className={classes.menuDivider} />
         <Menu.Item icon={<IconSettings size={16} stroke={1.5} />}>Account settings</Menu.Item>
-        <Menu.Item
-          icon={<IconLogout size={16} stroke={1.5} />}
-          // onClick={userAuth}
-        >
+        <Menu.Item icon={<IconLogout size={16} stroke={1.5} />} onClick={() => auth.signOut()}>
           Logout
         </Menu.Item>
       </Menu.Dropdown>

@@ -1,4 +1,4 @@
-import { IconAt } from '@tabler/icons-react';
+import { IconAt, IconUser } from '@tabler/icons-react';
 import { IconLock } from '@tabler/icons-react';
 import { FC } from 'react';
 
@@ -6,13 +6,14 @@ import { Box, PasswordInput, TextInput } from '@mantine/core';
 import { Flex } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-import { loginUserEmail } from '@/service/firebaseEmailAuth';
+import { registerUserEmail } from '@/service/firebaseEmailAuth';
 
 import { ButtonCustom } from '@/components';
 
-const Login: FC = () => {
+const Register: FC = () => {
   const form = useForm({
     initialValues: {
+      name: '',
       email: '',
       password: '',
     },
@@ -22,12 +23,21 @@ const Login: FC = () => {
     <Box
       component='form'
       onSubmit={form.onSubmit(({ email, password }) => {
-        loginUserEmail(email, password);
+        registerUserEmail(email, password);
         form.reset();
       })}
       h='100%'
     >
       <Flex gap={20} align='center' justify='center' direction='column' h='100%'>
+        <TextInput
+          size='lg'
+          withAsterisk
+          label='Name'
+          placeholder='Your name'
+          iconWidth={40}
+          icon={<IconUser size={18} stroke={1.5} />}
+          {...form.getInputProps('name')}
+        />
         <TextInput
           size='lg'
           withAsterisk
@@ -47,11 +57,11 @@ const Login: FC = () => {
           {...form.getInputProps('password')}
         />
         <ButtonCustom type='submit' variant='filled-grey' size='lg' uppercase>
-          Login
+          Register
         </ButtonCustom>
       </Flex>
     </Box>
   );
 };
 
-export default Login;
+export default Register;

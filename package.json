@@ -6,11 +6,14 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "netlify deploy -p"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@mantine/core": "^6.0.0",
+    "@mantine/form": "^6.0.2",
     "@mantine/hooks": "^6.0.0",
     "@tabler/icons-react": "^2.7.0",
     "firebase": "^9.17.2",

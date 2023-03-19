@@ -22,6 +22,14 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             xl: '90em',
           },
           activeStyles: { transform: 'translateY(0px)' },
+          focusRingStyles: {
+            inputStyles: () => ({
+              outline: 'none',
+              borderColor: 'black',
+              boxShadow: 'inset 0 0 0 1px black',
+            }),
+          },
+
           defaultRadius: 0,
           components: {
             Container: {
@@ -29,13 +37,28 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 maw: 1440,
               },
             },
+            Input: {
+              styles: () => ({
+                input: {
+                  transition: 'border-color 100ms ease, box-shadow 100ms ease',
+                },
+              }),
+            },
+
             Button: {
+              styles: (theme) => ({
+                root: {
+                  '&:not([data-disabled])': theme.fn.hover({
+                    backgroundColor: theme.black,
+                    color: theme.white,
+                  }),
+                },
+              }),
               variants: {
                 'filled-grey': (theme) => ({
                   root: {
                     backgroundColor: theme.colors.gray[4],
                     color: theme.black,
-                    ...theme.fn.hover({ backgroundColor: theme.black, color: theme.white }),
                   },
                 }),
               },

@@ -5,7 +5,7 @@ import { Variants } from '@mantine/styles';
 
 export interface BtnProps extends ButtonProps {
   variant?: Variants<ButtonProps['variant'] | 'filled-grey'>;
-  onClick?: any;
+  onClick?: () => void;
 }
 
 const ButtonCustom: FC<BtnProps> = (props) => {

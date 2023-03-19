@@ -1,11 +1,13 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
 
-import { auth } from '@/service/firebaseAuth';
+import auth from '@/service/firebaseAuth';
 
 import type { IUseUser } from '@/interfaces';
 
 const useUser = (): IUseUser => {
   const [user] = useAuthState(auth);
+
+  console.log(user);
 
   const displayName: IUseUser['displayName'] = user?.displayName as string;
   const photoURL: IUseUser['photoURL'] = user?.photoURL as string;

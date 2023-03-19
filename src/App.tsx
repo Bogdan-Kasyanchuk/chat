@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { Container, Flex } from '@mantine/core';
 
 import { Footer, Header } from '@/layouts';
-import { ChatPage, HomePage, LoginPage } from '@/pages';
+import { ChatPage, HomePage, LoginPage, RegisterPage } from '@/pages';
 import { PrivateRoute, PublicRoute } from '@/routes';
 
 function App() {
@@ -25,6 +25,14 @@ function App() {
             element={
               <PublicRoute>
                 <LoginPage />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path='/register'
+            element={
+              <PublicRoute>
+                <RegisterPage />
               </PublicRoute>
             }
           />
