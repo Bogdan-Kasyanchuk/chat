@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import { MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
 
 import './index.scss';
 import App from '@/App';
@@ -29,7 +30,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
               boxShadow: 'inset 0 0 0 1px black',
             }),
           },
-
           defaultRadius: 0,
           components: {
             Container: {
@@ -66,6 +66,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           },
         }}
       >
+        <Notifications position='top-center' autoClose={2000} zIndex={100} />
         <App />
       </MantineProvider>
     </BrowserRouter>

@@ -27,7 +27,7 @@ const Login: FC = () => {
       })}
       h='100%'
     >
-      <Flex gap={20} align='center' justify='center' direction='column' h='100%'>
+      <Flex gap={20} align='stretch' justify='center' direction='column' h='100%'>
         <TextInput
           size='lg'
           withAsterisk

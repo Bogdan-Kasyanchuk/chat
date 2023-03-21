@@ -2,6 +2,7 @@ import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
 import { MouseEvent, useState } from 'react';
 
 import { Avatar, Group, Indicator, Menu, Text, UnstyledButton } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 
 import useUser from '@/hooks/useUser';
 
@@ -72,7 +73,25 @@ function UserMenu() {
         ))}
         <Menu.Divider m={0} className={classes.menuDivider} />
         <Menu.Item icon={<IconSettings size={16} stroke={1.5} />}>Account settings</Menu.Item>
-        <Menu.Item icon={<IconLogout size={16} stroke={1.5} />} onClick={() => auth.signOut()}>
+        <Menu.Item
+          icon={<IconLogout size={16} stroke={1.5} />}
+          onClick={() => {
+            auth
+              .signOut()
+              .then(() => {
+                notifications.show({
+                  message: 'Exit is successful!',
+                  color: 'green',
+                });
+              })
+              .catch((error) => {
+                notifications.show({
+                  message: `${error}`,
+                  color: 'red',
+                });
+              });
+          }}
+        >
           Logout
         </Menu.Item>
       </Menu.Dropdown>
