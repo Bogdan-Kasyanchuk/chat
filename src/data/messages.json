@@ -1,0 +1,58 @@
+[
+  {
+    "idOwner": "id-1",
+    "id": "f27933ef-a192-413e-bc62-210cee678915",
+    "body": "Is simply dummy text of the printing and typesetting industry",
+    "date": "9/12/2017, 11:00:00 AM",
+    "read": false
+  },
+  {
+    "idOwner": "id-1",
+    "id": "3a269d7a-c969-4300-801b-7f2eff3328dd",
+    "body": "It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum",
+    "date": "10/10/2017, 10:30:00 AM",
+    "read": false
+  },
+  {
+    "idOwner": "id-2",
+    "id": "9c9b5fff-3f10-4de5-883c-d6d929e69778",
+    "body": "Lorem Ipsum is not simply random text",
+    "date": "4/22/2017, 4:00:00 AM",
+    "read": false
+  },
+  {
+    "idOwner": "id-2",
+    "id": "ab61fbd7-6b3a-4815-9093-84ba2b7a999e",
+    "body": "It has roots in a piece of classical Latin literature from",
+    "date": "10/22/2017, 4:05:00 AM",
+    "read": false
+  },
+  {
+    "idOwner": "id-3",
+    "id": "d36452a4-c6fb-4008-9ce1-2cd621675390",
+    "body": "Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source",
+    "date": "3/17/2017, 11:15:00 AM",
+    "read": false
+  },
+  {
+    "idOwner": "id-3",
+    "id": "91c3ff02-e236-4432-976d-db182aadbccd",
+    "body": "This book is a treatise on the theory of ethics, very popular during the Renaissance",
+    "date": "3/18/2017, 11:35:00 AM",
+    "read": false
+  },
+  {
+    "idOwner": "id-4",
+    "id": "d3uyu2a4-c6fb-4008-9ce1-2cd56776216753",
+    "body": "Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage.",
+    "date": "11/11/2017, 11:33:00 AM",
+    "read": false
+  },
+  {
+    "idOwner": "id-4",
+    "id": "91c3ff0trt2-e236-44kj-87jh-db182aadbccd",
+    "body": "This book is, very popular during the Renaissance",
+    "date": "10/05/2017, 11:10:00 AM",
+    "read": false
+  }
+]

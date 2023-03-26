@@ -10,7 +10,7 @@ function App() {
   return (
     <Flex direction='column' h='100%'>
       <Header />
-      <Container p={20} h='100%'>
+      <Container bg='gray.1' px={0} h='100%' w='100%' mx='auto'>
         <Routes>
           <Route
             path='/'

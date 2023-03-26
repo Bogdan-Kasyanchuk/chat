@@ -1,4 +1,4 @@
-export async function tryCatch<T>(func: T) {
+async function tryCatch<T>(func: T) {
   try {
     return func;
   } catch (error) {

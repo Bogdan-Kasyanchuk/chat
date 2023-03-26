@@ -3,18 +3,11 @@ import { createStyles, rem } from '@mantine/core';
 const useStyles = createStyles((theme) => ({
   user: {
     transition: 'background-color 150ms ease',
-
-    '&:hover': {
-      backgroundColor: theme.colors.gray[4],
-    },
-  },
-
-  userActive: {
-    backgroundColor: theme.colors.gray[4],
   },
 
   userIcon: {
     marginRight: rem(-5),
+    color: theme.white,
   },
 
   userStatus: {
@@ -40,7 +33,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   menu: {
-    borderColor: theme.colors.gray[3],
+    borderColor: theme.colors.gray[4],
     padding: 0,
   },
 
@@ -53,7 +46,7 @@ const useStyles = createStyles((theme) => ({
   },
 
   menuDivider: {
-    borderTopColor: theme.colors.gray[3],
+    borderTopColor: theme.colors.gray[4],
   },
 }));
 

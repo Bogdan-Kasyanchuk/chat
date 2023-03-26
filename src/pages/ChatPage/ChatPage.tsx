@@ -1,7 +1,9 @@
 import { FC } from 'react';
 
+import { Chat } from '@/components';
+
 const GamePage: FC = () => {
-  return <div>ChatPage</div>;
+  return <Chat />;
 };
 
 export default GamePage;

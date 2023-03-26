@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
-import { MantineProvider } from '@mantine/core';
+import { MantineProvider, rem } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 
 import './index.scss';
@@ -16,18 +16,18 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         withNormalizeCSS
         theme={{
           breakpoints: {
-            xs: '22.5em',
-            sm: '36em',
-            md: '48em',
-            lg: '64em',
-            xl: '90em',
+            xs: rem(360),
+            sm: rem(576),
+            md: rem(768),
+            lg: rem(1024),
+            xl: rem(1440),
           },
           activeStyles: { transform: 'translateY(0px)' },
           focusRingStyles: {
-            inputStyles: () => ({
+            inputStyles: (theme) => ({
               outline: 'none',
-              borderColor: 'black',
-              boxShadow: 'inset 0 0 0 1px black',
+              borderColor: theme.black,
+              boxShadow: `inset 0 0 0 1px ${theme.black}`,
             }),
           },
           defaultRadius: 0,
@@ -38,8 +38,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
               },
             },
             Input: {
-              styles: () => ({
+              styles: (theme) => ({
                 input: {
+                  border: `${rem(1)} solid ${theme.colors.gray[4]}`,
                   transition: 'border-color 100ms ease, box-shadow 100ms ease',
                 },
               }),
@@ -49,7 +50,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
               styles: (theme) => ({
                 root: {
                   '&:not([data-disabled])': theme.fn.hover({
-                    backgroundColor: theme.black,
+                    backgroundColor: theme.colors.dark[5],
                     color: theme.white,
                   }),
                 },
@@ -58,6 +59,12 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 'filled-grey': (theme) => ({
                   root: {
                     backgroundColor: theme.colors.gray[4],
+                    color: theme.black,
+                  },
+                }),
+                'filled-white': (theme) => ({
+                  root: {
+                    backgroundColor: theme.white,
                     color: theme.black,
                   },
                 }),

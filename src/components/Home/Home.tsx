@@ -10,12 +10,12 @@ import { ButtonCustom } from '@/components';
 
 const Home: FC = () => {
   return (
-    <Flex gap='xl' align='stretch' justify='center' direction='column' h='100%'>
+    <Flex gap='xl' justify='center' direction='column' h='100%' w='fit-content' mx='auto'>
       <ButtonCustom variant='filled' size='lg' uppercase color='orange' onClick={userGoogleAuth}>
-        Login with google
+        Continue with google
       </ButtonCustom>
       <ButtonCustom variant='outline' size='lg' uppercase color='dark' onClick={userGitHubAuth}>
-        Login with GitHub
+        Continue with GitHub
       </ButtonCustom>
       <Link to='/login'>
         <ButtonCustom variant='filled-grey' size='lg' uppercase w='100%'>
