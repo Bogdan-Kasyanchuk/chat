@@ -4,8 +4,10 @@ import { MouseEvent, useState } from 'react';
 import { Avatar, Group, Indicator, Menu, Text, UnstyledButton } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
+import useClassStatus from '@/hooks/useClassStatus';
 import useUser from '@/hooks/useUser';
 
+import firstTUC from '@/helpers/firstTUC';
 import showError from '@/helpers/showError';
 
 import { TStatusUser } from '@/types';
@@ -17,19 +19,12 @@ import useStyles from './UserMenu.styles';
 function UserMenu() {
   const { classes, cx } = useStyles();
   const [userMenuOpened, setUserMenuOpened] = useState<boolean>(false);
-  const [userStatus, setUserStatus] = useState<TStatusUser>('Online');
+  const { allStatus, userStatus, setUserStatus } = useClassStatus('online');
   const { auth, displayName, photoURL } = useUser();
   const min_576 = useMediaQuery('(min-width: 36em)');
 
-  const STATUS: { [x: string]: string } = {
-    Online: classes.userStatusOnline,
-    Offline: classes.userStatusOffline,
-    'Do not disturb': classes.userStatusDoNotDisturb,
-    'Out of place': classes.userStatusOutOfPlace,
-  };
-
   const setStatus = (e: MouseEvent<HTMLButtonElement>) => {
-    setUserStatus((e.target as HTMLButtonElement).textContent as TStatusUser);
+    setUserStatus((e.target as HTMLButtonElement).textContent?.toLowerCase() as TStatusUser);
   };
 
   return (
@@ -58,7 +53,7 @@ function UserMenu() {
               offset={4}
               position='bottom-end'
               withBorder
-              classNames={{ indicator: STATUS[`${userStatus}`] }}
+              classNames={{ indicator: userStatus }}
             >
               <Avatar size={32} radius='xl' src={photoURL ?? dataUser.image} alt={dataUser.name} />
             </Indicator>
@@ -72,14 +67,14 @@ function UserMenu() {
           </Text>
         )}
         <Menu.Divider m={0} className={classes.menuDivider} />
-        {Object.keys(STATUS).map((el) => (
+        {Object.keys(allStatus).map((el) => (
           <Menu.Item
             key={el}
-            icon={<div className={cx(classes.userStatus, STATUS[`${el}`])} />}
+            icon={<div className={cx(classes.userStatus, allStatus[`${el}`])} />}
             onClick={setStatus}
             fw={500}
           >
-            {el}
+            {firstTUC(el)}
           </Menu.Item>
         ))}
         <Menu.Divider m={0} className={classes.menuDivider} />

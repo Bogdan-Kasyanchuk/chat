@@ -16,22 +16,6 @@ const useStyles = createStyles((theme) => ({
     borderRadius: '50%',
   },
 
-  userStatusOnline: {
-    backgroundColor: theme.colors.green[7],
-  },
-
-  userStatusOffline: {
-    backgroundColor: theme.colors.red[7],
-  },
-
-  userStatusDoNotDisturb: {
-    backgroundColor: theme.colors.yellow[7],
-  },
-
-  userStatusOutOfPlace: {
-    backgroundColor: theme.colors.gray[7],
-  },
-
   menu: {
     borderColor: theme.colors.gray[4],
     padding: 0,

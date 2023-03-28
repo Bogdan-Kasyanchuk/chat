@@ -1,10 +1,11 @@
 import { IconSearch } from '@tabler/icons-react';
 import { FC } from 'react';
 
-import { Avatar, Box, Indicator, Text, TextInput } from '@mantine/core';
+import { Box, TextInput } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 
 import useFilter from '@/hooks/useFilter';
+import useStylesGlobal from '@/hooks/useStylesGlobal';
 
 import getLocaleDate from '@/helpers/getLocaleDate';
 import getTime from '@/helpers/getTime';
@@ -12,14 +13,16 @@ import getTime from '@/helpers/getTime';
 import contacts from '@/data/contacts.json';
 import messages from '@/data/messages.json';
 
-import useStyles from './ContactsBoard.styles';
+// import useStyles from './ContactsBoard.styles';
+import { ContactsList } from '@/components';
 
 const ContactsBoard: FC = () => {
   const [value, setValue] = useInputState('');
   const { filteredContacts } = useFilter(contacts, value);
-  const { classes } = useStyles();
+  const { classes: classesGlobal } = useStylesGlobal();
+  // const { classes } = useStyles();
 
-  const sortFilteredContacts = filteredContacts
+  const resultContacts = filteredContacts
     .map((elem: any) => {
       const arrayMessages = messages.filter((el) => el.idOwner === elem.id);
       const arrayDateMessages = arrayMessages.map((el) => getTime(el.date));
@@ -33,23 +36,21 @@ const ContactsBoard: FC = () => {
         avatar: elem.avatar,
         status: elem.status,
         notRead: arrayNotReadMessages.length,
-        message: maxDateMessages,
+        message: maxDateMessages?.body,
+        messageDate: getLocaleDate(maxDateMessages?.date as string, {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+        }),
       };
     })
-    .sort((a: any, b: any) => getTime(b.message.date) - getTime(a.message.date));
-
-  const lastMessagesDate = getLocaleDate(sortFilteredContacts.message?.date, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+    .sort((a: any, b: any) => getTime(b.messageDate) - getTime(a.messageDate));
 
   return (
-    <Box w='35%' miw={360} className={classes.contactsBoard}>
-      <Box bg='gray.2' p={20} className={classes.search}>
+    <Box w='35%' miw={360} className={classesGlobal.borderR}>
+      <Box bg='gray.2' p={20} className={classesGlobal.borderB}>
         <TextInput
           type='search'
-          aria-label='Search chat'
           size='lg'
           placeholder='Search chat'
           iconWidth={40}
@@ -58,26 +59,7 @@ const ContactsBoard: FC = () => {
           onChange={setValue}
         />
       </Box>
-      <ul>
-        {sortFilteredContacts.map((el: any) => (
-          <li key={el.id}>
-            <Indicator
-              inline
-              size={20}
-              offset={5}
-              position='bottom-end'
-              withBorder
-              classNames={{ indicator: 'bg-red-500' }}
-            >
-              <Avatar size={40} radius='xl' src={el.avatar} alt={el.name} />
-            </Indicator>
-            <Text>{el.name}</Text>
-            <Text>{el.message.body}</Text>
-            <Text>{lastMessagesDate}</Text>
-            <Text>{el.notRead}</Text>
-          </li>
-        ))}
-      </ul>
+      <ContactsList resultContacts={resultContacts} />
     </Box>
   );
 };

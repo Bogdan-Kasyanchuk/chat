@@ -15,6 +15,11 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         withGlobalStyles
         withNormalizeCSS
         theme={{
+          globalStyles: (theme) => ({
+            'html, body, #root': {
+              height: '100%',
+            },
+          }),
           breakpoints: {
             xs: rem(360),
             sm: rem(576),

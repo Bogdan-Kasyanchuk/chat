@@ -1,1 +1,1 @@
-export type TStatusUser = 'Online' | 'Offline' | 'Do not disturb' | 'Out of place';
+export type TStatusUser = 'online' | 'offline' | 'do not disturb' | 'out of place';

@@ -4,6 +4,8 @@ import { FC } from 'react';
 import { ActionIcon, Avatar, Box, Flex, Group, Indicator, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
+import useStylesGlobal from '@/hooks/useStylesGlobal';
+
 import getLocaleDate from '@/helpers/getLocaleDate';
 
 import messages from '@/data/messages.json';
@@ -12,6 +14,7 @@ import useStyles from './MessageBoard.styles';
 import { ButtonCustom } from '@/components';
 
 const MessageBoard: FC = () => {
+  const { classes: classesGlobal } = useStylesGlobal();
   const { classes } = useStyles();
   const form = useForm({
     initialValues: {
@@ -21,7 +24,7 @@ const MessageBoard: FC = () => {
 
   return (
     <Box w='65%'>
-      <Box bg='gray.2' p={20} h={91} className={classes.messageBoard}>
+      <Box bg='gray.2' p={20} h={91} className={classesGlobal.borderB}>
         <Group>
           <Indicator
             inline
