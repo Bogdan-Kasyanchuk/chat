@@ -31,6 +31,7 @@ const useStyles = createStyles((theme) => ({
 
   menuDivider: {
     borderTopColor: theme.colors.gray[4],
+    margin: 0,
   },
 }));
 

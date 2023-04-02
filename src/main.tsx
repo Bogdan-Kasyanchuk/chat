@@ -17,7 +17,15 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         theme={{
           globalStyles: (theme) => ({
             'html, body, #root': {
-              height: '100%',
+              height: '100vh',
+            },
+            ul: {
+              listStyleType: 'none',
+              margin: 0,
+              padding: 0,
+            },
+            p: {
+              margin: 0,
             },
           }),
           breakpoints: {
@@ -40,6 +48,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             Container: {
               defaultProps: {
                 maw: 1440,
+                w: '100%',
               },
             },
             Input: {
@@ -50,7 +59,23 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 },
               }),
             },
-
+            ScrollArea: {
+              defaultProps: {
+                type: 'auto',
+                py: 20,
+                px: 15,
+              },
+              styles: (theme) => ({
+                scrollbar: {
+                  '&[data-orientation="vertical"] .mantine-ScrollArea-thumb': {
+                    backgroundColor: theme.colors.gray[2],
+                  },
+                  '&[data-orientation="vertical"] .mantine-ScrollArea-thumb:hover': {
+                    backgroundColor: theme.colors.dark[5],
+                  },
+                },
+              }),
+            },
             Button: {
               styles: (theme) => ({
                 root: {

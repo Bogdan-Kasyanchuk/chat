@@ -1,12 +1,14 @@
 import ButtonCustom from './ButtonCustom';
 import Chat from './Chat';
+import ContactItem from './ContactItem';
 import ContactsBoard from './ContactsBoard';
-import ContactsItem from './ContactsItem';
 import ContactsList from './ContactsList';
 import Form from './Form';
 import Home from './Home';
 import Login from './Login';
-import MessageBoard from './MessageBoard';
+import MessageItem from './MessageItem';
+import MessagesBoard from './MessagesBoard';
+import MessagesList from './MessagesList';
 import Register from './Register';
 import StartViewChat from './StartViewChat';
 import UserMenu from './UserMenu';
@@ -15,12 +17,14 @@ export {
   ButtonCustom,
   Chat,
   ContactsBoard,
-  ContactsItem,
+  ContactItem,
   ContactsList,
   Form,
   Home,
   Login,
-  MessageBoard,
+  MessageItem,
+  MessagesBoard,
+  MessagesList,
   Register,
   StartViewChat,
   UserMenu,

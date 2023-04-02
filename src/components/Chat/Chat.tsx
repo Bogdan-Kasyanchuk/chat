@@ -1,20 +1,22 @@
 import { FC } from 'react';
 
-import { Flex } from '@mantine/core';
+import { Flex, rem } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 import useStylesGlobal from '@/hooks/useStylesGlobal';
 
 import useStyles from './Chat.styles';
-import { ContactsBoard, MessageBoard } from '@/components';
+import { ContactsBoard, MessagesBoard } from '@/components';
 
 const Home: FC = () => {
-  const { classes: classesGlobal } = useStylesGlobal();
-  const { classes } = useStyles();
+  const { classes: cG } = useStylesGlobal();
+  const { classes: c } = useStyles();
+  const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
 
   return (
-    <Flex justify='center' h='100%' className={classesGlobal.borderX}>
+    <Flex justify='center' h='100%' className={cG.borderX}>
       <ContactsBoard />
-      <MessageBoard />
+      {true && <MessagesBoard />}
     </Flex>
   );
 };
