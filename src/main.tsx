@@ -62,8 +62,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
             ScrollArea: {
               defaultProps: {
                 type: 'auto',
-                py: 20,
-                px: 15,
               },
               styles: (theme) => ({
                 scrollbar: {
