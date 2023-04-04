@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { Avatar, Box, Flex, Indicator, List, Text } from '@mantine/core';
+import { Avatar, Box, Flex, Indicator, Text } from '@mantine/core';
 
 import useClassStatus from '@/hooks/useClassStatus';
 
@@ -11,36 +11,36 @@ const ContactItem: FC<{ el: any }> = ({ el }) => {
   const { allStatus } = useClassStatus('online');
 
   return (
-    <List.Item className={c.item}>
-      <Flex justify='space-between' align='center'>
+    <li className={c.item}>
+      <Flex justify='space-between'>
         <Indicator
           inline
           size={20}
-          offset={6}
+          offset={7}
           position='bottom-end'
           withBorder
           classNames={{ indicator: allStatus[`${el.status}`] }}
         >
           <Avatar size={50} radius='xl' src={el.avatar} alt={el.name} />
         </Indicator>
-        <Flex direction='column' className={c.contentBox}>
-          <Text component='p' className={c.name}>
+        <Flex direction='column' mx={12}>
+          <Text component='p' fz={20} lh={1.3}>
             {el.name}
           </Text>
-          <Text lineClamp={1} component='p' className={c.message}>
+          <Text lineClamp={1} component='p' color='gray.6'>
             {el.message}
           </Text>
         </Flex>
         <Box className={c.paramsBox}>
-          <Text component='time' className={c.date}>
+          <Text component='time' display='block' color='gray.6'>
             {el.messageDate}
           </Text>
-          <Text component='p' className={c.quantity}>
+          <Text component='span' className={c.quantity}>
             {el.notRead}
           </Text>
         </Box>
       </Flex>
-    </List.Item>
+    </li>
   );
 };
 

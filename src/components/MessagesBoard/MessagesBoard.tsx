@@ -36,7 +36,7 @@ const MessagesBoard: FC = () => {
         <Indicator
           inline
           size={20}
-          offset={5}
+          offset={7}
           position='bottom-end'
           withBorder
           classNames={{ indicator: 'bg-red-500' }}
@@ -48,7 +48,7 @@ const MessagesBoard: FC = () => {
             alt='dsf'
           />
         </Indicator>
-        <Text component='p' fz={18} fw={600}>
+        <Text component='p' fz={24} fw={600}>
           Petro Petrov
         </Text>
       </Group>
