@@ -23,21 +23,25 @@ const ContactItem: FC<{ el: any }> = ({ el }) => {
         >
           <Avatar size={50} radius='xl' src={el.avatar} alt={el.name} />
         </Indicator>
-        <Flex direction='column' mx={12}>
+        <Flex direction='column' justify='center' mx={12}>
           <Text component='p' fz={20} lh={1.3}>
             {el.name}
           </Text>
-          <Text lineClamp={1} component='p' color='gray.6'>
-            {el.message}
-          </Text>
+          {true && (
+            <Text lineClamp={1} component='p' color='gray.6'>
+              {el.message}
+            </Text>
+          )}
         </Flex>
         <Box className={c.paramsBox}>
           <Text component='time' display='block' color='gray.6'>
             {el.messageDate}
           </Text>
-          <Text component='span' className={c.quantity}>
-            {el.notRead}
-          </Text>
+          {true && (
+            <Text component='span' className={c.quantity}>
+              {el.notRead}
+            </Text>
+          )}
         </Box>
       </Flex>
     </li>

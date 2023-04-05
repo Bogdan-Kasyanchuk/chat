@@ -5,12 +5,10 @@ import { useMediaQuery } from '@mantine/hooks';
 
 import useStylesGlobal from '@/hooks/useStylesGlobal';
 
-import useStyles from './Chat.styles';
 import { ContactsBoard, MessagesBoard } from '@/components';
 
 const Home: FC = () => {
   const { classes: cG } = useStylesGlobal();
-  const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
 
   return (

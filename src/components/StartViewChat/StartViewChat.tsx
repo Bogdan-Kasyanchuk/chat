@@ -4,11 +4,8 @@ import { Center, Text } from '@mantine/core';
 
 import useStylesGlobal from '@/hooks/useStylesGlobal';
 
-// import useStyles from './StartViewChat.styles';
-
 const StartViewChat: FC = () => {
   const { classes: cG } = useStylesGlobal();
-  // const { classes } = useStyles();
 
   return (
     <Center h='100%'>
