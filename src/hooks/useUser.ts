@@ -5,12 +5,14 @@ import auth from '@/service/firebaseAuth';
 import type { IUseUser } from '@/interfaces';
 
 const useUser = (): IUseUser => {
-  const [user] = useAuthState(auth);
+  const [user, loading] = useAuthState(auth);
 
-  const displayName: IUseUser['displayName'] = user?.displayName as string;
-  const photoURL: IUseUser['photoURL'] = user?.photoURL as string;
+  const name: IUseUser['name'] = user?.displayName;
+  const avatar: IUseUser['avatar'] = user?.photoURL;
+  const id: IUseUser['id'] = user?.uid;
+  const status: IUseUser['status'] = 'online';
 
-  return { auth, user, displayName, photoURL };
+  return { auth, user, loading, name, avatar, id, status };
 };
 
 export default useUser;

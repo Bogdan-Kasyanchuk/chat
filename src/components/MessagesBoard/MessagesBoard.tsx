@@ -15,15 +15,17 @@ import {
 import { useForm } from '@mantine/form';
 
 import useStylesGlobal from '@/hooks/useStylesGlobal';
+import useUser from '@/hooks/useUser';
 
 import messages from '@/data/messages.json';
 
 import useStyles from './MessagesBoard.styles';
 import { MessagesList } from '@/components';
 
-const MessagesBoard: FC = () => {
+const MessagesBoard: FC<{ idActiveContact: any }> = ({ idActiveContact }) => {
   const { classes: cG } = useStylesGlobal();
   const { classes: c } = useStyles();
+  const { id } = useUser();
   const form = useForm({
     initialValues: {
       message: '',
@@ -53,7 +55,9 @@ const MessagesBoard: FC = () => {
         </Text>
       </Group>
       <ScrollArea h='calc(100% - 81px - 81px)'>
-        <MessagesList messages={messages} />
+        <MessagesList
+          messages={messages.filter((el) => el.idFilter === id + '-' + idActiveContact)}
+        />
       </ScrollArea>
       <Box
         component='form'

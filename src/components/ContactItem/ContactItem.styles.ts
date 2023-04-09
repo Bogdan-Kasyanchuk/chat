@@ -10,7 +10,7 @@ const useStyles = createStyles((theme) => ({
     },
 
     '&:hover': {
-      backgroundColor: theme.colors.gray[2],
+      backgroundColor: theme.colors.gray[1],
       cursor: 'pointer',
     },
 

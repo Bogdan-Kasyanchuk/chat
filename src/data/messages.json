@@ -2,20 +2,31 @@
   {
     "idOwner": "id-1",
     "id": "user-fgdfhgfh",
-    "body": "Is simply dummy text of the printing and typesetting industry Is simply dummy text of the printing and typesetting industry",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-1",
+    "body": "33333DIs simply dummy text of the printing and typesetting industry Is simply dummy text of the printing and typesetting industry",
     "date": "9/15/2017, 11:00:00 AM",
     "read": false
   },
   {
     "idOwner": "id-1",
     "id": "3a269d7a",
-    "body": "It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
-    "date": "11/16/2017, 10:30:00 AM",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-1",
+    "body": "1111It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
+    "date": "8/20/2017, 10:30:00 AM",
+    "read": false
+  },
+  {
+    "idOwner": "id-1",
+    "id": "0123",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-1",
+    "body": "2222It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
+    "date": "10/12/2017, 10:30:00 AM",
     "read": false
   },
   {
     "idOwner": "id-2",
     "id": "user-3a26a",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-2",
     "body": "It was popularised in the 1960s with the release of Letraset",
     "date": "12/13/2018, 10:30:00 AM",
     "read": false
@@ -23,6 +34,7 @@
   {
     "idOwner": "id-2",
     "id": "c969",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-2",
     "body": "It was popularised in the 1960s with the release of Letraset",
     "date": "2/14/2017, 10:25:00 AM",
     "read": false
@@ -30,6 +42,7 @@
   {
     "idOwner": "id-3",
     "id": "user-3f10-4de5",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-3",
     "body": "Lorem Ipsum is not simply random text",
     "date": "4/22/2017, 4:00:00 AM",
     "read": false
@@ -37,6 +50,7 @@
   {
     "idOwner": "id-3",
     "id": "user-84ba2b7a999e",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-3",
     "body": "It has roots in a piece of classical Latin literature from",
     "date": "10/23/2017, 4:05:00 AM",
     "read": false
@@ -44,6 +58,7 @@
   {
     "idOwner": "id-4",
     "id": "user-6b3a-3",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-4",
     "body": "It has roots in a piece of classical Latin literature from",
     "date": "1/23/2017, 3:05:00 AM",
     "read": false
@@ -51,6 +66,7 @@
   {
     "idOwner": "id-4",
     "id": "7-6b3a-4",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-4",
     "body": "It has roots in a piece of classical",
     "date": "8/27/2017, 4:12:00 AM",
     "read": false
@@ -58,6 +74,7 @@
   {
     "idOwner": "id-5",
     "id": "user-b-4-9c",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-5",
     "body": "Richard professor at Hampden-Sydney College in Virginia",
     "date": "3/17/2017, 10:10:10 AM",
     "read": false
@@ -65,6 +82,7 @@
   {
     "idOwner": "id-5",
     "id": "9ccd",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-5",
     "body": "This very popular during the Renaissance",
     "date": "3/18/2018, 11:35:00 AM",
     "read": false
@@ -72,6 +90,7 @@
   {
     "idOwner": "id-6",
     "id": "user-d3uyu3",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-6",
     "body": "Richard McClintock, a College in Virginia",
     "date": "4/19/2017, 11:35:00 AM",
     "read": false
@@ -79,6 +98,7 @@
   {
     "idOwner": "id-6",
     "id": "91c3ff0t-e23d",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-6",
     "body": "This book is, very popular during the Renaissance",
     "date": "10/25/2017, 11:10:00 AM",
     "read": false
@@ -86,6 +106,7 @@
   {
     "idOwner": "id-7",
     "id": "d3u753",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-7",
     "body": "Richard at Hampden-Sydney College in Virginia",
     "date": "11/14/2017, 10:33:00 AM",
     "read": false
@@ -93,6 +114,7 @@
   {
     "idOwner": "id-7",
     "id": "user-91e236-44d",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-7",
     "body": "This book is, very popular during the Renaissance",
     "date": "10/20/2017, 11:10:00 AM",
     "read": false
@@ -100,6 +122,7 @@
   {
     "idOwner": "id-8",
     "id": "d3uyu2a4-c6fb-4008-9ce1-2cd56776216753",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-8",
     "body": "Richard McClintock, a Latin professor at",
     "date": "12/15/2017, 7:33:00 AM",
     "read": false
@@ -107,6 +130,7 @@
   {
     "idOwner": "id-8",
     "id": "user-91c3f5656d",
+    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-8",
     "body": "This book is, very popular during the Renaissance",
     "date": "3/23/2017, 4:10:00 AM",
     "read": false

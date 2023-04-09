@@ -15,7 +15,7 @@ const useClassStatus = (defaultValue: TStatusUser) => {
     'out of place': classes.statusOutPlace,
   };
 
-  const setUserStatus = (value: TStatusUser): void => {
+  const setUserStatus = (value: TStatusUser) => {
     setStatus(value);
   };
 

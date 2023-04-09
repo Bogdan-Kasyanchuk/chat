@@ -5,10 +5,11 @@ import { Box, ScrollArea, TextInput } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 
 import useFilter from '@/hooks/useFilter';
+import useResultContacts from '@/hooks/useResultContacts';
 import useStylesGlobal from '@/hooks/useStylesGlobal';
+import useUser from '@/hooks/useUser';
 
-import getLocaleDate from '@/helpers/getLocaleDate';
-import getTime from '@/helpers/getTime';
+import type { IUser } from '@/interfaces';
 
 import contacts from '@/data/contacts.json';
 import messages from '@/data/messages.json';
@@ -16,35 +17,13 @@ import messages from '@/data/messages.json';
 import useStyles from './ContactsBoard.styles';
 import { ContactsList } from '@/components';
 
-const ContactsBoard: FC = () => {
+const ContactsBoard: FC<{ setIdActiveContact: any }> = ({ setIdActiveContact }) => {
+  const { id } = useUser();
   const [value, setValue] = useInputState('');
-  const { filteredContacts } = useFilter(contacts, value);
+  const { filteredContacts } = useFilter(contacts.filter((el) => el.id !== id) as IUser[], value);
+  const { resultContacts } = useResultContacts(filteredContacts, messages);
   const { classes: cG } = useStylesGlobal();
   const { classes: c, cx } = useStyles();
-
-  const resultContacts = filteredContacts
-    .map((elem: any) => {
-      const arrayMessages = messages.filter((el) => el.idOwner === elem.id);
-      const arrayDateMessages = arrayMessages.map((el) => getTime(el.date));
-      const arrayNotReadMessages = arrayMessages.filter((el) => el.read === false);
-      const maxDateMessages = arrayMessages.find(
-        (el) => getTime(el.date) === Math.max(...arrayDateMessages),
-      );
-      return {
-        id: elem.id,
-        name: elem.name,
-        avatar: elem.avatar,
-        status: elem.status,
-        notRead: arrayNotReadMessages.length,
-        message: maxDateMessages?.body,
-        messageDate: getLocaleDate(maxDateMessages?.date as string, {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        }),
-      };
-    })
-    .sort((a: any, b: any) => getTime(b.messageDate) - getTime(a.messageDate));
 
   return (
     <Box className={cx(c.boardBox, cG.borderR)}>
@@ -60,7 +39,7 @@ const ContactsBoard: FC = () => {
         />
       </Box>
       <ScrollArea h='calc(100% - 81px)'>
-        <ContactsList resultContacts={resultContacts} />
+        <ContactsList resultContacts={resultContacts} setIdActiveContact={setIdActiveContact} />
       </ScrollArea>
     </Box>
   );

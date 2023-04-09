@@ -1,8 +1,9 @@
 import { Auth, User } from 'firebase/auth';
 
-export interface IUseUser {
+import type { IUser } from '@/interfaces';
+
+export interface IUseUser extends IUser {
   auth: Auth;
   user: User | null | undefined;
-  displayName: string;
-  photoURL: string;
+  loading: boolean;
 }

@@ -6,12 +6,12 @@ import useClassStatus from '@/hooks/useClassStatus';
 
 import useStyles from './ContactItem.styles';
 
-const ContactItem: FC<{ el: any }> = ({ el }) => {
+const ContactItem: FC<{ el: any; setIdActiveContact: any }> = ({ el, setIdActiveContact }) => {
   const { classes: c } = useStyles();
   const { allStatus } = useClassStatus('online');
 
   return (
-    <li className={c.item}>
+    <li className={c.item} onClick={() => setIdActiveContact(el.id)}>
       <Flex justify='space-between'>
         <Indicator
           inline

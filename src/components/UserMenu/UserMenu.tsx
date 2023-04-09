@@ -1,5 +1,5 @@
 import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
-import { MouseEvent, useState } from 'react';
+import { MouseEvent } from 'react';
 
 import { Avatar, Group, Indicator, Menu, Text, UnstyledButton, rem } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
@@ -12,15 +12,14 @@ import showError from '@/helpers/showError';
 
 import { TStatusUser } from '@/types';
 
-import { dataUser } from '@/data/dataUser';
+import dataUser from '@/data/dataUser.json';
 
 import useStyles from './UserMenu.styles';
 
 function UserMenu() {
   const { classes: c, cx } = useStyles();
-  const [userMenuOpened, setUserMenuOpened] = useState<boolean>(false);
-  const { allStatus, userStatus, setUserStatus } = useClassStatus('online');
-  const { auth, displayName, photoURL } = useUser();
+  const { auth, name, avatar, status } = useUser();
+  const { allStatus, userStatus, setUserStatus } = useClassStatus(status);
   const min_576 = useMediaQuery(`(min-width: ${rem(576)})`);
 
   const setStatus = (e: MouseEvent<HTMLButtonElement>) => {
@@ -32,7 +31,6 @@ function UserMenu() {
       width={200}
       position='bottom-end'
       transitionProps={{ transition: 'scale-y' }}
-      onChange={() => setUserMenuOpened(!userMenuOpened)}
       withinPortal
       classNames={{ dropdown: c.menu, item: c.menuItem }}
     >
@@ -43,7 +41,7 @@ function UserMenu() {
               <>
                 <IconChevronDown size={24} className={c.userIcon} stroke={2} />
                 <Text component='p' fz={18} fw={600} color='white'>
-                  {displayName ?? dataUser.name}
+                  {name ?? dataUser.name}
                 </Text>
               </>
             )}
@@ -55,15 +53,20 @@ function UserMenu() {
               withBorder
               classNames={{ indicator: userStatus }}
             >
-              <Avatar size={32} radius='xl' src={photoURL ?? dataUser.image} alt={dataUser.name} />
+              <Avatar
+                size={32}
+                radius='xl'
+                src={avatar ?? dataUser.image}
+                alt={name ?? dataUser.name}
+              />
             </Indicator>
           </Group>
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
         {!min_576 && (
-          <Text component='p' fz={18} fw={600} px={12} py={10} bg='gray.1'>
-            {displayName ?? dataUser.name}
+          <Text component='p' fz={18} fw={600} px={12} py={10} bg='gray.2'>
+            {name ?? dataUser.name}
           </Text>
         )}
         <Menu.Divider className={c.menuDivider} />

@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { Avatar, Box, Flex, Text } from '@mantine/core';
+import { Avatar, Flex, Text } from '@mantine/core';
 
 import getLocaleDate from '@/helpers/getLocaleDate';
 

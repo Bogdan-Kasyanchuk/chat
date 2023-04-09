@@ -59,6 +59,15 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 },
               }),
             },
+            ActionIcon: {
+              styles: () => ({
+                root: {
+                  '&:hover': {
+                    backgroundColor: 'transparent',
+                  },
+                },
+              }),
+            },
             ScrollArea: {
               defaultProps: {
                 type: 'auto',
