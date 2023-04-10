@@ -14,9 +14,11 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
+import useClassStatus from '@/hooks/useClassStatus';
 import useStylesGlobal from '@/hooks/useStylesGlobal';
 import useUser from '@/hooks/useUser';
 
+import contacts from '@/data/contacts.json';
 import messages from '@/data/messages.json';
 
 import useStyles from './MessagesBoard.styles';
@@ -25,12 +27,15 @@ import { MessagesList } from '@/components';
 const MessagesBoard: FC<{ idActiveContact: any }> = ({ idActiveContact }) => {
   const { classes: cG } = useStylesGlobal();
   const { classes: c } = useStyles();
+  const { allStatus } = useClassStatus('online');
   const { id } = useUser();
   const form = useForm({
     initialValues: {
       message: '',
     },
   });
+
+  const contact = contacts.find((el) => el.id === idActiveContact);
 
   return (
     <Box className={c.boardBox}>
@@ -41,22 +46,22 @@ const MessagesBoard: FC<{ idActiveContact: any }> = ({ idActiveContact }) => {
           offset={7}
           position='bottom-end'
           withBorder
-          classNames={{ indicator: 'bg-red-500' }}
+          classNames={{ indicator: allStatus[`${contact?.status}`] }}
         >
-          <Avatar
-            size={50}
-            radius='xl'
-            src='https://lh3.googleusercontent.com/a/AGNmyxYVYM2tRUxhS3shuKbRV58EFy3N14MFixvTe2I=s96-c'
-            alt='dsf'
-          />
+          <Avatar size={50} radius='xl' src={contact?.avatar} alt={contact?.name} />
         </Indicator>
         <Text component='p' fz={24} fw={600}>
-          Petro Petrov
+          {contact?.name}
         </Text>
       </Group>
       <ScrollArea h='calc(100% - 81px - 81px)'>
         <MessagesList
-          messages={messages.filter((el) => el.idFilter === id + '-' + idActiveContact)}
+          messages={messages.filter(
+            (el) =>
+              el.idFilter === id + '-' + idActiveContact ||
+              el.idFilter === idActiveContact + '-' + id,
+          )}
+          contact={contact}
         />
       </ScrollArea>
       <Box

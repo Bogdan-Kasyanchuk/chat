@@ -1,6 +1,6 @@
 [
   {
-    "idOwner": "id-1",
+    "idOwner": "UlGmYeMkAVbkfuBXiG283Hk1OFn2",
     "id": "user-fgdfhgfh",
     "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-1",
     "body": "33333DIs simply dummy text of the printing and typesetting industry Is simply dummy text of the printing and typesetting industry",
@@ -26,7 +26,7 @@
   {
     "idOwner": "id-2",
     "id": "user-3a26a",
-    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-2",
+    "idFilter": "id-2-UlGmYeMkAVbkfuBXiG283Hk1OFn2",
     "body": "It was popularised in the 1960s with the release of Letraset",
     "date": "12/13/2018, 10:30:00 AM",
     "read": false
@@ -34,10 +34,10 @@
   {
     "idOwner": "id-2",
     "id": "c969",
-    "idFilter": "UlGmYeMkAVbkfuBXiG283Hk1OFn2-id-2",
+    "idFilter": "id-2-UlGmYeMkAVbkfuBXiG283Hk1OFn2",
     "body": "It was popularised in the 1960s with the release of Letraset",
     "date": "2/14/2017, 10:25:00 AM",
-    "read": false
+    "read": true
   },
   {
     "idOwner": "id-3",

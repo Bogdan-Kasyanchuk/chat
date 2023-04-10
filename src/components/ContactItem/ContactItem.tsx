@@ -4,9 +4,11 @@ import { Avatar, Box, Flex, Indicator, Text } from '@mantine/core';
 
 import useClassStatus from '@/hooks/useClassStatus';
 
+import type { IContactItem } from '@/interfaces';
+
 import useStyles from './ContactItem.styles';
 
-const ContactItem: FC<{ el: any; setIdActiveContact: any }> = ({ el, setIdActiveContact }) => {
+const ContactItem: FC<IContactItem> = ({ el, setIdActiveContact }) => {
   const { classes: c } = useStyles();
   const { allStatus } = useClassStatus('online');
 
@@ -37,7 +39,7 @@ const ContactItem: FC<{ el: any; setIdActiveContact: any }> = ({ el, setIdActive
           <Text component='time' display='block' color='gray.6'>
             {el.messageDate}
           </Text>
-          {true && (
+          {!!el.notRead && (
             <Text component='span' className={c.quantity}>
               {el.notRead}
             </Text>

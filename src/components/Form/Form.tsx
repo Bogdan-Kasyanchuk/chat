@@ -6,7 +6,7 @@ import { Box, PasswordInput, TextInput } from '@mantine/core';
 import { Flex } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-import { IFormProps } from '@/interfaces';
+import type { IFormProps } from '@/interfaces';
 
 import { ButtonCustom } from '@/components';
 

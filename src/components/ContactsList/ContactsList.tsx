@@ -1,14 +1,13 @@
 import { FC } from 'react';
 
+import type { IContactsList } from '@/interfaces';
+
 import { ContactItem } from '@/components';
 
-const ContactsList: FC<{ resultContacts: any; setIdActiveContact: any }> = ({
-  resultContacts,
-  setIdActiveContact,
-}) => {
+const ContactsList: FC<IContactsList> = ({ resultContacts, setIdActiveContact }) => {
   return (
     <ul>
-      {resultContacts.map((el: any) => (
+      {resultContacts.map((el) => (
         <ContactItem key={el.id} el={el} setIdActiveContact={setIdActiveContact} />
       ))}
     </ul>

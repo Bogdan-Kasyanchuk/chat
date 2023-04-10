@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 
 import useUser from '@/hooks/useUser';
 
-import { IRouteProps } from '@/interfaces';
+import type { IRouteProps } from '@/interfaces';
 
 const PrivateRoute: FC<IRouteProps> = ({ children }) => {
   const { user } = useUser();

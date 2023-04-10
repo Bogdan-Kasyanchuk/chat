@@ -10,18 +10,18 @@ const useResultContacts = (contacts: IUser[], messages: IMessages[]) => {
 
   const resultContacts: IUseResultContacts[] = contacts
     .map(({ id, name, avatar, status }) => {
-      const lastMessage: IMessages = messages
-        .filter((el) => el.idFilter === idUser + '-' + id)
-        .sort((a, b) => getTime(b.date) - getTime(a.date))[0];
+      const messagesUser: IMessages[] = messages
+        .filter((el) => el.idFilter === idUser + '-' + id || el.idFilter === id + '-' + idUser)
+        .sort((a, b) => getTime(b.date) - getTime(a.date));
 
       return {
         id,
         name,
         avatar,
         status,
-        notRead: messages.filter((el) => el.read === false).length,
-        message: lastMessage.body,
-        messageDate: getLocaleDate(lastMessage.date, {
+        notRead: messagesUser.filter((el) => el.read === false).length,
+        message: messagesUser[0].body,
+        messageDate: getLocaleDate(messagesUser[0].date, {
           year: 'numeric',
           month: 'short',
           day: 'numeric',

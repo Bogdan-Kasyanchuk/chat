@@ -1,14 +1,10 @@
 import { FC } from 'react';
 
-import { Button, ButtonProps } from '@mantine/core';
-import { Variants } from '@mantine/styles';
+import { Button } from '@mantine/core';
 
-export interface BtnProps extends ButtonProps {
-  variant?: Variants<ButtonProps['variant'] | 'filled-grey'>;
-  onClick?: () => void;
-}
+import type { IButtonCustom } from '@/interfaces';
 
-const ButtonCustom: FC<BtnProps> = (props) => {
+const ButtonCustom: FC<IButtonCustom> = (props) => {
   return <Button {...props}>{props.children}</Button>;
 };
 

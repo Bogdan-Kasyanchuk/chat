@@ -9,7 +9,7 @@ import useResultContacts from '@/hooks/useResultContacts';
 import useStylesGlobal from '@/hooks/useStylesGlobal';
 import useUser from '@/hooks/useUser';
 
-import type { IUser } from '@/interfaces';
+import type { IContactsBoard, IUser } from '@/interfaces';
 
 import contacts from '@/data/contacts.json';
 import messages from '@/data/messages.json';
@@ -17,7 +17,7 @@ import messages from '@/data/messages.json';
 import useStyles from './ContactsBoard.styles';
 import { ContactsList } from '@/components';
 
-const ContactsBoard: FC<{ setIdActiveContact: any }> = ({ setIdActiveContact }) => {
+const ContactsBoard: FC<IContactsBoard> = ({ setIdActiveContact }) => {
   const { id } = useUser();
   const [value, setValue] = useInputState('');
   const { filteredContacts } = useFilter(contacts.filter((el) => el.id !== id) as IUser[], value);
