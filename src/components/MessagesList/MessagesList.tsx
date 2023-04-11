@@ -1,8 +1,10 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { MessageItem } from '@/components';
 
-const MessagesList: FC<{ messages: any; contact: any }> = ({ messages, contact }) => {
+import { IMessagesListProps } from '@/interfaces';
+
+const MessagesList: FC<IMessagesListProps> = ({ messages, contact }) => {
   return (
     <ul>
       {messages.map((el: any) => (

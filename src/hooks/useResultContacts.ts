@@ -1,7 +1,6 @@
-import useUser from '@/hooks/useUser';
+import { useUser } from '@/hooks';
 
-import getLocaleDate from '@/helpers/getLocaleDate';
-import getTime from '@/helpers/getTime';
+import { getLocaleDate, getTime } from '@/helpers';
 
 import type { IMessages, IUseResultContacts, IUser } from '@/interfaces';
 
@@ -20,8 +19,8 @@ const useResultContacts = (contacts: IUser[], messages: IMessages[]) => {
         avatar,
         status,
         notRead: messagesUser.filter((el) => el.read === false).length,
-        message: messagesUser[0].body,
-        messageDate: getLocaleDate(messagesUser[0].date, {
+        message: messagesUser[0]?.body,
+        messageDate: getLocaleDate(messagesUser[0]?.date, {
           year: 'numeric',
           month: 'short',
           day: 'numeric',

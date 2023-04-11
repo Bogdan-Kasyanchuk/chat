@@ -1,12 +1,15 @@
-import { IconMessages } from '@tabler/icons-react';
+import type { FC } from 'react';
 import { Link, useMatch } from 'react-router-dom';
 
 import { Container, Group, Text, rem } from '@mantine/core';
 
-import useStyles from './Header.styles';
+import { IconMessages } from '@tabler/icons-react';
+
 import { ButtonCustom, UserMenu } from '@/components';
 
-function Header() {
+import useStyles from './Header.styles';
+
+const Header: FC = () => {
   const { classes: c } = useStyles();
   const matchLogin = useMatch('/login');
   const matchRegister = useMatch('/register');
@@ -37,6 +40,6 @@ function Header() {
       </Group>
     </Container>
   );
-}
+};
 
 export default Header;

@@ -1,14 +1,14 @@
-import { IconAt } from '@tabler/icons-react';
-import { IconLock } from '@tabler/icons-react';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { Box, PasswordInput, TextInput } from '@mantine/core';
 import { Flex } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-import type { IFormProps } from '@/interfaces';
+import { IconAt, IconLock } from '@tabler/icons-react';
 
 import { ButtonCustom } from '@/components';
+
+import type { IFormProps } from '@/interfaces';
 
 const Form: FC<IFormProps> = ({ submitForm, childrenButton }) => {
   const form = useForm({

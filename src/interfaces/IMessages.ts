@@ -1,4 +1,4 @@
-export interface IMessages {
+export default interface IMessages {
   idOwner: string;
   id: string;
   idFilter: string;

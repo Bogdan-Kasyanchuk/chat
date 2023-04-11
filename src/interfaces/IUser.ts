@@ -1,6 +1,6 @@
-import { TStatusUser } from '@/types';
+import type { TStatusUser } from '@/types';
 
-export interface IUser {
+export default interface IUser {
   id: string;
   name: string;
   avatar: string;

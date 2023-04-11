@@ -1,9 +1,10 @@
-import { FC, useState } from 'react';
+import { useState } from 'react';
+import type { FC } from 'react';
 
 import { Flex, rem } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
-import useStylesGlobal from '@/hooks/useStylesGlobal';
+import { useStylesGlobal } from '@/hooks';
 
 import { ContactsBoard, MessagesBoard, StartViewChat } from '@/components';
 

@@ -1,14 +1,17 @@
+import type { FC } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { Container, Flex, LoadingOverlay } from '@mantine/core';
 
-import useUser from '@/hooks/useUser';
+import { useUser } from '@/hooks';
 
 import { Footer, Header } from '@/layouts';
+
 import { ChatPage, HomePage, LoginPage, RegisterPage } from '@/pages';
+
 import { PrivateRoute, PublicRoute } from '@/routes';
 
-function App() {
+const App: FC = () => {
   const { loading } = useUser();
   return (
     <>
@@ -65,6 +68,6 @@ function App() {
       </Flex>
     </>
   );
-}
+};
 
 export default App;

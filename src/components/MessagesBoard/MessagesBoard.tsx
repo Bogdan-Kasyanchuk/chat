@@ -1,5 +1,4 @@
-import { IconBrandTelegram } from '@tabler/icons-react';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import {
   ActionIcon,
@@ -14,17 +13,20 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-import useClassStatus from '@/hooks/useClassStatus';
-import useStylesGlobal from '@/hooks/useStylesGlobal';
-import useUser from '@/hooks/useUser';
+import { IconBrandTelegram } from '@tabler/icons-react';
+
+import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
+
+import { MessagesList } from '@/components';
+
+import { IMessagesBoardProps, IUser } from '@/interfaces';
 
 import contacts from '@/data/contacts.json';
 import messages from '@/data/messages.json';
 
 import useStyles from './MessagesBoard.styles';
-import { MessagesList } from '@/components';
 
-const MessagesBoard: FC<{ idActiveContact: any }> = ({ idActiveContact }) => {
+const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact }) => {
   const { classes: cG } = useStylesGlobal();
   const { classes: c } = useStyles();
   const { allStatus } = useClassStatus('online');
@@ -61,7 +63,7 @@ const MessagesBoard: FC<{ idActiveContact: any }> = ({ idActiveContact }) => {
               el.idFilter === id + '-' + idActiveContact ||
               el.idFilter === idActiveContact + '-' + id,
           )}
-          contact={contact}
+          contact={contact as IUser}
         />
       </ScrollArea>
       <Box

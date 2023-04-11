@@ -1,12 +1,14 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { Avatar, Flex, Text } from '@mantine/core';
 
-import getLocaleDate from '@/helpers/getLocaleDate';
+import { getLocaleDate } from '@/helpers';
+
+import { IMessageItemProps } from '@/interfaces';
 
 import useStyles from './MessageItem.styles';
 
-const MessageItem: FC<{ el: any; contact: any }> = ({ el, contact }) => {
+const MessageItem: FC<IMessageItemProps> = ({ el, contact }) => {
   const { classes: c } = useStyles();
 
   return (

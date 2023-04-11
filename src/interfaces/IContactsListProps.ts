@@ -1,8 +1,8 @@
 import type { IUseResultContacts } from '@/interfaces';
 
-import { TSetIdActiveContact } from '@/types';
+import type { TSetIdActiveContact } from '@/types';
 
-export interface IContactsList {
+export default interface IContactsListProps {
   resultContacts: IUseResultContacts[];
   setIdActiveContact: TSetIdActiveContact;
 }

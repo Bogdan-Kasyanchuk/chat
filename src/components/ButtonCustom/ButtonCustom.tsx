@@ -1,10 +1,10 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { Button } from '@mantine/core';
 
-import type { IButtonCustom } from '@/interfaces';
+import type { IButtonCustomProps } from '@/interfaces';
 
-const ButtonCustom: FC<IButtonCustom> = (props) => {
+const ButtonCustom: FC<IButtonCustomProps> = (props) => {
   return <Button {...props}>{props.children}</Button>;
 };
 

@@ -1,10 +1,10 @@
-import { FC } from 'react';
-
-import type { IContactsList } from '@/interfaces';
+import type { FC } from 'react';
 
 import { ContactItem } from '@/components';
 
-const ContactsList: FC<IContactsList> = ({ resultContacts, setIdActiveContact }) => {
+import type { IContactsListProps } from '@/interfaces';
+
+const ContactsList: FC<IContactsListProps> = ({ resultContacts, setIdActiveContact }) => {
   return (
     <ul>
       {resultContacts.map((el) => (

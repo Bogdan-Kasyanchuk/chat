@@ -1,14 +1,14 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { Avatar, Box, Flex, Indicator, Text } from '@mantine/core';
 
-import useClassStatus from '@/hooks/useClassStatus';
+import { useClassStatus } from '@/hooks';
 
-import type { IContactItem } from '@/interfaces';
+import type { IContactItemProps } from '@/interfaces';
 
 import useStyles from './ContactItem.styles';
 
-const ContactItem: FC<IContactItem> = ({ el, setIdActiveContact }) => {
+const ContactItem: FC<IContactItemProps> = ({ el, setIdActiveContact }) => {
   const { classes: c } = useStyles();
   const { allStatus } = useClassStatus('online');
 

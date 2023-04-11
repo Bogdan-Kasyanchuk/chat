@@ -1,10 +1,12 @@
+import type { FC } from 'react';
+
 import { Container, Flex, Text } from '@mantine/core';
 
-import useUser from '@/hooks/useUser';
+import { useUser } from '@/hooks';
 
 import contacts from '@/data/contacts.json';
 
-function Footer() {
+const Footer: FC = () => {
   const { user } = useUser();
   return (
     <Container h={60} p={10} bg='dark.5'>
@@ -20,6 +22,6 @@ function Footer() {
       )}
     </Container>
   );
-}
+};
 
 export default Footer;

@@ -1,23 +1,22 @@
-import { IconSearch } from '@tabler/icons-react';
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { Box, ScrollArea, TextInput } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 
-import useFilter from '@/hooks/useFilter';
-import useResultContacts from '@/hooks/useResultContacts';
-import useStylesGlobal from '@/hooks/useStylesGlobal';
-import useUser from '@/hooks/useUser';
+import { IconSearch } from '@tabler/icons-react';
 
-import type { IContactsBoard, IUser } from '@/interfaces';
+import { useFilter, useResultContacts, useStylesGlobal, useUser } from '@/hooks';
+
+import { ContactsList } from '@/components';
+
+import type { IContactsBoardProps, IUser } from '@/interfaces';
 
 import contacts from '@/data/contacts.json';
 import messages from '@/data/messages.json';
 
 import useStyles from './ContactsBoard.styles';
-import { ContactsList } from '@/components';
 
-const ContactsBoard: FC<IContactsBoard> = ({ setIdActiveContact }) => {
+const ContactsBoard: FC<IContactsBoardProps> = ({ setIdActiveContact }) => {
   const { id } = useUser();
   const [value, setValue] = useInputState('');
   const { filteredContacts } = useFilter(contacts.filter((el) => el.id !== id) as IUser[], value);

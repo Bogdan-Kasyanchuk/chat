@@ -1,8 +1,8 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 
 import { Center, Text } from '@mantine/core';
 
-import useStylesGlobal from '@/hooks/useStylesGlobal';
+import { useStylesGlobal } from '@/hooks';
 
 import useStyles from './StartViewChat.styles';
 

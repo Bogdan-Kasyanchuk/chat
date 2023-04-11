@@ -1,20 +1,25 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Flex } from '@mantine/core';
 
-import { userGitHubAuth } from '@/service/firebaseGitHubAuth';
-import { userGoogleAuth } from '@/service/firebaseGoogleAuth';
+import { firebaseGitHubAuth, firebaseGoogleAuth } from '@/service/firebase';
 
 import { ButtonCustom } from '@/components';
 
 const Home: FC = () => {
   return (
     <Flex gap='xl' justify='center' direction='column' h='100%' w='fit-content' mx='auto'>
-      <ButtonCustom variant='filled' size='lg' uppercase color='orange' onClick={userGoogleAuth}>
+      <ButtonCustom
+        variant='filled'
+        size='lg'
+        uppercase
+        color='orange'
+        onClick={firebaseGoogleAuth}
+      >
         Continue with google
       </ButtonCustom>
-      <ButtonCustom variant='outline' size='lg' uppercase color='dark' onClick={userGitHubAuth}>
+      <ButtonCustom variant='outline' size='lg' uppercase color='dark' onClick={firebaseGitHubAuth}>
         Continue with GitHub
       </ButtonCustom>
       <Link to='/login'>

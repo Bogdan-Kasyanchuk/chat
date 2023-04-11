@@ -1,7 +1,7 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 import { Navigate } from 'react-router-dom';
 
-import useUser from '@/hooks/useUser';
+import { useUser } from '@/hooks';
 
 import type { IRouteProps } from '@/interfaces';
 

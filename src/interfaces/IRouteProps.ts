@@ -1,5 +1,5 @@
-import { ReactElement } from 'react';
+import type { ReactElement } from 'react';
 
-export interface IRouteProps {
+export default interface IRouteProps {
   children: ReactElement;
 }

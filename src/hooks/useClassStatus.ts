@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
-import useStylesGlobal from '@/hooks/useStylesGlobal';
+import { useStylesGlobal } from '@/hooks';
 
-import { TStatusUser } from '@/types';
+import type { TStatusUser } from '@/types';
 
 const useClassStatus = (defaultValue: TStatusUser) => {
   const { classes } = useStylesGlobal();

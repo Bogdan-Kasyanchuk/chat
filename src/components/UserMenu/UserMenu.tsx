@@ -1,14 +1,13 @@
-import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
-import { MouseEvent } from 'react';
+import type { FC, MouseEvent } from 'react';
 
 import { Avatar, Group, Indicator, Menu, Text, UnstyledButton, rem } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
-import useClassStatus from '@/hooks/useClassStatus';
-import useUser from '@/hooks/useUser';
+import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
 
-import firstTUC from '@/helpers/firstTUC';
-import showError from '@/helpers/showError';
+import { useClassStatus, useUser } from '@/hooks';
+
+import { firstTUC, showError } from '@/helpers';
 
 import { TStatusUser } from '@/types';
 
@@ -16,9 +15,9 @@ import dataUser from '@/data/dataUser.json';
 
 import useStyles from './UserMenu.styles';
 
-function UserMenu() {
+const UserMenu: FC = () => {
   const { classes: c, cx } = useStyles();
-  const { auth, name, avatar, status } = useUser();
+  const { firebaseAuth, name, avatar, status } = useUser();
   const { allStatus, userStatus, setUserStatus } = useClassStatus(status);
   const min_576 = useMediaQuery(`(min-width: ${rem(576)})`);
 
@@ -87,7 +86,7 @@ function UserMenu() {
         <Menu.Item
           icon={<IconLogout size={16} stroke={1.5} />}
           onClick={() => {
-            auth.signOut().catch((error) => {
+            firebaseAuth.signOut().catch((error) => {
               showError(error);
             });
           }}
@@ -98,6 +97,6 @@ function UserMenu() {
       </Menu.Dropdown>
     </Menu>
   );
-}
+};
 
 export default UserMenu;
