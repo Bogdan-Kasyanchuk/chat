@@ -31,7 +31,14 @@ const Header: FC = () => {
         ) : (
           (matchLogin || matchRegister) && (
             <Link to='/'>
-              <ButtonCustom variant='filled-white' compact size='lg' uppercase className={c.btn}>
+              <ButtonCustom
+                type='button'
+                variant='filled-white'
+                compact
+                size='lg'
+                uppercase
+                className={c.btn}
+              >
                 Home
               </ButtonCustom>
             </Link>

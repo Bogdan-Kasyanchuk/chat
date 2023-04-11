@@ -29,6 +29,7 @@ const ContactsBoard: FC<IContactsBoardProps> = ({ setIdActiveContact }) => {
       <Box bg='gray.2' p={15} className={cG.borderB}>
         <TextInput
           type='search'
+          radius={16}
           size='lg'
           placeholder='Search chat'
           iconWidth={40}

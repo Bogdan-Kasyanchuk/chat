@@ -18,7 +18,7 @@ const useResultContacts = (contacts: IUser[], messages: IMessages[]) => {
         name,
         avatar,
         status,
-        notRead: messagesUser.filter((el) => el.read === false).length,
+        notRead: messagesUser.filter((el) => el.read === false && el.idOwner === id).length,
         message: messagesUser[0]?.body,
         messageDate: getLocaleDate(messagesUser[0]?.date, {
           year: 'numeric',

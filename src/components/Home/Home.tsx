@@ -11,6 +11,7 @@ const Home: FC = () => {
   return (
     <Flex gap='xl' justify='center' direction='column' h='100%' w='fit-content' mx='auto'>
       <ButtonCustom
+        type='button'
         variant='filled'
         size='lg'
         uppercase
@@ -19,16 +20,23 @@ const Home: FC = () => {
       >
         Continue with google
       </ButtonCustom>
-      <ButtonCustom variant='outline' size='lg' uppercase color='dark' onClick={firebaseGitHubAuth}>
+      <ButtonCustom
+        type='button'
+        variant='outline'
+        size='lg'
+        uppercase
+        color='dark.5'
+        onClick={firebaseGitHubAuth}
+      >
         Continue with GitHub
       </ButtonCustom>
       <Link to='/login'>
-        <ButtonCustom variant='filled-grey' size='lg' uppercase w='100%'>
+        <ButtonCustom type='button' variant='filled-grey' size='lg' uppercase w='100%'>
           Login with Email
         </ButtonCustom>
       </Link>
       <Link to='/register'>
-        <ButtonCustom variant='filled-grey' size='lg' uppercase w='100%'>
+        <ButtonCustom type='button' variant='filled-grey' size='lg' uppercase w='100%'>
           Register with Email
         </ButtonCustom>
       </Link>

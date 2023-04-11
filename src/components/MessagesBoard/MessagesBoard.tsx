@@ -5,15 +5,16 @@ import {
   Avatar,
   Box,
   Flex,
-  Group,
   Indicator,
   ScrollArea,
   Text,
   TextInput,
+  rem,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
+import { useMediaQuery } from '@mantine/hooks';
 
-import { IconBrandTelegram } from '@tabler/icons-react';
+import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
 
 import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
 
@@ -26,9 +27,10 @@ import messages from '@/data/messages.json';
 
 import useStyles from './MessagesBoard.styles';
 
-const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact }) => {
+const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveContact }) => {
   const { classes: cG } = useStylesGlobal();
   const { classes: c } = useStyles();
+  const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const { allStatus } = useClassStatus('online');
   const { id } = useUser();
   const form = useForm({
@@ -41,7 +43,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact }) => {
 
   return (
     <Box className={c.boardBox}>
-      <Group bg='gray.2' p={15} h={81} className={cG.borderB}>
+      <Flex align='center' gap={15} bg='gray.2' p={15} h={81} className={cG.borderB}>
         <Indicator
           inline
           size={20}
@@ -52,10 +54,15 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact }) => {
         >
           <Avatar size={50} radius='xl' src={contact?.avatar} alt={contact?.name} />
         </Indicator>
-        <Text component='p' fz={24} fw={600}>
+        <Text lineClamp={1} component='p' fz={24} fw={600}>
           {contact?.name}
         </Text>
-      </Group>
+        {!min_768 && (
+          <ActionIcon type='button' size={40} ml='auto' onClick={() => setIdActiveContact(null)}>
+            <IconArrowBigLeftFilled size={40} />
+          </ActionIcon>
+        )}
+      </Flex>
       <ScrollArea h='calc(100% - 81px - 81px)'>
         <MessagesList
           messages={messages.filter(
@@ -77,6 +84,8 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact }) => {
       >
         <Flex gap={20} align='center' pos='relative'>
           <TextInput
+            type='text'
+            radius={16}
             w='100%'
             size='lg'
             placeholder='Type your message'

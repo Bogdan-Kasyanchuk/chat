@@ -7,7 +7,7 @@ import { IMessagesListProps } from '@/interfaces';
 const MessagesList: FC<IMessagesListProps> = ({ messages, contact }) => {
   return (
     <ul>
-      {messages.map((el: any) => (
+      {messages.map((el) => (
         <MessageItem key={el.id} el={el} contact={contact} />
       ))}
     </ul>

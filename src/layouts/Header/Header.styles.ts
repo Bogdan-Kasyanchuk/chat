@@ -9,7 +9,7 @@ const useStyles = createStyles((theme) => ({
   btn: {
     '&:not([data-disabled])': theme.fn.hover({
       backgroundColor: theme.colors.gray[4],
-      color: theme.black,
+      color: theme.colors.dark[5],
     }),
   },
 }));

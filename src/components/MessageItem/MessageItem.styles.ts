@@ -9,7 +9,7 @@ const useStyles = createStyles((theme) => ({
     padding: rem(12),
     marginBottom: rem(8),
     fontSize: rem(18),
-    borderRadius: rem(20),
+    borderRadius: rem(16),
     lineHeight: 1.3,
   },
 }));

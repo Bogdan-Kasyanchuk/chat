@@ -26,7 +26,7 @@ const ContactItem: FC<IContactItemProps> = ({ el, setIdActiveContact }) => {
           <Avatar size={50} radius='xl' src={el.avatar} alt={el.name} />
         </Indicator>
         <Flex direction='column' justify='center' mx={12}>
-          <Text component='p' fz={20} lh={1.3}>
+          <Text lineClamp={1} component='p' fz={20} lh={1.3}>
             {el.name}
           </Text>
           {true && (

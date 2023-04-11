@@ -39,8 +39,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           focusRingStyles: {
             inputStyles: (theme) => ({
               outline: 'none',
-              borderColor: theme.black,
-              boxShadow: `inset 0 0 0 1px ${theme.black}`,
+              borderColor: theme.colors.dark[5],
+              boxShadow: `inset 0 0 0 1px ${theme.colors.dark[5]}`,
             }),
           },
           defaultRadius: 0,
@@ -96,13 +96,13 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 'filled-grey': (theme) => ({
                   root: {
                     backgroundColor: theme.colors.gray[4],
-                    color: theme.black,
+                    color: theme.colors.dark[5],
                   },
                 }),
                 'filled-white': (theme) => ({
                   root: {
                     backgroundColor: theme.white,
-                    color: theme.black,
+                    color: theme.colors.dark[5],
                   },
                 }),
               },
