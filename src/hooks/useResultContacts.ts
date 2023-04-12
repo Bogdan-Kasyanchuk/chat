@@ -1,13 +1,23 @@
 import { useResultMessages } from '@/hooks';
+import { useUser } from '@/hooks';
 
 import { getLocaleDate, getTime } from '@/helpers';
 
 import type { IMessages, IUseResultContacts, IUser } from '@/interfaces';
 
 const useResultContacts = (contacts: IUser[], messages: IMessages[]) => {
+  const { id: idUser } = useUser();
   const resultContacts: IUseResultContacts[] = contacts
     .map(({ id, name, avatar, status }) => {
-      const { resultMessages } = useResultMessages(messages, id);
+      const resultMessages = messages
+        .filter(
+          (el) =>
+            (el.idInterlocutor === idUser && el.idOwner === id) ||
+            (el.idInterlocutor === id && el.idOwner === idUser),
+        )
+        .sort((a, b) => getTime(a.date) - getTime(b.date));
+
+      // const { resultMessages } = useResultMessages(messages, id);
       const lastMessage = resultMessages[resultMessages.length - 1];
 
       return {
@@ -16,8 +26,8 @@ const useResultContacts = (contacts: IUser[], messages: IMessages[]) => {
         avatar,
         status,
         notRead: resultMessages.filter((el) => el.read === false && el.idOwner === id).length,
-        message: lastMessage.body,
-        messageDate: getLocaleDate(lastMessage.date, {
+        message: lastMessage?.body,
+        messageDate: getLocaleDate(lastMessage?.date, {
           year: 'numeric',
           month: 'short',
           day: 'numeric',

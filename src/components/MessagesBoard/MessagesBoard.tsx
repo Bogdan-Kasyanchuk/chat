@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import {
   ActionIcon,
@@ -78,7 +78,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
         <MessagesList
           messages={resultMessages}
           contact={contact}
-          idFirstNotReadMessage={idFirstNotReadMessage?.id}
+          idFirstNotReadMessage={idFirstNotReadMessage?.id as string}
           ref={targetRef}
         />
       </ScrollArea>

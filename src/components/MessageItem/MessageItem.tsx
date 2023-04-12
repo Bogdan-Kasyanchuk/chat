@@ -16,7 +16,7 @@ const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
 
     return (
       <>
-        {idFirstNotReadMessage && (
+        {el.id === idFirstNotReadMessage && (
           <li ref={ref}>
             <Text component='p' color='white' bg='dark.1' align='center'>
               Unread messages
