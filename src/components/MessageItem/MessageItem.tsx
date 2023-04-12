@@ -1,53 +1,57 @@
-import type { FC } from 'react';
+import { forwardRef } from 'react';
 
 import { Avatar, Flex, Text } from '@mantine/core';
 
 import { getLocaleDate } from '@/helpers';
 
-import { IMessageItemProps } from '@/interfaces';
+import type { IMessageItemProps } from '@/interfaces';
 
 import useStyles from './MessageItem.styles';
 
-const MessageItem: FC<IMessageItemProps> = ({ el, contact }) => {
-  const { classes: c } = useStyles();
+const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
+  ({ el, contact, idFirstNotReadMessage }, ref) => {
+    const { classes: c } = useStyles();
 
-  const checkId = el.idOwner === contact.id;
+    const checkId = el.idOwner === contact.id;
 
-  return (
-    <>
-      <li className={c.item}>
-        <Flex ml={checkId ? 0 : 'auto'} maw={500}>
-          {checkId && (
-            <Avatar mr={10} size={50} radius='xl' src={contact.avatar} alt={contact.name} />
-          )}
-          <Flex direction='column' align={checkId ? 'flex-start' : 'flex-end'}>
-            <Text
-              component='p'
-              color={checkId ? 'white' : 'dark.5'}
-              bg={checkId ? 'dark.5' : 'gray.2'}
-              className={c.message}
-            >
-              {el.body}
+    return (
+      <>
+        {idFirstNotReadMessage && (
+          <li ref={ref}>
+            <Text component='p' color='white' bg='dark.1' align='center'>
+              Unread messages
             </Text>
-            <Text component='time' fz={14} color='gray.6' px={15}>
-              {getLocaleDate(el.date, {
-                day: 'numeric',
-                month: 'numeric',
-                year: '2-digit',
-                hour: 'numeric',
-                minute: 'numeric',
-              })}
-            </Text>
+          </li>
+        )}
+        <li className={c.item}>
+          <Flex ml={checkId ? 0 : 'auto'} maw={500}>
+            {checkId && (
+              <Avatar mr={10} size={50} radius='xl' src={contact.avatar} alt={contact.name} />
+            )}
+            <Flex direction='column' align={checkId ? 'flex-start' : 'flex-end'}>
+              <Text
+                component='p'
+                color={checkId ? 'white' : 'dark.5'}
+                bg={checkId ? 'dark.5' : 'gray.2'}
+                className={c.message}
+              >
+                {el.body}
+              </Text>
+              <Text component='time' fz={14} color='gray.6' px={15}>
+                {getLocaleDate(el.date, {
+                  day: 'numeric',
+                  month: 'numeric',
+                  year: '2-digit',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                })}
+              </Text>
+            </Flex>
           </Flex>
-        </Flex>
-      </li>
-      <li>
-        <Text component='p' color='white' bg='dark.1' align='center'>
-          Unread messages
-        </Text>
-      </li>
-    </>
-  );
-};
+        </li>
+      </>
+    );
+  },
+);
 
 export default MessageItem;

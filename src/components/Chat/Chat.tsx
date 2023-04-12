@@ -8,13 +8,13 @@ import { useKeyDown, useStylesGlobal } from '@/hooks';
 
 import { ContactsBoard, MessagesBoard, StartViewChat } from '@/components';
 
-import { TIdActiveContact } from '@/types';
+import type { TIdActiveContact } from '@/types';
 
 const Chat: FC = () => {
   const { classes: cG } = useStylesGlobal();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
-  const [idActiveContact, setIdActiveContact] = useState<TIdActiveContact>(null);
-  useKeyDown(() => setIdActiveContact(null));
+  const [idActiveContact, setIdActiveContact] = useState<TIdActiveContact>('');
+  useKeyDown(() => setIdActiveContact(''));
 
   return (
     <Flex justify='center' h='100%' className={cG.borderX}>

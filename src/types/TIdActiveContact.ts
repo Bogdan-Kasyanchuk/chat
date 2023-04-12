@@ -1,1 +1,1 @@
-export type TIdActiveContact = null | string;
+export type TIdActiveContact = string;

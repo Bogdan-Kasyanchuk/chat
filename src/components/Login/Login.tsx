@@ -4,7 +4,7 @@ import { loginUserEmail } from '@/service/firebase';
 
 import { Form } from '@/components';
 
-import { ICredential } from '@/interfaces';
+import type { ICredential } from '@/interfaces';
 
 const Login: FC = () => {
   return (

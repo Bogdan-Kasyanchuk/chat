@@ -1,3 +1,3 @@
 import type { Dispatch, SetStateAction } from 'react';
 
-export type TSetIdActiveContact = Dispatch<SetStateAction<null | string>>;
+export type TSetIdActiveContact = Dispatch<SetStateAction<string>>;

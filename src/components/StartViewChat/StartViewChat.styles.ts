@@ -1,7 +1,7 @@
 import { createStyles } from '@mantine/core';
 
 const useStyles = createStyles(() => ({
-  box: {
+  startViewbox: {
     flexGrow: 1,
     height: '100%',
   },

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useEffect, useRef } from 'react';
 
 import {
   ActionIcon,
@@ -12,11 +13,11 @@ import {
   rem,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useMediaQuery } from '@mantine/hooks';
+import { useMediaQuery, useScrollIntoView } from '@mantine/hooks';
 
 import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
 
-import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
+import { useClassStatus, useResultMessages, useStylesGlobal } from '@/hooks';
 
 import { MessagesList } from '@/components';
 
@@ -32,15 +33,25 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const { allStatus } = useClassStatus('online');
-  const { id: idUser } = useUser();
+  const { resultMessages } = useResultMessages(messages, idActiveContact);
+  const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
+    HTMLLIElement,
+    HTMLDivElement
+  >({ offset: 50, duration: 500 });
   const form = useForm({
     initialValues: {
       message: '',
     },
   });
-
   const contact = contacts.find((el) => el.id === idActiveContact) as IUser;
 
+  const idFirstNotReadMessage = messages.find(
+    (el) => el.read === false && el.idOwner === idActiveContact,
+  );
+
+  useEffect(() => {
+    scrollIntoView();
+  });
   return (
     <Box className={c.boardBox}>
       <Flex align='center' gap={15} bg='gray.2' p={15} h={81} className={cG.borderB}>
@@ -58,19 +69,17 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
           {contact?.name}
         </Text>
         {!min_768 && (
-          <ActionIcon type='button' size={40} ml='auto' onClick={() => setIdActiveContact(null)}>
+          <ActionIcon type='button' size={40} ml='auto' onClick={() => setIdActiveContact('')}>
             <IconArrowBigLeftFilled size={40} />
           </ActionIcon>
         )}
       </Flex>
-      <ScrollArea h='calc(100% - 81px - 81px)'>
+      <ScrollArea h='calc(100% - 81px - 81px)' viewportRef={scrollableRef}>
         <MessagesList
-          messages={messages.filter(
-            (el) =>
-              (el.idInterlocutor === idUser && el.idOwner === idActiveContact) ||
-              (el.idInterlocutor === idActiveContact && el.idOwner === idUser),
-          )}
+          messages={resultMessages}
           contact={contact}
+          idFirstNotReadMessage={idFirstNotReadMessage?.id}
+          ref={targetRef}
         />
       </ScrollArea>
       <Box
@@ -90,7 +99,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
             size='lg'
             placeholder='Type your message'
             {...form.getInputProps('message')}
-            classNames={{ input: 'pr-14' }}
+            classNames={{ input: c.boardInput }}
           />
           <ActionIcon type='submit' size={30} pos='absolute' right={16}>
             <IconBrandTelegram size={30} stroke={1.5} />
@@ -100,5 +109,4 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
     </Box>
   );
 };
-
 export default MessagesBoard;

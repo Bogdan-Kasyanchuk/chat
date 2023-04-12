@@ -2,6 +2,7 @@ import useClassStatus from '@/hooks/useClassStatus';
 import useFilteredContacts from '@/hooks/useFilteredContacts';
 import useKeyDown from '@/hooks/useKeyDown';
 import useResultContacts from '@/hooks/useResultContacts';
+import useResultMessages from '@/hooks/useResultMessages';
 import useStylesGlobal from '@/hooks/useStylesGlobal';
 import useUser from '@/hooks/useUser';
 
@@ -10,6 +11,7 @@ export {
   useFilteredContacts,
   useKeyDown,
   useResultContacts,
+  useResultMessages,
   useStylesGlobal,
   useUser,
 };

@@ -1,30 +1,23 @@
-import { useUser } from '@/hooks';
+import { useResultMessages } from '@/hooks';
 
 import { getLocaleDate, getTime } from '@/helpers';
 
 import type { IMessages, IUseResultContacts, IUser } from '@/interfaces';
 
 const useResultContacts = (contacts: IUser[], messages: IMessages[]) => {
-  const { id: idUser } = useUser();
-
   const resultContacts: IUseResultContacts[] = contacts
     .map(({ id, name, avatar, status }) => {
-      const messagesUser: IMessages[] = messages
-        .filter(
-          (el) =>
-            (el.idInterlocutor === idUser && el.idOwner === id) ||
-            (el.idInterlocutor === id && el.idOwner === idUser),
-        )
-        .sort((a, b) => getTime(b.date) - getTime(a.date));
+      const { resultMessages } = useResultMessages(messages, id);
+      const lastMessage = resultMessages[resultMessages.length - 1];
 
       return {
         id,
         name,
         avatar,
         status,
-        notRead: messagesUser.filter((el) => el.read === false && el.idOwner === id).length,
-        message: messagesUser[0]?.body,
-        messageDate: getLocaleDate(messagesUser[0]?.date, {
+        notRead: resultMessages.filter((el) => el.read === false && el.idOwner === id).length,
+        message: lastMessage.body,
+        messageDate: getLocaleDate(lastMessage.date, {
           year: 'numeric',
           month: 'short',
           day: 'numeric',

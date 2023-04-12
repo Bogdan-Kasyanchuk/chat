@@ -8,6 +8,10 @@ const useStyles = createStyles((theme) => ({
       width: '65%',
     },
   },
+
+  boardInput: {
+    paddingRight: rem(56),
+  },
 }));
 
 export default useStyles;

@@ -5,7 +5,7 @@
     "idInterlocutor": "id-1",
     "body": "33333DIs simply dummy text of the printing and typesetting industry Is simply dummy text of the printing and typesetting industry",
     "date": "9/15/2017, 11:00:00 AM",
-    "read": false
+    "read": true
   },
   {
     "idOwner": "id-1",
@@ -13,7 +13,7 @@
     "idInterlocutor": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
     "body": "1111It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
     "date": "8/20/2017, 10:30:00 AM",
-    "read": false
+    "read": true
   },
   {
     "idOwner": "id-1",
@@ -21,7 +21,7 @@
     "idInterlocutor": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
     "body": "2222It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
     "date": "10/12/2017, 10:30:00 AM",
-    "read": false
+    "read": true
   },
   {
     "idOwner": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
@@ -29,13 +29,13 @@
     "idInterlocutor": "id-1",
     "body": "44444 simply dummy text of the printing and typesetting industry Is simply dummy text of the printing and typesetting industry",
     "date": "10/20/2017, 11:00:00 AM",
-    "read": false
+    "read": true
   },
   {
     "idOwner": "id-1",
     "id": "3a26656569d7a",
     "idInterlocutor": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
-    "body": "32321111It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
+    "body": "No 32321111It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
     "date": "11/01/2017, 11:30:00 AM",
     "read": false
   },
@@ -43,7 +43,7 @@
     "idOwner": "id-1",
     "id": "3a266565-кук69d7a",
     "idInterlocutor": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
-    "body": "кукуку32321111It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
+    "body": "No кукуку32321111It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
     "date": "11/02/2017, 11:30:00 AM",
     "read": false
   },
@@ -51,7 +51,7 @@
     "idOwner": "id-1",
     "id": "3a344266565-кук69d7a",
     "idInterlocutor": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
-    "body": "212121 1213232 авававававава куеке3куgfgfgfgfgf was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
+    "body": "No 212121 1213232 авававававава куеке3куgfgfgfgfgf was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
     "date": "11/02/2017, 11:45:00 AM",
     "read": false
   },

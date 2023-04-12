@@ -9,7 +9,7 @@ import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
 
 import { firstTUC, showError } from '@/helpers';
 
-import { TStatusUser } from '@/types';
+import type { TStatusUser } from '@/types';
 
 import dataUser from '@/data/dataUser.json';
 
