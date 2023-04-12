@@ -5,12 +5,12 @@ import { Flex } from '@mantine/core';
 
 import { firebaseGitHubAuth, firebaseGoogleAuth } from '@/service/firebase';
 
-import { ButtonCustom } from '@/components';
+import { Button } from '@/components';
 
 const Home: FC = () => {
   return (
     <Flex gap='xl' justify='center' direction='column' h='100%' w='fit-content' mx='auto'>
-      <ButtonCustom
+      <Button
         type='button'
         variant='filled'
         size='lg'
@@ -19,8 +19,8 @@ const Home: FC = () => {
         onClick={firebaseGoogleAuth}
       >
         Continue with google
-      </ButtonCustom>
-      <ButtonCustom
+      </Button>
+      <Button
         type='button'
         variant='outline'
         size='lg'
@@ -29,16 +29,16 @@ const Home: FC = () => {
         onClick={firebaseGitHubAuth}
       >
         Continue with GitHub
-      </ButtonCustom>
+      </Button>
       <Link to='/login'>
-        <ButtonCustom type='button' variant='filled-grey' size='lg' uppercase w='100%'>
+        <Button type='button' variant='filled-grey' size='lg' uppercase w='100%'>
           Login with Email
-        </ButtonCustom>
+        </Button>
       </Link>
       <Link to='/register'>
-        <ButtonCustom type='button' variant='filled-grey' size='lg' uppercase w='100%'>
+        <Button type='button' variant='filled-grey' size='lg' uppercase w='100%'>
           Register with Email
-        </ButtonCustom>
+        </Button>
       </Link>
     </Flex>
   );

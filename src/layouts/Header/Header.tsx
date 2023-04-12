@@ -5,7 +5,7 @@ import { Container, Group, Text, rem } from '@mantine/core';
 
 import { IconMessages } from '@tabler/icons-react';
 
-import { ButtonCustom, UserMenu } from '@/components';
+import { Button, UserMenu } from '@/components';
 
 import useStyles from './Header.styles';
 
@@ -31,7 +31,7 @@ const Header: FC = () => {
         ) : (
           (matchLogin || matchRegister) && (
             <Link to='/'>
-              <ButtonCustom
+              <Button
                 type='button'
                 variant='filled-white'
                 compact
@@ -40,7 +40,7 @@ const Header: FC = () => {
                 className={c.btn}
               >
                 Home
-              </ButtonCustom>
+              </Button>
             </Link>
           )
         )}

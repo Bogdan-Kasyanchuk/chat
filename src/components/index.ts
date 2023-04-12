@@ -1,4 +1,4 @@
-import ButtonCustom from './ButtonCustom';
+import Button from './Button';
 import Chat from './Chat';
 import ContactItem from './ContactItem';
 import ContactsBoard from './ContactsBoard';
@@ -14,7 +14,7 @@ import StartViewChat from './StartViewChat';
 import UserMenu from './UserMenu';
 
 export {
-  ButtonCustom,
+  Button,
   Chat,
   ContactsBoard,
   ContactItem,

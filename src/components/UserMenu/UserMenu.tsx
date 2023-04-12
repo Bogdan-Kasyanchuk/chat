@@ -5,7 +5,7 @@ import { useMediaQuery } from '@mantine/hooks';
 
 import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
 
-import { useClassStatus, useUser } from '@/hooks';
+import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
 
 import { firstTUC, showError } from '@/helpers';
 
@@ -17,6 +17,7 @@ import useStyles from './UserMenu.styles';
 
 const UserMenu: FC = () => {
   const { classes: c, cx } = useStyles();
+  const { classes: cG } = useStylesGlobal();
   const { firebaseAuth, name, avatar, status } = useUser();
   const { allStatus, userStatus, setUserStatus } = useClassStatus(status);
   const min_576 = useMediaQuery(`(min-width: ${rem(576)})`);
@@ -38,7 +39,7 @@ const UserMenu: FC = () => {
           <Group spacing={10}>
             {min_576 && (
               <>
-                <IconChevronDown size={24} className={c.userIcon} stroke={2} />
+                <IconChevronDown className={c.userIcon} stroke={2} />
                 <Text component='p' fz={18} fw={600} color='white'>
                   {name ?? dataUser.name}
                 </Text>
@@ -68,7 +69,7 @@ const UserMenu: FC = () => {
             {name ?? dataUser.name}
           </Text>
         )}
-        <Menu.Divider className={c.menuDivider} />
+        <Menu.Divider m={0} className={cG.borderT} />
         {Object.keys(allStatus).map((el) => (
           <Menu.Item
             key={el}
@@ -79,7 +80,7 @@ const UserMenu: FC = () => {
             {firstTUC(el)}
           </Menu.Item>
         ))}
-        <Menu.Divider className={c.menuDivider} />
+        <Menu.Divider m={0} className={cG.borderT} />
         <Menu.Item icon={<IconSettings size={16} stroke={1.5} />} fw={500}>
           Account settings
         </Menu.Item>

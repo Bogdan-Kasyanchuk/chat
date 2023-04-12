@@ -5,7 +5,7 @@ import { useInputState } from '@mantine/hooks';
 
 import { IconSearch } from '@tabler/icons-react';
 
-import { useFilter, useResultContacts, useStylesGlobal, useUser } from '@/hooks';
+import { useFilteredContacts, useResultContacts, useStylesGlobal } from '@/hooks';
 
 import { ContactsList } from '@/components';
 
@@ -17,9 +17,8 @@ import messages from '@/data/messages.json';
 import useStyles from './ContactsBoard.styles';
 
 const ContactsBoard: FC<IContactsBoardProps> = ({ setIdActiveContact }) => {
-  const { id } = useUser();
   const [value, setValue] = useInputState('');
-  const { filteredContacts } = useFilter(contacts.filter((el) => el.id !== id) as IUser[], value);
+  const { filteredContacts } = useFilteredContacts(contacts as IUser[], value);
   const { resultContacts } = useResultContacts(filteredContacts, messages);
   const { classes: cG } = useStylesGlobal();
   const { classes: c, cx } = useStyles();

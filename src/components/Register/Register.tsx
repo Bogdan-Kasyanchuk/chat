@@ -9,7 +9,7 @@ import { ICredential } from '@/interfaces';
 const Register: FC = () => {
   return (
     <Form
-      submitForm={(email: ICredential['email'], password: ICredential['email']) => {
+      submitForm={(email: ICredential['email'], password: ICredential['password']) => {
         registerUserEmail(email, password);
       }}
       childrenButton='Register'

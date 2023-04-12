@@ -29,7 +29,7 @@ const ContactItem: FC<IContactItemProps> = ({ el, setIdActiveContact }) => {
           <Text lineClamp={1} component='p' fz={20} lh={1.3}>
             {el.name}
           </Text>
-          {true && (
+          {el.message && (
             <Text lineClamp={1} component='p' color='gray.6'>
               {el.message}
             </Text>

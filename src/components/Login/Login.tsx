@@ -9,7 +9,7 @@ import { ICredential } from '@/interfaces';
 const Login: FC = () => {
   return (
     <Form
-      submitForm={(email: ICredential['email'], password: ICredential['email']) => {
+      submitForm={(email: ICredential['email'], password: ICredential['password']) => {
         loginUserEmail(email, password);
       }}
       childrenButton='Login'

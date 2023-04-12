@@ -1,7 +1,7 @@
 export default interface IMessages {
   idOwner: string;
+  idInterlocutor: string;
   id: string;
-  idFilter: string;
   body: string;
   date: string;
   read: boolean;

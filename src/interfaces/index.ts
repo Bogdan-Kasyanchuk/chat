@@ -1,4 +1,4 @@
-import IButtonCustomProps from '@/interfaces/IButtonCustomProps';
+import IButtonProps from '@/interfaces/IButtonProps';
 import IContactItemProps from '@/interfaces/IContactItemProps';
 import IContactsBoardProps from '@/interfaces/IContactsBoardProps';
 import IContactsListProps from '@/interfaces/IContactsListProps';
@@ -15,7 +15,7 @@ import IUseUser from '@/interfaces/IUseUser';
 import IUser from '@/interfaces/IUser';
 
 export type {
-  IButtonCustomProps,
+  IButtonProps,
   IContactItemProps,
   IContactsBoardProps,
   IContactsListProps,

@@ -32,14 +32,14 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const { allStatus } = useClassStatus('online');
-  const { id } = useUser();
+  const { id: idUser } = useUser();
   const form = useForm({
     initialValues: {
       message: '',
     },
   });
 
-  const contact = contacts.find((el) => el.id === idActiveContact);
+  const contact = contacts.find((el) => el.id === idActiveContact) as IUser;
 
   return (
     <Box className={c.boardBox}>
@@ -67,10 +67,10 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
         <MessagesList
           messages={messages.filter(
             (el) =>
-              el.idFilter === id + '-' + idActiveContact ||
-              el.idFilter === idActiveContact + '-' + id,
+              (el.idInterlocutor === idUser && el.idOwner === idActiveContact) ||
+              (el.idInterlocutor === idActiveContact && el.idOwner === idUser),
           )}
-          contact={contact as IUser}
+          contact={contact}
         />
       </ScrollArea>
       <Box

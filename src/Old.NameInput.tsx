@@ -1,11 +1,12 @@
-import { IconUser } from '@tabler/icons-react';
 import { FC } from 'react';
 
 import { Box, TextInput } from '@mantine/core';
 import { Flex } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
-import { ButtonCustom } from '@/components';
+import { IconUser } from '@tabler/icons-react';
+
+import { Button } from '@/components';
 
 const Register: FC = () => {
   const form = useForm({
@@ -32,9 +33,9 @@ const Register: FC = () => {
           icon={<IconUser size={18} stroke={1.5} />}
           {...form.getInputProps('name')}
         />
-        <ButtonCustom type='submit' variant='filled-grey' size='lg' uppercase>
+        <Button type='submit' variant='filled-grey' size='lg' uppercase>
           Register
-        </ButtonCustom>
+        </Button>
       </Flex>
     </Box>
   );

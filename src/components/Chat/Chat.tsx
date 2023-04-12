@@ -10,7 +10,7 @@ import { ContactsBoard, MessagesBoard, StartViewChat } from '@/components';
 
 import { TIdActiveContact } from '@/types';
 
-const Home: FC = () => {
+const Chat: FC = () => {
   const { classes: cG } = useStylesGlobal();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const [idActiveContact, setIdActiveContact] = useState<TIdActiveContact>(null);
@@ -39,4 +39,4 @@ const Home: FC = () => {
   );
 };
 
-export default Home;
+export default Chat;

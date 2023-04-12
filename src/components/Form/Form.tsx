@@ -6,7 +6,7 @@ import { useForm } from '@mantine/form';
 
 import { IconAt, IconLock } from '@tabler/icons-react';
 
-import { ButtonCustom } from '@/components';
+import { Button } from '@/components';
 
 import type { IFormProps } from '@/interfaces';
 
@@ -49,9 +49,9 @@ const Form: FC<IFormProps> = ({ submitForm, childrenButton }) => {
           icon={<IconLock size={18} stroke={1.5} />}
           {...form.getInputProps('password')}
         />
-        <ButtonCustom type='submit' variant='filled-grey' size='lg' uppercase>
+        <Button type='submit' variant='filled-grey' size='lg' uppercase>
           {childrenButton}
-        </ButtonCustom>
+        </Button>
       </Flex>
     </Box>
   );

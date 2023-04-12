@@ -28,11 +28,6 @@ const useStyles = createStyles((theme) => ({
       backgroundColor: theme.colors.gray[4],
     },
   },
-
-  menuDivider: {
-    borderTopColor: theme.colors.gray[4],
-    margin: 0,
-  },
 }));
 
 export default useStyles;

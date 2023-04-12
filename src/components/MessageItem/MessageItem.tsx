@@ -11,18 +11,20 @@ import useStyles from './MessageItem.styles';
 const MessageItem: FC<IMessageItemProps> = ({ el, contact }) => {
   const { classes: c } = useStyles();
 
+  const checkId = el.idOwner === contact.id;
+
   return (
     <>
       <li className={c.item}>
-        <Flex ml={el.idOwner === contact.id ? 0 : 'auto'} maw={500}>
-          {el.idOwner === contact.id && (
+        <Flex ml={checkId ? 0 : 'auto'} maw={500}>
+          {checkId && (
             <Avatar mr={10} size={50} radius='xl' src={contact.avatar} alt={contact.name} />
           )}
-          <Flex direction='column' align={el.idOwner === contact.id ? 'flex-start' : 'flex-end'}>
+          <Flex direction='column' align={checkId ? 'flex-start' : 'flex-end'}>
             <Text
               component='p'
-              color={el.idOwner === contact.id ? 'white' : 'dark.5'}
-              bg={el.idOwner === contact.id ? 'dark.5' : 'gray.2'}
+              color={checkId ? 'white' : 'dark.5'}
+              bg={checkId ? 'dark.5' : 'gray.2'}
               className={c.message}
             >
               {el.body}

@@ -11,7 +11,7 @@ const StartViewChat: FC = () => {
   const { classes: c } = useStyles();
 
   return (
-    <Center h='100%' className={c.box}>
+    <Center className={c.box}>
       <Text component='p' w='max-content' fz={18} p={16} bg='gray.1' className={cG.border}>
         Choose who you would like to write to
       </Text>

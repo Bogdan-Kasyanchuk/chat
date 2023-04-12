@@ -10,7 +10,11 @@ const useResultContacts = (contacts: IUser[], messages: IMessages[]) => {
   const resultContacts: IUseResultContacts[] = contacts
     .map(({ id, name, avatar, status }) => {
       const messagesUser: IMessages[] = messages
-        .filter((el) => el.idFilter === idUser + '-' + id || el.idFilter === id + '-' + idUser)
+        .filter(
+          (el) =>
+            (el.idInterlocutor === idUser && el.idOwner === id) ||
+            (el.idInterlocutor === id && el.idOwner === idUser),
+        )
         .sort((a, b) => getTime(b.date) - getTime(a.date));
 
       return {
