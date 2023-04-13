@@ -5,21 +5,18 @@ import { useInputState } from '@mantine/hooks';
 
 import { IconSearch } from '@tabler/icons-react';
 
-import { useFilteredContacts, useResultContacts, useStylesGlobal } from '@/hooks';
+import { useFilteredContacts, useNormalizedContacts, useStylesGlobal } from '@/hooks';
 
 import { ContactsList } from '@/components';
 
-import type { IContactsBoardProps, IUser } from '@/interfaces';
-
-import contacts from '@/data/contacts.json';
-import messages from '@/data/messages.json';
+import type { IContactsBoardProps } from '@/interfaces';
 
 import useStyles from './ContactsBoard.styles';
 
 const ContactsBoard: FC<IContactsBoardProps> = ({ setIdActiveContact }) => {
   const [value, setValue] = useInputState('');
-  const { filteredContacts } = useFilteredContacts(contacts as IUser[], value);
-  const { resultContacts } = useResultContacts(filteredContacts, messages);
+  const { normalizedContacts } = useNormalizedContacts();
+  const { filteredContacts } = useFilteredContacts(normalizedContacts, value);
   const { classes: cG } = useStylesGlobal();
   const { classes: c, cx } = useStyles();
 
@@ -38,7 +35,7 @@ const ContactsBoard: FC<IContactsBoardProps> = ({ setIdActiveContact }) => {
         />
       </Box>
       <ScrollArea h='calc(100% - 81px)'>
-        <ContactsList resultContacts={resultContacts} setIdActiveContact={setIdActiveContact} />
+        <ContactsList contacts={filteredContacts} setIdActiveContact={setIdActiveContact} />
       </ScrollArea>
     </Box>
   );

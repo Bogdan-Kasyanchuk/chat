@@ -2,13 +2,15 @@ import { useState } from 'react';
 
 import { useStylesGlobal } from '@/hooks';
 
+import type { IStatus } from '@/interfaces';
+
 import type { TStatusUser } from '@/types';
 
-const useClassStatus = (defaultValue: TStatusUser) => {
+const useClassStatus = (value: TStatusUser) => {
   const { classes } = useStylesGlobal();
-  const [status, setStatus] = useState<TStatusUser>(defaultValue);
+  const [status, setStatus] = useState<TStatusUser>(value);
 
-  const allStatus: { [x: string]: string } = {
+  const allStatus: IStatus = {
     online: classes.statusOnline,
     offline: classes.statusOffline,
     'do not disturb': classes.statusNotDisturb,

@@ -1,7 +1,7 @@
 import type { IMessages, IUser } from '@/interfaces';
 
 export default interface IMessageItemProps {
-  el: IMessages;
+  message: IMessages;
   contact: IUser;
-  idFirstNotReadMessage: string;
+  idFirstNotReadMessage: string | undefined;
 }

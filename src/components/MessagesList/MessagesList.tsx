@@ -8,10 +8,10 @@ const MessagesList = forwardRef<HTMLLIElement, IMessagesListProps>(
   ({ messages, contact, idFirstNotReadMessage }, ref) => {
     return (
       <ul>
-        {messages.map((el) => (
+        {messages.map((message) => (
           <MessageItem
-            key={el.id}
-            el={el}
+            key={message.id}
+            message={message}
             contact={contact}
             idFirstNotReadMessage={idFirstNotReadMessage}
             ref={ref}

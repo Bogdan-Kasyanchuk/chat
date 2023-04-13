@@ -4,11 +4,11 @@ import { ContactItem } from '@/components';
 
 import type { IContactsListProps } from '@/interfaces';
 
-const ContactsList: FC<IContactsListProps> = ({ resultContacts, setIdActiveContact }) => {
+const ContactsList: FC<IContactsListProps> = ({ contacts, setIdActiveContact }) => {
   return (
     <ul>
-      {resultContacts.map((el) => (
-        <ContactItem key={el.id} el={el} setIdActiveContact={setIdActiveContact} />
+      {contacts.map((contact) => (
+        <ContactItem key={contact.id} contact={contact} setIdActiveContact={setIdActiveContact} />
       ))}
     </ul>
   );

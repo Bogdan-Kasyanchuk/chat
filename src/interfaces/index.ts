@@ -8,10 +8,10 @@ import IMessageItemProps from '@/interfaces/IMessageItemProps';
 import IMessages from '@/interfaces/IMessages';
 import IMessagesBoardProps from '@/interfaces/IMessagesBoardProps';
 import IMessagesListProps from '@/interfaces/IMessagesListProps';
+import INormalizedContact from '@/interfaces/INormalizedContact';
 import IOptionsLocaleDate from '@/interfaces/IOptionsLocaleDate';
 import IRouteProps from '@/interfaces/IRouteProps';
-import IUseResultContacts from '@/interfaces/IUseResultContacts';
-import IUseUser from '@/interfaces/IUseUser';
+import IStatus from '@/interfaces/IStatus';
 import IUser from '@/interfaces/IUser';
 
 export type {
@@ -27,7 +27,7 @@ export type {
   IMessagesListProps,
   IOptionsLocaleDate,
   IRouteProps,
-  IUseResultContacts,
-  IUseUser,
+  INormalizedContact,
+  IStatus,
   IUser,
 };

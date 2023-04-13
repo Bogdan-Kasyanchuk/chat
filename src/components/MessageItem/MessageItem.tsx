@@ -9,14 +9,13 @@ import type { IMessageItemProps } from '@/interfaces';
 import useStyles from './MessageItem.styles';
 
 const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
-  ({ el, contact, idFirstNotReadMessage }, ref) => {
+  ({ message, contact, idFirstNotReadMessage }, ref) => {
     const { classes: c } = useStyles();
-
-    const checkId = el.idOwner === contact.id;
+    const checkId = message.idOwner === contact.id;
 
     return (
       <>
-        {el.id === idFirstNotReadMessage && (
+        {message.id === idFirstNotReadMessage && (
           <li ref={ref}>
             <Text component='p' color='white' bg='dark.1' align='center'>
               Unread messages
@@ -35,10 +34,10 @@ const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
                 bg={checkId ? 'dark.5' : 'gray.2'}
                 className={c.message}
               >
-                {el.body}
+                {message.body}
               </Text>
               <Text component='time' fz={14} color='gray.6' px={15}>
-                {getLocaleDate(el.date, {
+                {getLocaleDate(message.date, {
                   day: 'numeric',
                   month: 'numeric',
                   year: '2-digit',

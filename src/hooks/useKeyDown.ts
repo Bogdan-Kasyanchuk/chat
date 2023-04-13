@@ -1,4 +1,5 @@
-import { KeyboardEvent, useEffect } from 'react';
+import type { KeyboardEvent } from 'react';
+import { useEffect } from 'react';
 
 const useKeyDown = (hundler: () => void) => {
   const onKeyDown = (e: KeyboardEvent<Element>) => {

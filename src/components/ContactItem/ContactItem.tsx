@@ -8,12 +8,12 @@ import type { IContactItemProps } from '@/interfaces';
 
 import useStyles from './ContactItem.styles';
 
-const ContactItem: FC<IContactItemProps> = ({ el, setIdActiveContact }) => {
+const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => {
   const { classes: c } = useStyles();
   const { allStatus } = useClassStatus('online');
 
   return (
-    <li className={c.item} onClick={() => setIdActiveContact(el.id)}>
+    <li className={c.item} onClick={() => setIdActiveContact(contact.id)}>
       <Flex justify='space-between'>
         <Indicator
           inline
@@ -21,27 +21,27 @@ const ContactItem: FC<IContactItemProps> = ({ el, setIdActiveContact }) => {
           offset={7}
           position='bottom-end'
           withBorder
-          classNames={{ indicator: allStatus[`${el.status}`] }}
+          classNames={{ indicator: allStatus[`${contact.status}`] }}
         >
-          <Avatar size={50} radius='xl' src={el.avatar} alt={el.name} />
+          <Avatar size={50} radius='xl' src={contact.avatar} alt={contact.name} />
         </Indicator>
         <Flex direction='column' justify='center' mx={12}>
           <Text lineClamp={1} component='p' fz={20} lh={1.3}>
-            {el.name}
+            {contact.name}
           </Text>
-          {el.message && (
+          {contact.lastMessageBody && (
             <Text lineClamp={1} component='p' color='gray.6'>
-              {el.message}
+              {contact.lastMessageBody}
             </Text>
           )}
         </Flex>
         <Box className={c.paramsBox}>
           <Text component='time' display='block' color='gray.6'>
-            {el.messageDate}
+            {contact.lastMessageDate}
           </Text>
-          {!!el.notRead && (
+          {!!contact.unreadCountMessages && (
             <Text component='span' className={c.quantity}>
-              {el.notRead}
+              {contact.unreadCountMessages}
             </Text>
           )}
         </Box>

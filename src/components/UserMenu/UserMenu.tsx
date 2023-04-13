@@ -73,7 +73,7 @@ const UserMenu: FC = () => {
         {Object.keys(allStatus).map((el) => (
           <Menu.Item
             key={el}
-            icon={<div className={cx(c.userStatus, allStatus[`${el}`])} />}
+            icon={<div className={cx(c.userStatus, allStatus[`${el as TStatusUser}`])} />}
             onClick={setStatus}
             fw={500}
           >
