@@ -3,6 +3,7 @@ import Chat from './Chat';
 import ContactItem from './ContactItem';
 import ContactsBoard from './ContactsBoard';
 import ContactsList from './ContactsList';
+import Error_404 from './Error_404';
 import Form from './Form';
 import Home from './Home';
 import Login from './Login';
@@ -19,6 +20,7 @@ export {
   ContactsBoard,
   ContactItem,
   ContactsList,
+  Error_404,
   Form,
   Home,
   Login,

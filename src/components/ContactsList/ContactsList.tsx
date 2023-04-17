@@ -8,7 +8,11 @@ const ContactsList: FC<IContactsListProps> = ({ contacts, setIdActiveContact }) 
   return (
     <ul>
       {contacts.map((contact) => (
-        <ContactItem key={contact.id} contact={contact} setIdActiveContact={setIdActiveContact} />
+        <ContactItem
+          key={contact.idContact}
+          contact={contact}
+          setIdActiveContact={setIdActiveContact}
+        />
       ))}
     </ul>
   );

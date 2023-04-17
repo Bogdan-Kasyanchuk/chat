@@ -3,7 +3,9 @@ import type { FC, MouseEvent } from 'react';
 import { Avatar, Group, Indicator, Menu, Text, UnstyledButton, rem } from '@mantine/core';
 import { useDidUpdate, useMediaQuery } from '@mantine/hooks';
 
-import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
+import { IconChevronDown, IconLogout, IconSettings, IconTrash } from '@tabler/icons-react';
+
+import { deleteUser, firebaseAuth, updateStatusUser, updateUser } from '@/service/firebase';
 
 import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
 
@@ -11,15 +13,13 @@ import { firstTUC, showError } from '@/helpers';
 
 import type { TStatusUser } from '@/types';
 
-import dataUser from '@/data/dataUser.json';
-
 import useStyles from './UserMenu.styles';
 
 const UserMenu: FC = () => {
   const { classes: c, cx } = useStyles();
   const { classes: cG } = useStylesGlobal();
-  const { firebaseAuth, name, avatar, status } = useUser();
-  const { allStatus, userStatus, setUserStatus } = useClassStatus('online');
+  const { name, avatar, status, idUser } = useUser();
+  const { allStatus, userStatus, setUserStatus } = useClassStatus();
   const min_576 = useMediaQuery(`(min-width: ${rem(576)})`);
 
   useDidUpdate(() => {
@@ -30,7 +30,10 @@ const UserMenu: FC = () => {
   }, [status]);
 
   const setStatus = (e: MouseEvent<HTMLButtonElement>) => {
-    setUserStatus((e.target as HTMLButtonElement).textContent?.toLowerCase() as TStatusUser);
+    const status = (e.target as HTMLButtonElement).textContent?.toLowerCase() as TStatusUser;
+
+    setUserStatus(status);
+    updateStatusUser(idUser, status);
   };
 
   return (
@@ -48,7 +51,7 @@ const UserMenu: FC = () => {
               <>
                 <IconChevronDown className={c.userIcon} stroke={2} />
                 <Text component='p' fz={18} fw={600} color='white'>
-                  {name ?? dataUser.name}
+                  {name}
                 </Text>
               </>
             )}
@@ -60,12 +63,7 @@ const UserMenu: FC = () => {
               withBorder
               classNames={{ indicator: userStatus }}
             >
-              <Avatar
-                size={32}
-                radius='xl'
-                src={avatar ?? dataUser.image}
-                alt={name ?? dataUser.name}
-              />
+              <Avatar size={32} radius='xl' src={avatar} alt={name} />
             </Indicator>
           </Group>
         </UnstyledButton>
@@ -73,7 +71,7 @@ const UserMenu: FC = () => {
       <Menu.Dropdown>
         {!min_576 && (
           <Text component='p' fz={18} fw={600} px={12} py={10} bg='gray.2'>
-            {name ?? dataUser.name}
+            {name}
           </Text>
         )}
         <Menu.Divider m={0} className={cG.borderT} />
@@ -88,9 +86,29 @@ const UserMenu: FC = () => {
           </Menu.Item>
         ))}
         <Menu.Divider m={0} className={cG.borderT} />
-        <Menu.Item icon={<IconSettings size={16} stroke={1.5} />} fw={500}>
-          Account settings
+        <Menu.Item
+          icon={<IconSettings size={16} stroke={1.5} />}
+          onClick={() => {
+            updateUser(idUser, {
+              name: 'Igor Fed',
+              avatar: 'https://i.stack.imgur.com/kpHGQ.jpg?s=64&g=1',
+            });
+          }}
+          fw={500}
+        >
+          Update profile
         </Menu.Item>
+        <Menu.Item
+          color='red.7'
+          icon={<IconTrash size={16} stroke={1.5} />}
+          onClick={() => {
+            deleteUser(idUser);
+          }}
+          fw={500}
+        >
+          Delete profile
+        </Menu.Item>
+        <Menu.Divider m={0} className={cG.borderT} />
         <Menu.Item
           icon={<IconLogout size={16} stroke={1.5} />}
           onClick={() => {

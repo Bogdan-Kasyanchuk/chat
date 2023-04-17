@@ -4,7 +4,8 @@ const useStyles = createStyles((theme) => ({
   boardBox: {
     width: '100%',
     height: '100%',
-    [`@media (min-width: ${theme.breakpoints.md})`]: {
+
+    [theme.fn.largerThan('md')]: {
       width: '65%',
     },
   },

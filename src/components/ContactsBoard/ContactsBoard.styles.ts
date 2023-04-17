@@ -5,7 +5,8 @@ const useStyles = createStyles((theme) => ({
     width: '100%',
     height: '100%',
     minWidth: rem(360),
-    [`@media (min-width: ${theme.breakpoints.md})`]: {
+
+    [theme.fn.largerThan('md')]: {
       width: '35%',
     },
   },

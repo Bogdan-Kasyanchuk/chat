@@ -6,13 +6,13 @@ import { showError } from '@/helpers';
 
 import type { ICredential } from '@/interfaces';
 
-export const registerUserEmail = (email: ICredential['email'], password: ICredential['email']) => {
+export const registerUserEmail = ({ email, password }: ICredential) => {
   createUserWithEmailAndPassword(firebaseAuth, email, password).catch((error) => {
     showError(error);
   });
 };
 
-export const loginUserEmail = (email: ICredential['email'], password: ICredential['email']) => {
+export const loginUserEmail = ({ email, password }: ICredential) => {
   signInWithEmailAndPassword(firebaseAuth, email, password).catch((error) => {
     showError(error);
   });

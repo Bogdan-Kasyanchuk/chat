@@ -11,7 +11,7 @@ import useStyles from './MessageItem.styles';
 const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
   ({ message, contact, idFirstNotReadMessage }, ref) => {
     const { classes: c } = useStyles();
-    const checkId = message.idOwner === contact.id;
+    const checkId = message.idOwner === contact.idContact;
 
     return (
       <>

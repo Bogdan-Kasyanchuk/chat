@@ -6,8 +6,8 @@ import { getLocaleDate, getTime } from '@/helpers';
 
 import type { IMessages, INormalizedContact } from '@/interfaces';
 
-const useNormalizedContacts = (idContact?: string) => {
-  const { id: idUser } = useUser();
+const useNormalizedContacts = (id?: string) => {
+  const { idUser } = useUser();
   const { data: contacts } = useData('contacts');
   const { data: messages } = useData('messages');
   const [normalizedContacts, setNormalizedContacts] = useState<INormalizedContact[]>([]);
@@ -20,27 +20,27 @@ const useNormalizedContacts = (idContact?: string) => {
     setNormalizedContacts(
       contacts
         .filter((el) => {
-          return el.id !== idUser;
+          return el.idContact !== idUser;
         })
-        .map(({ id, name, avatar, status }) => {
+        .map(({ idContact, name, avatar, status }) => {
           const normalizedMessages = (messages as IMessages[])
             ?.filter(
               (el) =>
-                (el.idInterlocutor === idUser && el.idOwner === id) ||
-                (el.idInterlocutor === id && el.idOwner === idUser),
+                (el.idInterlocutor === idUser && el.idOwner === idContact) ||
+                (el.idInterlocutor === idContact && el.idOwner === idUser),
             )
             .sort((a, b) => getTime(a.date) - getTime(b.date));
 
           const lastMessage = normalizedMessages[normalizedMessages.length - 1];
 
           return {
-            id,
+            idContact,
             name,
             avatar,
             status,
             messages: normalizedMessages,
             unreadCountMessages: normalizedMessages.filter(
-              (el) => el.read === false && el.idOwner === id,
+              (el) => !el.read && el.idOwner === idContact,
             ).length,
             lastMessageBody: lastMessage?.body,
             lastMessageDate: getLocaleDate(lastMessage?.date, {
@@ -55,7 +55,7 @@ const useNormalizedContacts = (idContact?: string) => {
   }, [contacts, messages]);
 
   const normalizedContact = normalizedContacts.find(
-    (el) => el.id === idContact,
+    (el) => el.idContact === id,
   ) as INormalizedContact;
 
   return { normalizedContact, normalizedContacts };

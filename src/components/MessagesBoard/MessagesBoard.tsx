@@ -29,11 +29,12 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const { normalizedContact } = useNormalizedContacts(idActiveContact);
-  const { userStatus, setUserStatus } = useClassStatus('online');
+  const { allStatus } = useClassStatus();
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLLIElement,
     HTMLDivElement
   >({ offset: 50, duration: 500 });
+
   const form = useForm({
     initialValues: {
       message: '',
@@ -48,14 +49,6 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
     scrollIntoView();
   });
 
-  useDidUpdate(() => {
-    if (!normalizedContact?.status) {
-      return;
-    }
-
-    setUserStatus(normalizedContact.status);
-  }, [normalizedContact?.status]);
-
   return (
     <Box className={c.boardBox}>
       <Flex align='center' gap={15} bg='gray.2' p={15} h={81} className={cG.borderB}>
@@ -65,7 +58,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
           offset={7}
           position='bottom-end'
           withBorder
-          classNames={{ indicator: userStatus }}
+          classNames={{ indicator: allStatus[`${normalizedContact?.status}`] }}
         >
           <Avatar
             size={50}
