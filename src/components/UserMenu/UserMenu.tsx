@@ -1,7 +1,7 @@
 import type { FC, MouseEvent } from 'react';
 
 import { Avatar, Group, Indicator, Menu, Text, UnstyledButton, rem } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import { useDidUpdate, useMediaQuery } from '@mantine/hooks';
 
 import { IconChevronDown, IconLogout, IconSettings } from '@tabler/icons-react';
 
@@ -19,8 +19,15 @@ const UserMenu: FC = () => {
   const { classes: c, cx } = useStyles();
   const { classes: cG } = useStylesGlobal();
   const { firebaseAuth, name, avatar, status } = useUser();
-  const { allStatus, userStatus, setUserStatus } = useClassStatus(status);
+  const { allStatus, userStatus, setUserStatus } = useClassStatus('online');
   const min_576 = useMediaQuery(`(min-width: ${rem(576)})`);
+
+  useDidUpdate(() => {
+    if (!status) {
+    }
+
+    setUserStatus(status);
+  }, [status]);
 
   const setStatus = (e: MouseEvent<HTMLButtonElement>) => {
     setUserStatus((e.target as HTMLButtonElement).textContent?.toLowerCase() as TStatusUser);

@@ -6,6 +6,8 @@ import { useClassStatus } from '@/hooks';
 
 import type { IContactItemProps } from '@/interfaces';
 
+import type { TStatusUser } from '@/types';
+
 import useStyles from './ContactItem.styles';
 
 const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => {
@@ -21,7 +23,7 @@ const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => 
           offset={7}
           position='bottom-end'
           withBorder
-          classNames={{ indicator: allStatus[`${contact.status}`] }}
+          classNames={{ indicator: allStatus[`${contact.status as TStatusUser}`] }}
         >
           <Avatar size={50} radius='xl' src={contact.avatar} alt={contact.name} />
         </Indicator>

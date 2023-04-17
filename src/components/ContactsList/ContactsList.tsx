@@ -7,7 +7,7 @@ import type { IContactsListProps } from '@/interfaces';
 const ContactsList: FC<IContactsListProps> = ({ contacts, setIdActiveContact }) => {
   return (
     <ul>
-      {contacts?.map((contact) => (
+      {contacts.map((contact) => (
         <ContactItem key={contact.id} contact={contact} setIdActiveContact={setIdActiveContact} />
       ))}
     </ul>
