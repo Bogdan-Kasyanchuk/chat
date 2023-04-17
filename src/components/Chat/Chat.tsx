@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FC } from 'react';
 
 import { Flex, rem } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
-import { useKeyDown, useStylesGlobal } from '@/hooks';
+import { checkUser, createUser } from '@/service/firebase';
+
+import { useKeyDown, useStylesGlobal, useUser } from '@/hooks';
 
 import { ContactsBoard, MessagesBoard, StartViewChat } from '@/components';
 
@@ -15,6 +17,18 @@ const Chat: FC = () => {
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const [idActiveContact, setIdActiveContact] = useState<TIdActiveContact>('');
   useKeyDown(() => setIdActiveContact(''));
+
+  const { name, avatar, idUser, status } = useUser();
+
+  useEffect(() => {
+    checkUser(idUser).then((docSnap) => {
+      if (docSnap?.exists()) {
+        return;
+      }
+
+      createUser(idUser, { name, avatar, status, idContact: idUser });
+    });
+  }, [name, avatar]);
 
   return (
     <Flex justify='center' h='100%' className={cG.borderX}>

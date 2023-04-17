@@ -10,10 +10,10 @@ import useStyles from './ContactItem.styles';
 
 const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => {
   const { classes: c } = useStyles();
-  const { allStatus } = useClassStatus('online');
+  const { userStatus } = useClassStatus(contact.status);
 
   return (
-    <li className={c.item} onClick={() => setIdActiveContact(contact.id)}>
+    <li className={c.item} onClick={() => setIdActiveContact(contact.idContact)}>
       <Flex justify='space-between'>
         <Indicator
           inline
@@ -21,7 +21,7 @@ const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => 
           offset={7}
           position='bottom-end'
           withBorder
-          classNames={{ indicator: allStatus[`${contact.status}`] }}
+          classNames={{ indicator: userStatus }}
         >
           <Avatar size={50} radius='xl' src={contact.avatar} alt={contact.name} />
         </Indicator>

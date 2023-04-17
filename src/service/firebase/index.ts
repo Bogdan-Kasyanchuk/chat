@@ -5,6 +5,14 @@ import { loginUserEmail, registerUserEmail } from '@/service/firebase/firebaseEm
 import firebaseGitHubAuth from '@/service/firebase/firebaseGitHubAuth';
 import firebaseGoogleAuth from '@/service/firebase/firebaseGoogleAuth';
 import firebaseInitApp from '@/service/firebase/firebaseInitApp';
+import {
+  checkUser,
+  createMessage,
+  createUser,
+  deleteUser,
+  updateStatusUser,
+  updateUser,
+} from '@/service/firebase/firebaseOperations';
 
 export {
   firebaseAuth,
@@ -15,4 +23,10 @@ export {
   firebaseGitHubAuth,
   firebaseGoogleAuth,
   firebaseInitApp,
+  checkUser,
+  createMessage,
+  createUser,
+  deleteUser,
+  updateStatusUser,
+  updateUser,
 };

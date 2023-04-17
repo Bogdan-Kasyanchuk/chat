@@ -6,9 +6,9 @@ import type { IStatus } from '@/interfaces';
 
 import type { TStatusUser } from '@/types';
 
-const useClassStatus = (value: TStatusUser) => {
+const useClassStatus = (value?: TStatusUser) => {
   const { classes } = useStylesGlobal();
-  const [status, setStatus] = useState<TStatusUser>(value);
+  const [status, setStatus] = useState<TStatusUser>(value ?? 'online');
 
   const allStatus: IStatus = {
     online: classes.statusOnline,

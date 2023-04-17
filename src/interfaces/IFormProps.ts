@@ -1,4 +1,6 @@
+import type { ICredential } from '@/interfaces';
+
 export default interface IFormProps {
-  submitForm: (email: string, password: string) => void;
+  submitForm: (email: ICredential['password'], password: ICredential['password']) => void;
   childrenButton: string;
 }

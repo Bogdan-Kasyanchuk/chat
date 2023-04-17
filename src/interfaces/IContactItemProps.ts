@@ -1,8 +1,8 @@
-import type { IUseResultContacts } from '@/interfaces';
+import type { INormalizedContact } from '@/interfaces';
 
 import type { TSetIdActiveContact } from '@/types';
 
 export default interface IContactItemProps {
-  contact: IUseResultContacts;
+  contact: INormalizedContact;
   setIdActiveContact: TSetIdActiveContact;
 }

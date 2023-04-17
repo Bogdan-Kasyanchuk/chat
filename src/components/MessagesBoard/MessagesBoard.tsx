@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useEffect } from 'react';
 
 import {
   ActionIcon,
@@ -13,7 +12,7 @@ import {
   rem,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useMediaQuery, useScrollIntoView } from '@mantine/hooks';
+import { useDidUpdate, useMediaQuery, useScrollIntoView } from '@mantine/hooks';
 
 import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
 
@@ -30,24 +29,26 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const { normalizedContact } = useNormalizedContacts(idActiveContact);
-  const { userStatus } = useClassStatus(normalizedContact.status);
+  const { allStatus } = useClassStatus();
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLLIElement,
     HTMLDivElement
   >({ offset: 50, duration: 500 });
+
   const form = useForm({
     initialValues: {
       message: '',
     },
   });
 
-  const idFirstNotReadMessage = normalizedContact.messages.find(
+  const idFirstNotReadMessage = normalizedContact?.messages.find(
     (el) => el.read === false && el.idOwner === idActiveContact,
   );
 
-  useEffect(() => {
+  useDidUpdate(() => {
     scrollIntoView();
   });
+
   return (
     <Box className={c.boardBox}>
       <Flex align='center' gap={15} bg='gray.2' p={15} h={81} className={cG.borderB}>
@@ -57,17 +58,17 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
           offset={7}
           position='bottom-end'
           withBorder
-          classNames={{ indicator: userStatus }}
+          classNames={{ indicator: allStatus[`${normalizedContact?.status}`] }}
         >
           <Avatar
             size={50}
             radius='xl'
-            src={normalizedContact.avatar}
-            alt={normalizedContact.name}
+            src={normalizedContact?.avatar}
+            alt={normalizedContact?.name}
           />
         </Indicator>
         <Text lineClamp={1} component='p' fz={24} fw={600}>
-          {normalizedContact.name}
+          {normalizedContact?.name}
         </Text>
         {!min_768 && (
           <ActionIcon type='button' size={40} ml='auto' onClick={() => setIdActiveContact('')}>
@@ -77,7 +78,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
       </Flex>
       <ScrollArea h='calc(100% - 81px - 81px)' viewportRef={scrollableRef}>
         <MessagesList
-          messages={normalizedContact.messages}
+          messages={normalizedContact?.messages}
           contact={normalizedContact}
           idFirstNotReadMessage={idFirstNotReadMessage?.id}
           ref={targetRef}

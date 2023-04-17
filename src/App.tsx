@@ -7,7 +7,7 @@ import { useUser } from '@/hooks';
 
 import { Footer, Header } from '@/layouts';
 
-import { ChatPage, HomePage, LoginPage, RegisterPage } from '@/pages';
+import { ChatPage, Error_404Page, HomePage, LoginPage, RegisterPage } from '@/pages';
 
 import { PrivateRoute, PublicRoute } from '@/routes';
 
@@ -59,7 +59,7 @@ const App: FC = () => {
                     </PrivateRoute>
                   }
                 />
-                <Route path='/*' element={<Navigate to='/' />} />
+                <Route path='/*' element={<Error_404Page />} />
               </Routes>
             </Container>
             <Footer />

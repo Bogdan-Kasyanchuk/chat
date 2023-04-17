@@ -1,21 +1,45 @@
+import type { User } from 'firebase/auth';
+import { deleteUser as delUser, updateProfile } from 'firebase/auth';
 import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
-// import db from '@/service/firebaseDB';
+import firebaseAuth from '@/service/firebase/firebaseAuth';
+import firebaseDB from '@/service/firebase/firebaseDB';
 
-// import tryCatch from '@/helpers/tryCatch';
+import { tryCatch } from '@/helpers';
 
-// export async function startGame(idGame: TIdGame) {
-//   await tryCatch(setDoc(doc(db, 'games', idGame), initialData()));
-// }
+import { IMessages, IUser } from '@/interfaces';
 
-// export async function updateGame<T>(idGame: TIdGame, data: { [x: string]: T }) {
-//   await tryCatch(updateDoc(doc(db, 'games', idGame), data));
-// }
+const currentUser = () => {
+  return firebaseAuth.currentUser as User;
+};
 
-// export async function checkGame(idGame: TIdGame) {
-//   return tryCatch(getDoc(doc(db, 'games', idGame)));
-// }
+export const createUser = async (id: IUser['idContact'], data: IUser) => {
+  await tryCatch(setDoc(doc(firebaseDB, 'contacts', id), data));
+};
 
-// export async function deleteGame(idGame: TIdGame) {
-//   await tryCatch(deleteDoc(doc(db, 'games', idGame)));
-// }
+export async function checkUser(id: IUser['idContact']) {
+  return tryCatch(getDoc(doc(firebaseDB, 'contacts', id)));
+}
+
+export const updateUser = async (id: IUser['idContact'], data: Pick<IUser, 'name' | 'avatar'>) => {
+  await tryCatch(
+    updateProfile(currentUser(), {
+      displayName: data.name,
+      photoURL: data.avatar,
+    }),
+  );
+  await tryCatch(updateDoc(doc(firebaseDB, 'contacts', id), data));
+};
+
+export const updateStatusUser = async (id: IUser['idContact'], status: IUser['status']) => {
+  await tryCatch(updateDoc(doc(firebaseDB, 'contacts', id), { status }));
+};
+
+export const deleteUser = async (id: IUser['idContact']) => {
+  await tryCatch(deleteDoc(doc(firebaseDB, 'contacts', id)));
+  await tryCatch(delUser(currentUser()));
+};
+
+export const createMessage = async (id: IMessages['id'], data: IMessages) => {
+  await tryCatch(setDoc(doc(firebaseDB, 'messages', id), data));
+};

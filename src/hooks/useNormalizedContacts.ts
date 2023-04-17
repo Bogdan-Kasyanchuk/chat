@@ -1,51 +1,61 @@
-import { useUser } from '@/hooks';
+import { useEffect, useState } from 'react';
+
+import { useData, useUser } from '@/hooks';
 
 import { getLocaleDate, getTime } from '@/helpers';
 
-import type { IMessages, INormalizedContact, IUser } from '@/interfaces';
+import type { IMessages, INormalizedContact } from '@/interfaces';
 
-import contacts from '@/data/contacts.json';
-import messages from '@/data/messages.json';
+const useNormalizedContacts = (id?: string) => {
+  const { idUser } = useUser();
+  const { data: contacts } = useData('contacts');
+  const { data: messages } = useData('messages');
+  const [normalizedContacts, setNormalizedContacts] = useState<INormalizedContact[]>([]);
 
-const useNormalizedContacts = (idContact?: string) => {
-  const { id: idUser } = useUser();
+  useEffect(() => {
+    if (!contacts || !messages) {
+      return;
+    }
 
-  const normalizedContacts: INormalizedContact[] = (contacts as IUser[])
-    .filter((el) => {
-      return el.id !== idUser;
-    })
-    .map(({ id, name, avatar, status }) => {
-      const normalizedMessages: IMessages[] = messages
-        .filter(
-          (el) =>
-            (el.idInterlocutor === idUser && el.idOwner === id) ||
-            (el.idInterlocutor === id && el.idOwner === idUser),
-        )
-        .sort((a, b) => getTime(a.date) - getTime(b.date));
+    setNormalizedContacts(
+      contacts
+        .filter((el) => {
+          return el.idContact !== idUser;
+        })
+        .map(({ idContact, name, avatar, status }) => {
+          const normalizedMessages = (messages as IMessages[])
+            ?.filter(
+              (el) =>
+                (el.idInterlocutor === idUser && el.idOwner === idContact) ||
+                (el.idInterlocutor === idContact && el.idOwner === idUser),
+            )
+            .sort((a, b) => getTime(a.date) - getTime(b.date));
 
-      const lastMessage = normalizedMessages[normalizedMessages.length - 1];
+          const lastMessage = normalizedMessages[normalizedMessages.length - 1];
 
-      return {
-        id,
-        name,
-        avatar,
-        status,
-        messages: normalizedMessages,
-        unreadCountMessages: normalizedMessages.filter(
-          (el) => el.read === false && el.idOwner === id,
-        ).length,
-        lastMessageBody: lastMessage?.body,
-        lastMessageDate: getLocaleDate(lastMessage?.date, {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-        }),
-      };
-    })
-    .sort((a, b) => getTime(b.lastMessageDate) - getTime(a.lastMessageDate));
+          return {
+            idContact,
+            name,
+            avatar,
+            status,
+            messages: normalizedMessages,
+            unreadCountMessages: normalizedMessages.filter(
+              (el) => !el.read && el.idOwner === idContact,
+            ).length,
+            lastMessageBody: lastMessage?.body,
+            lastMessageDate: getLocaleDate(lastMessage?.date, {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            }),
+          };
+        })
+        .sort((a, b) => getTime(b.lastMessageDate) - getTime(a.lastMessageDate)),
+    );
+  }, [contacts, messages]);
 
   const normalizedContact = normalizedContacts.find(
-    (el) => el.id === idContact,
+    (el) => el.idContact === id,
   ) as INormalizedContact;
 
   return { normalizedContact, normalizedContacts };
