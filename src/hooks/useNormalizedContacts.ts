@@ -42,7 +42,6 @@ const useNormalizedContacts = (id?: string) => {
             unreadCountMessages: normalizedMessages.filter(
               (el) => !el.read && el.idOwner === idContact,
             ).length,
-            lastMessageOwner: lastMessage?.idOwner,
             lastMessageBody: lastMessage?.body,
             lastMessageDate: getLocaleDate(lastMessage?.date, {
               year: 'numeric',
