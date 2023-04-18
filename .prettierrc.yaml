@@ -20,6 +20,7 @@
       '^@tabler/(.*)',
       '^@/service',
       '^@/hooks',
+      '^@/lib',
       '^@/helpers',
       '^@/assets/(.*)',
       '^@/layouts',

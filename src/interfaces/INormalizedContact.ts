@@ -1,8 +1,9 @@
-import type { IMessages, IUser } from '@/interfaces';
+import type { IMessage, IUser } from '@/interfaces';
 
 export default interface INormalizedContact extends IUser {
-  messages: IMessages[];
+  messages: IMessage[];
   unreadCountMessages: number;
+  lastMessageOwner: string;
   lastMessageBody: string;
   lastMessageDate: string;
 }

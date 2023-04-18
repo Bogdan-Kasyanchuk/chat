@@ -8,7 +8,7 @@ import { IconAt, IconLock } from '@tabler/icons-react';
 
 import { Button } from '@/components';
 
-import type { IFormProps } from '@/interfaces';
+import type IFormProps from './IFormProps';
 
 const Form: FC<IFormProps> = ({ submitForm, childrenButton }) => {
   const form = useForm({

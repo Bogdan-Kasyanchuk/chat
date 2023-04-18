@@ -4,7 +4,7 @@ import { useData, useUser } from '@/hooks';
 
 import { getLocaleDate, getTime } from '@/helpers';
 
-import type { IMessages, INormalizedContact } from '@/interfaces';
+import type { IMessage, INormalizedContact } from '@/interfaces';
 
 const useNormalizedContacts = (id?: string) => {
   const { idUser } = useUser();
@@ -23,7 +23,7 @@ const useNormalizedContacts = (id?: string) => {
           return el.idContact !== idUser;
         })
         .map(({ idContact, name, avatar, status }) => {
-          const normalizedMessages = (messages as IMessages[])
+          const normalizedMessages = (messages as IMessage[])
             ?.filter(
               (el) =>
                 (el.idInterlocutor === idUser && el.idOwner === idContact) ||
@@ -42,6 +42,7 @@ const useNormalizedContacts = (id?: string) => {
             unreadCountMessages: normalizedMessages.filter(
               (el) => !el.read && el.idOwner === idContact,
             ).length,
+            lastMessageOwner: lastMessage?.idOwner,
             lastMessageBody: lastMessage?.body,
             lastMessageDate: getLocaleDate(lastMessage?.date, {
               year: 'numeric',

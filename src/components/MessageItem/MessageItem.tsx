@@ -4,8 +4,7 @@ import { Avatar, Flex, Text } from '@mantine/core';
 
 import { getLocaleDate } from '@/helpers';
 
-import type { IMessageItemProps } from '@/interfaces';
-
+import type IMessageItemProps from './IMessageItemProps';
 import useStyles from './MessageItem.styles';
 
 const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
@@ -23,7 +22,7 @@ const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
           </li>
         )}
         <li className={c.item}>
-          <Flex ml={checkId ? 0 : 'auto'} maw={500}>
+          <Flex ml={checkId ? 0 : 'auto'} maw={500} justify={checkId ? 'flex-start' : 'flex-end'}>
             {checkId && (
               <Avatar mr={10} size={50} radius='xl' src={contact.avatar} alt={contact.name} />
             )}

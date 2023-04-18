@@ -4,9 +4,8 @@ import { Avatar, Box, Flex, Indicator, Text } from '@mantine/core';
 
 import { useClassStatus } from '@/hooks';
 
-import type { IContactItemProps } from '@/interfaces';
-
 import useStyles from './ContactItem.styles';
+import type IContactItemProps from './IContactItemProps';
 
 const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => {
   const { classes: c } = useStyles();
@@ -36,9 +35,11 @@ const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => 
           )}
         </Flex>
         <Box className={c.paramsBox}>
-          <Text component='time' display='block' color='gray.6'>
-            {contact.lastMessageDate}
-          </Text>
+          {contact.lastMessageBody && (
+            <Text component='time' display='block' color='gray.6'>
+              {contact.lastMessageDate}
+            </Text>
+          )}
           {!!contact.unreadCountMessages && (
             <Text component='span' className={c.quantity}>
               {contact.unreadCountMessages}

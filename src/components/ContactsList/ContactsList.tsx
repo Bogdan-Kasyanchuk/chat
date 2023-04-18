@@ -2,7 +2,7 @@ import type { FC } from 'react';
 
 import { ContactItem } from '@/components';
 
-import type { IContactsListProps } from '@/interfaces';
+import type IContactsListProps from './IContactsListProps';
 
 const ContactsList: FC<IContactsListProps> = ({ contacts, setIdActiveContact }) => {
   return (

@@ -16,24 +16,30 @@ import { useDidUpdate, useMediaQuery, useScrollIntoView } from '@mantine/hooks';
 
 import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
 
-import { useClassStatus, useNormalizedContacts, useStylesGlobal } from '@/hooks';
+import { createMessage } from '@/service/firebase';
+
+import { useClassStatus, useNormalizedContacts, useStylesGlobal, useUser } from '@/hooks';
+
+import { CreateMessage } from '@/lib';
 
 import { MessagesList } from '@/components';
 
-import { IMessagesBoardProps } from '@/interfaces';
+import { IMessage } from '@/interfaces';
 
+import IMessagesBoardProps from './IMessagesBoardProps';
 import useStyles from './MessagesBoard.styles';
 
 const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveContact }) => {
   const { classes: cG } = useStylesGlobal();
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
+  const { idUser } = useUser();
   const { normalizedContact } = useNormalizedContacts(idActiveContact);
   const { allStatus } = useClassStatus();
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLLIElement,
     HTMLDivElement
-  >({ offset: 50, duration: 500 });
+  >({ duration: 500 });
 
   const form = useForm({
     initialValues: {
@@ -45,8 +51,26 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
     (el) => el.read === false && el.idOwner === idActiveContact,
   );
 
+  const scrollToBottom = () => {
+    scrollableRef.current?.scrollTo({
+      top: scrollableRef.current.scrollHeight,
+      behavior: 'smooth',
+    });
+  };
+
+  const addMessage = (body: string) => {
+    const newMessage: IMessage = new CreateMessage(body, idUser, normalizedContact?.idContact);
+    createMessage(newMessage.id, { ...newMessage });
+  };
+
   useDidUpdate(() => {
-    scrollIntoView();
+    if (idFirstNotReadMessage) {
+      // console.log('--scrollIntoView--');
+      scrollIntoView();
+    } else {
+      // console.log('--scrollToBottom--');
+      scrollToBottom();
+    }
   });
 
   return (
@@ -87,6 +111,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
       <Box
         component='form'
         onSubmit={form.onSubmit(({ message }) => {
+          addMessage(message);
           form.reset();
         })}
         bg='gray.2'

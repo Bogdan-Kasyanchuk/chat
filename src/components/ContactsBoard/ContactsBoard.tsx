@@ -9,9 +9,8 @@ import { useFilteredContacts, useNormalizedContacts, useStylesGlobal } from '@/h
 
 import { ContactsList } from '@/components';
 
-import type { IContactsBoardProps } from '@/interfaces';
-
 import useStyles from './ContactsBoard.styles';
+import type IContactsBoardProps from './IContactsBoardProps';
 
 const ContactsBoard: FC<IContactsBoardProps> = ({ setIdActiveContact }) => {
   const [value, setValue] = useInputState('');

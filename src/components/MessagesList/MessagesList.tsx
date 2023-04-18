@@ -2,7 +2,7 @@ import { forwardRef } from 'react';
 
 import { MessageItem } from '@/components';
 
-import { IMessagesListProps } from '@/interfaces';
+import IMessagesListProps from './IMessagesListProps';
 
 const MessagesList = forwardRef<HTMLLIElement, IMessagesListProps>(
   ({ messages, contact, idFirstNotReadMessage }, ref) => {
