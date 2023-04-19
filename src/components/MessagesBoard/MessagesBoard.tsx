@@ -24,7 +24,7 @@ import { CreateMessage } from '@/lib';
 
 import { MessagesList } from '@/components';
 
-import { IMessage } from '@/interfaces';
+import type { IMessage } from '@/interfaces';
 
 import IMessagesBoardProps from './IMessagesBoardProps';
 import useStyles from './MessagesBoard.styles';
@@ -34,7 +34,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const { idUser } = useUser();
-  const { normalizedContact } = useNormalizedContacts(idActiveContact);
+  const { normalizedContact, normalizedContacts } = useNormalizedContacts(idActiveContact);
   const { allStatus } = useClassStatus();
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLLIElement,
@@ -71,7 +71,9 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
       // console.log('--scrollToBottom--');
       scrollToBottom();
     }
-  });
+  }, [normalizedContacts]);
+
+  console.log(22222222);
 
   return (
     <Box className={c.boardBox}>

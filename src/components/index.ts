@@ -10,6 +10,7 @@ import Login from './Login';
 import MessageItem from './MessageItem';
 import MessagesBoard from './MessagesBoard';
 import MessagesList from './MessagesList';
+import ModalConfirm from './ModalConfirm';
 import Register from './Register';
 import StartViewChat from './StartViewChat';
 import UserMenu from './UserMenu';
@@ -28,6 +29,7 @@ export {
   MessagesBoard,
   MessagesList,
   Register,
+  ModalConfirm,
   StartViewChat,
   UserMenu,
 };

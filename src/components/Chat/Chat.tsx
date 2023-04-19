@@ -45,7 +45,7 @@ const Chat: FC = () => {
       isMounted &&
       messages.sort((a, b) => getTime(a.date) - getTime(b.date)).at(-1)?.idInterlocutor === idUser
     ) {
-      // audio.play();
+      audio.play();
       console.log(555555);
     }
   }, [messages]);
