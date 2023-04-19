@@ -1,26 +1,32 @@
 import type { FC } from 'react';
 
-import { Button, Text } from '@mantine/core';
-import { modals } from '@mantine/modals';
+import { Button, Group, Modal } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 
 import type IModalConfirmProps from './IModalConfirmProps';
 
 const ModalConfirm: FC = () => {
-  const openModal = () =>
-    modals.openConfirmModal({
-      title: 'Please confirm your action',
-      children: (
-        <Text size='sm'>
-          This action is so important that you are required to confirm it with a modal. Please click
-          one of these buttons to proceed.
-        </Text>
-      ),
-      labels: { confirm: 'Confirm', cancel: 'Cancel' },
-      onCancel: () => console.log('Cancel'),
-      onConfirm: () => console.log('Confirmed'),
-    });
+  const [opened, { open, close }] = useDisclosure(false);
 
-  return <Button onClick={openModal}>Open confirm modal</Button>;
+  return (
+    <>
+      <Modal opened={opened} onClose={close} title='Authentication' centered>
+        Modal content Modal content Modal content Modal content Modal content Modal content
+        <Group position='center' spacing={30}>
+          <Button uppercase onClick={open}>
+            Ok
+          </Button>
+          <Button uppercase onClick={close}>
+            Cancel
+          </Button>
+        </Group>
+      </Modal>
+
+      <Group position='center'>
+        <Button onClick={open}>Open centered Modal</Button>
+      </Group>
+    </>
+  );
 };
 
 export default ModalConfirm;
