@@ -1,6 +1,6 @@
 import { getAuth } from 'firebase/auth';
 
-import firebaseInitApp from '@/service/firebase/firebaseInitApp';
+import firebaseInitApp from './firebaseInitApp';
 
 const firebaseAuth = getAuth(firebaseInitApp);
 

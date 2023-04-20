@@ -1,7 +1,7 @@
-import type { IMessage, INormalizedContact } from '@/interfaces';
+import type { IMessage, ITransformedContact } from '@/interfaces';
 
 export default interface IMessagesListProps {
   messages: IMessage[];
-  contact: INormalizedContact;
+  contact: ITransformedContact;
   idFirstNotReadMessage: string | undefined;
 }

@@ -1,3 +1,4 @@
+import { log } from 'console';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -110,7 +111,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           },
         }}
       >
-        <Notifications position='top-center' autoClose={2000} zIndex={100} />
+        <Notifications position='top-center' autoClose={3000} zIndex={100} />
         <App />
       </MantineProvider>
     </BrowserRouter>

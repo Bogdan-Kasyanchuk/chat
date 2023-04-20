@@ -18,7 +18,7 @@ import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
 
 import { createMessage } from '@/service/firebase';
 
-import { useClassStatus, useNormalizedContacts, useStylesGlobal, useUser } from '@/hooks';
+import { useClassStatus, useStylesGlobal, useTransformedData, useUser } from '@/hooks';
 
 import { CreateMessage } from '@/lib';
 
@@ -34,7 +34,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const { idUser } = useUser();
-  const { normalizedContact, normalizedContacts } = useNormalizedContacts(idActiveContact);
+  const { transformedContact, transformedContacts } = useTransformedData(idActiveContact);
   const { allStatus } = useClassStatus();
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLLIElement,
@@ -47,7 +47,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
     },
   });
 
-  const idFirstNotReadMessage = normalizedContact?.messages.find(
+  const idFirstNotReadMessage = transformedContact?.messages.find(
     (el) => el.read === false && el.idOwner === idActiveContact,
   );
 
@@ -59,21 +59,19 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
   };
 
   const addMessage = (body: string) => {
-    const newMessage: IMessage = new CreateMessage(body, idUser, normalizedContact?.idContact);
+    const newMessage: IMessage = new CreateMessage(body, idUser, transformedContact?.idContact);
     createMessage(newMessage.id, { ...newMessage });
   };
 
-  useDidUpdate(() => {
-    if (idFirstNotReadMessage) {
-      // console.log('--scrollIntoView--');
-      scrollIntoView();
-    } else {
-      // console.log('--scrollToBottom--');
-      scrollToBottom();
-    }
-  }, [normalizedContacts]);
-
-  console.log(22222222);
+  // useDidUpdate(() => {
+  //   if (idFirstNotReadMessage) {
+  //     console.log('--scrollIntoView--');
+  //     scrollIntoView();
+  //   } else {
+  //     console.log('--scrollToBottom--');
+  //     scrollToBottom();
+  //   }
+  // }, [transformedContacts]);
 
   return (
     <Box className={c.boardBox}>
@@ -84,17 +82,17 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
           offset={7}
           position='bottom-end'
           withBorder
-          classNames={{ indicator: allStatus[`${normalizedContact?.status}`] }}
+          classNames={{ indicator: allStatus[`${transformedContact?.status}`] }}
         >
           <Avatar
             size={50}
             radius='xl'
-            src={normalizedContact?.avatar}
-            alt={normalizedContact?.name}
+            src={transformedContact?.avatar}
+            alt={transformedContact?.name}
           />
         </Indicator>
         <Text lineClamp={1} component='p' fz={24} fw={600}>
-          {normalizedContact?.name}
+          {transformedContact?.name}
         </Text>
         {!min_768 && (
           <ActionIcon type='button' size={40} ml='auto' onClick={() => setIdActiveContact('')}>
@@ -104,8 +102,8 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
       </Flex>
       <ScrollArea h='calc(100% - 81px - 81px)' viewportRef={scrollableRef}>
         <MessagesList
-          messages={normalizedContact?.messages}
-          contact={normalizedContact}
+          messages={transformedContact?.messages}
+          contact={transformedContact}
           idFirstNotReadMessage={idFirstNotReadMessage?.id}
           ref={targetRef}
         />

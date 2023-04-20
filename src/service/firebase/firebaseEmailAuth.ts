@@ -1,10 +1,10 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
-import firebaseAuth from '@/service/firebase/firebaseAuth';
-
-import { showError } from '@/helpers';
+import { showError } from '@/lib';
 
 import type { ICredential } from '@/interfaces';
+
+import firebaseAuth from './firebaseAuth';
 
 export const registerUserEmail = ({ email, password }: ICredential) => {
   createUserWithEmailAndPassword(firebaseAuth, email, password).catch((error) => {

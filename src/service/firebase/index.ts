@@ -1,10 +1,10 @@
-import firebaseAuth from '@/service/firebase/firebaseAuth';
-import firebaseConfig from '@/service/firebase/firebaseConfig';
-import firebaseDB from '@/service/firebase/firebaseDB';
-import { loginUserEmail, registerUserEmail } from '@/service/firebase/firebaseEmailAuth';
-import firebaseGitHubAuth from '@/service/firebase/firebaseGitHubAuth';
-import firebaseGoogleAuth from '@/service/firebase/firebaseGoogleAuth';
-import firebaseInitApp from '@/service/firebase/firebaseInitApp';
+import firebaseAuth from './firebaseAuth';
+import firebaseConfig from './firebaseConfig';
+import firebaseDB from './firebaseDB';
+import { loginUserEmail, registerUserEmail } from './firebaseEmailAuth';
+import firebaseGitHubAuth from './firebaseGitHubAuth';
+import firebaseGoogleAuth from './firebaseGoogleAuth';
+import firebaseInitApp from './firebaseInitApp';
 import {
   checkUser,
   createMessage,
@@ -12,7 +12,7 @@ import {
   deleteUser,
   updateStatusUser,
   updateUser,
-} from '@/service/firebase/firebaseOperations';
+} from './firebaseOperations';
 
 export {
   firebaseAuth,

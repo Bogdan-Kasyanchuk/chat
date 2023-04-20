@@ -1,3 +1,9 @@
+import { ReactNode } from 'react';
+
 export default interface IModalConfirmProps {
-  // idFirstNotReadMessage: string | undefined;
+  title: string;
+  children: ReactNode;
+  isOpened: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
 }

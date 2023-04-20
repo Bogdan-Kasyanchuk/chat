@@ -9,16 +9,12 @@ import { Footer, Header } from '@/layouts';
 
 import { ChatPage, Error_404Page, HomePage, LoginPage, RegisterPage } from '@/pages';
 
-import { ModalConfirm } from '@/components';
-
 import { PrivateRoute, PublicRoute } from '@/routes';
 
 const App: FC = () => {
   const { loading } = useUser();
   return (
     <>
-      <ModalConfirm />
-
       <Flex direction='column' h='100%'>
         <LoadingOverlay
           visible={loading}

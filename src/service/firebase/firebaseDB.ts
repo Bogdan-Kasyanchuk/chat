@@ -1,6 +1,6 @@
 import { getFirestore } from 'firebase/firestore';
 
-import firebaseInitApp from '@/service/firebase/firebaseInitApp';
+import firebaseInitApp from './firebaseInitApp';
 
 const firebaseDB = getFirestore(firebaseInitApp);
 

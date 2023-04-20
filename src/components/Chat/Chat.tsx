@@ -6,9 +6,15 @@ import { useDidUpdate, useMediaQuery } from '@mantine/hooks';
 
 import { checkUser, createUser } from '@/service/firebase';
 
-import { useData, useKeyDown, useStylesGlobal, useUser } from '@/hooks';
+import {
+  useKeyDown,
+  useNormalizedContacts,
+  useNormalizedMessages,
+  useStylesGlobal,
+  useUser,
+} from '@/hooks';
 
-import { getTime } from '@/helpers';
+import { showLastMessage } from '@/lib';
 
 import newMessageAudio from '@/assets/newMessage.mp3';
 
@@ -21,7 +27,8 @@ const Chat: FC = () => {
   const [isMounted, setIsMounted] = useState(false);
   useKeyDown(() => setIdActiveContact(''));
   const { name, avatar, idUser, status } = useUser();
-  const { data: messages } = useData('messages');
+  const { normalizedMessages } = useNormalizedMessages();
+  const { normalizedContacts } = useNormalizedContacts();
 
   const audio = new Audio(newMessageAudio);
 
@@ -36,40 +43,43 @@ const Chat: FC = () => {
   }, []);
 
   useDidUpdate(() => {
-    if (messages) {
+    if (normalizedMessages.length > 0) {
       setIsMounted(true);
     }
 
-    if (
-      messages &&
-      isMounted &&
-      messages.sort((a, b) => getTime(a.date) - getTime(b.date)).at(-1)?.idInterlocutor === idUser
-    ) {
+    const lastMessage = normalizedMessages[normalizedMessages.length - 1];
+
+    if (normalizedMessages && isMounted && lastMessage.idInterlocutor === idUser) {
       audio.play();
-      console.log(555555);
+      showLastMessage(lastMessage, normalizedContacts);
     }
-  }, [messages]);
+  }, [normalizedMessages]);
 
   return (
-    <Flex justify='center' h='100%' className={cG.borderX}>
-      {min_768 ? (
-        <>
+    <>
+      <Flex justify='center' h='100%' className={cG.borderX}>
+        {min_768 ? (
+          <>
+            <ContactsBoard setIdActiveContact={setIdActiveContact} />
+            {idActiveContact ? (
+              <MessagesBoard
+                idActiveContact={idActiveContact}
+                setIdActiveContact={setIdActiveContact}
+              />
+            ) : (
+              <StartViewChat />
+            )}
+          </>
+        ) : idActiveContact ? (
+          <MessagesBoard
+            idActiveContact={idActiveContact}
+            setIdActiveContact={setIdActiveContact}
+          />
+        ) : (
           <ContactsBoard setIdActiveContact={setIdActiveContact} />
-          {idActiveContact ? (
-            <MessagesBoard
-              idActiveContact={idActiveContact}
-              setIdActiveContact={setIdActiveContact}
-            />
-          ) : (
-            <StartViewChat />
-          )}
-        </>
-      ) : idActiveContact ? (
-        <MessagesBoard idActiveContact={idActiveContact} setIdActiveContact={setIdActiveContact} />
-      ) : (
-        <ContactsBoard setIdActiveContact={setIdActiveContact} />
-      )}
-    </Flex>
+        )}
+      </Flex>
+    </>
   );
 };
 

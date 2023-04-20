@@ -1,31 +1,30 @@
 import type { FC } from 'react';
 
-import { Button, Group, Modal } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Group, Modal } from '@mantine/core';
+
+import { Button } from '@/components';
 
 import type IModalConfirmProps from './IModalConfirmProps';
 
-const ModalConfirm: FC = () => {
-  const [opened, { open, close }] = useDisclosure(false);
-
+const ModalConfirm: FC<IModalConfirmProps> = ({
+  title,
+  children,
+  isOpened,
+  onClose,
+  onConfirm,
+}) => {
   return (
-    <>
-      <Modal opened={opened} onClose={close} title='Authentication' centered>
-        Modal content Modal content Modal content Modal content Modal content Modal content
-        <Group position='center' spacing={30}>
-          <Button uppercase onClick={open}>
-            Ok
-          </Button>
-          <Button uppercase onClick={close}>
-            Cancel
-          </Button>
-        </Group>
-      </Modal>
-
-      <Group position='center'>
-        <Button onClick={open}>Open centered Modal</Button>
+    <Modal opened={isOpened} onClose={onClose} title={title} centered>
+      {children}
+      <Group position='center' spacing={30}>
+        <Button type='button' variant='filled-grey' compact size='lg' uppercase onClick={onConfirm}>
+          Ok
+        </Button>
+        <Button type='button' variant='filled-grey' compact size='lg' uppercase onClick={onClose}>
+          Cancel
+        </Button>
       </Group>
-    </>
+    </Modal>
   );
 };
 

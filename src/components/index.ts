@@ -13,6 +13,7 @@ import MessagesList from './MessagesList';
 import ModalConfirm from './ModalConfirm';
 import Register from './Register';
 import StartViewChat from './StartViewChat';
+import UpdateProfile from './UpdateProfile';
 import UserMenu from './UserMenu';
 
 export {
@@ -31,5 +32,6 @@ export {
   Register,
   ModalConfirm,
   StartViewChat,
+  UpdateProfile,
   UserMenu,
 };

@@ -1,17 +1,17 @@
-import ICredential from '@/interfaces/ICredential';
-import IMessage from '@/interfaces/IMessage';
-import INormalizedContact from '@/interfaces/INormalizedContact';
-import IOptionsLocaleDate from '@/interfaces/IOptionsLocaleDate';
-import IRouteProps from '@/interfaces/IRouteProps';
-import IStatus from '@/interfaces/IStatus';
-import IUser from '@/interfaces/IUser';
+import IContact from './IContact';
+import ICredential from './ICredential';
+import IMessage from './IMessage';
+import IOptionsLocaleDate from './IOptionsLocaleDate';
+import IRouteProps from './IRouteProps';
+import IStatus from './IStatus';
+import ITransformedContact from './ITransformedContact';
 
 export type {
   ICredential,
   IMessage,
   IOptionsLocaleDate,
   IRouteProps,
-  INormalizedContact,
+  ITransformedContact,
   IStatus,
-  IUser,
+  IContact,
 };

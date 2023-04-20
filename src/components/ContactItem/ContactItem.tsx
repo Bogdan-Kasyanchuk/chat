@@ -4,6 +4,8 @@ import { Avatar, Box, Flex, Indicator, Text } from '@mantine/core';
 
 import { useClassStatus } from '@/hooks';
 
+import { getLocaleDate } from '@/helpers';
+
 import useStyles from './ContactItem.styles';
 import type IContactItemProps from './IContactItemProps';
 
@@ -12,7 +14,12 @@ const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => 
   const { userStatus } = useClassStatus(contact.status);
 
   return (
-    <li className={c.item} onClick={() => setIdActiveContact(contact.idContact)}>
+    <li
+      className={c.item}
+      onClick={() => {
+        setIdActiveContact(contact.idContact);
+      }}
+    >
       <Flex justify='space-between'>
         <Indicator
           inline
@@ -37,7 +44,11 @@ const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => 
         <Box className={c.paramsBox}>
           {contact.lastMessageBody && (
             <Text component='time' display='block' color='gray.6'>
-              {contact.lastMessageDate}
+              {getLocaleDate(contact.lastMessageDate, {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
             </Text>
           )}
           {!!contact.unreadCountMessages && (

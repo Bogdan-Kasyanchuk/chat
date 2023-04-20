@@ -1,8 +1,8 @@
 import { GithubAuthProvider, signInWithPopup } from 'firebase/auth';
 
-import firebaseAuth from '@/service/firebase/firebaseAuth';
+import { showError } from '@/lib';
 
-import { showError } from '@/helpers';
+import firebaseAuth from './firebaseAuth';
 
 const gitHubProvider = new GithubAuthProvider();
 
