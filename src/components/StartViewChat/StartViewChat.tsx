@@ -12,7 +12,7 @@ const StartViewChat: FC = () => {
 
   return (
     <Center className={c.startViewbox}>
-      <Text component='p' w='max-content' fz={18} p={16} bg='gray.1' className={cG.border}>
+      <Text component='p' w='max-content' fz={18} p={16} bg='gray.2' className={cG.border}>
         Choose who you would like to write to
       </Text>
     </Center>

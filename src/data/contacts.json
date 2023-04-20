@@ -1,54 +1,54 @@
 [
   {
-    "id": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
+    "idContact": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
     "name": "Богдан Касянчук",
     "avatar": "https://lh3.googleusercontent.com/a/AGNmyxYVYM2tRUxhS3shuKbRV58EFy3N14MFixvTe2I=s96-c",
     "status": "online"
   },
   {
-    "id": "id-1",
+    "idContact": "idContact-1",
     "name": "User-01",
     "avatar": "https://cdn0.iconfinder.com/data/icons/avatars-and-smiles-collection/110/Icons__goose-512.png",
     "status": "online"
   },
   {
-    "id": "id-2",
+    "idContact": "idContact-2",
     "name": "User-02",
     "avatar": "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/female_woman_avatar_portrait-512.png",
     "status": "offline"
   },
   {
-    "id": "id-3",
+    "idContact": "idContact-3",
     "name": "User-03",
     "avatar": "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png",
     "status": "do not disturb"
   },
   {
-    "id": "id-4",
+    "idContact": "idContact-4",
     "name": "User-04",
     "avatar": "https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/female_woman_avatar_portrait-512.png",
     "status": "out of place"
   },
   {
-    "id": "id-5",
+    "idContact": "idContact-5",
     "name": "User-05",
     "avatar": "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png",
     "status": "online"
   },
   {
-    "id": "id-6",
+    "idContact": "idContact-6",
     "name": "User-06",
     "avatar": "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png",
     "status": "offline"
   },
   {
-    "id": "id-7",
+    "idContact": "idContact-7",
     "name": "User-07",
     "avatar": "https://cdn0.iconfinder.com/data/icons/avatars-and-smiles-collection/110/Icons__goose-512.png",
     "status": "do not disturb"
   },
   {
-    "id": "id-8",
+    "idContact": "idContact-8",
     "name": "User-08",
     "avatar": "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png",
     "status": "out of place"

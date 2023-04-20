@@ -1,16 +1,17 @@
-import { collection } from 'firebase/firestore';
+// import { collection } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
-import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-import { firebaseDB } from '@/service/firebase';
-
+// import { useCollectionData } from 'react-firebase-hooks/firestore';
+// import { firebaseDB } from '@/service/firebase';
 import { useUser } from '@/hooks';
 
 import type { IContact } from '@/interfaces';
 
+import contacts from '@/data/contacts.json';
+
 const useNormalizedContacts = () => {
   const { idUser } = useUser();
-  const [contacts] = useCollectionData(collection(firebaseDB, 'contacts'));
+  // const [contacts] = useCollectionData(collection(firebaseDB, 'contacts'));
   const [normalizedContacts, setNormalizedContacts] = useState<IContact[]>([]);
 
   useEffect(() => {

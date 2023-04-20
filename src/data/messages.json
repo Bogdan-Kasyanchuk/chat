@@ -8,7 +8,7 @@
     "read": true
   },
   {
-    "idOwner": "id-1",
+    "idOwner": "idContact-2",
     "id": "3a269d7a",
     "idInterlocutor": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
     "body": "1111It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
@@ -16,20 +16,20 @@
     "read": true
   },
   {
-    "idOwner": "id-1",
-    "id": "0123",
-    "idInterlocutor": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
+    "idOwner": "779PiiXKpnh6E59CKlMDd5STWjq2",
+    "id": "ewewewe-2",
+    "idInterlocutor": "idContact-2",
     "body": "2222It was popularised in the 1960s with the release of Is simply dummy text of the printing and typesetting industry",
     "date": "10/12/2017, 10:30:00 AM",
-    "read": true
+    "read": false
   },
   {
-    "idOwner": "I0QEYYleyJX9xnIaJbVugu5tE8C2",
-    "id": "user-fgdf32323hgfh",
-    "idInterlocutor": "id-1",
+    "idOwner": "idContact-2",
+    "id": "779PiiXKpnh6E59CKlMDd5STWjqwrwrwrwr2",
+    "idInterlocutor": "779PiiXKpnh6E59CKlMDd5STWjq2",
     "body": "44444 simply dummy text of the printing and typesetting industry Is simply dummy text of the printing and typesetting industry",
     "date": "10/20/2017, 11:00:00 AM",
-    "read": true
+    "read": false
   },
   {
     "idOwner": "id-1",

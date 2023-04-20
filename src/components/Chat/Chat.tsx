@@ -55,31 +55,38 @@ const Chat: FC = () => {
     }
   }, [normalizedMessages]);
 
+  console.log(normalizedMessages);
+
   return (
-    <>
-      <Flex justify='center' h='100%' className={cG.borderX}>
-        {min_768 ? (
-          <>
-            <ContactsBoard setIdActiveContact={setIdActiveContact} />
-            {idActiveContact ? (
-              <MessagesBoard
-                idActiveContact={idActiveContact}
-                setIdActiveContact={setIdActiveContact}
-              />
-            ) : (
-              <StartViewChat />
-            )}
-          </>
-        ) : idActiveContact ? (
-          <MessagesBoard
+    <Flex justify='center' h='100%' className={cG.borderX}>
+      {min_768 ? (
+        <>
+          <ContactsBoard
             idActiveContact={idActiveContact}
             setIdActiveContact={setIdActiveContact}
           />
-        ) : (
-          <ContactsBoard setIdActiveContact={setIdActiveContact} />
-        )}
-      </Flex>
-    </>
+          {/* <button
+            onClick={() =>
+              showLastMessage(normalizedMessages[normalizedMessages.length - 1], normalizedContacts)
+            }
+          >
+            fdgfgf
+          </button> */}
+          {idActiveContact ? (
+            <MessagesBoard
+              idActiveContact={idActiveContact}
+              setIdActiveContact={setIdActiveContact}
+            />
+          ) : (
+            <StartViewChat />
+          )}
+        </>
+      ) : idActiveContact ? (
+        <MessagesBoard idActiveContact={idActiveContact} setIdActiveContact={setIdActiveContact} />
+      ) : (
+        <ContactsBoard setIdActiveContact={setIdActiveContact} />
+      )}
+    </Flex>
   );
 };
 

@@ -12,7 +12,7 @@ import { ContactsList } from '@/components';
 import useStyles from './ContactsBoard.styles';
 import type IContactsBoardProps from './IContactsBoardProps';
 
-const ContactsBoard: FC<IContactsBoardProps> = ({ setIdActiveContact }) => {
+const ContactsBoard: FC<IContactsBoardProps> = ({ idActiveContact, setIdActiveContact }) => {
   const [value, setValue] = useInputState('');
   const { transformedContacts } = useTransformedData();
   const { filteredContacts } = useFilteredContacts(transformedContacts, value);
@@ -34,7 +34,11 @@ const ContactsBoard: FC<IContactsBoardProps> = ({ setIdActiveContact }) => {
         />
       </Box>
       <ScrollArea h='calc(100% - 81px)'>
-        <ContactsList contacts={filteredContacts} setIdActiveContact={setIdActiveContact} />
+        <ContactsList
+          contacts={filteredContacts}
+          idActiveContact={idActiveContact}
+          setIdActiveContact={setIdActiveContact}
+        />
       </ScrollArea>
     </Box>
   );

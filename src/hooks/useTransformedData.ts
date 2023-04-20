@@ -28,8 +28,8 @@ const useTransformedData = (id?: string) => {
         unreadCountMessages: filteredMessagesByContacts.filter(
           (el) => !el.read && el.idOwner === idContact,
         ).length,
-        lastMessageBody: lastMessageContact.body,
-        lastMessageDate: lastMessageContact.date,
+        lastMessageBody: lastMessageContact?.body,
+        lastMessageDate: lastMessageContact?.date,
       };
     })
     .sort((a, b) => getTime(b.lastMessageDate) - getTime(a.lastMessageDate));

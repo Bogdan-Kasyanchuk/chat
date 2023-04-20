@@ -9,7 +9,7 @@ import { getLocaleDate } from '@/helpers';
 import useStyles from './ContactItem.styles';
 import type IContactItemProps from './IContactItemProps';
 
-const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => {
+const ContactItem: FC<IContactItemProps> = ({ contact, idActiveContact, setIdActiveContact }) => {
   const { classes: c } = useStyles();
   const { userStatus } = useClassStatus(contact.status);
 
@@ -19,6 +19,7 @@ const ContactItem: FC<IContactItemProps> = ({ contact, setIdActiveContact }) => 
       onClick={() => {
         setIdActiveContact(contact.idContact);
       }}
+      style={{ backgroundColor: idActiveContact === contact.idContact ? '#f1f3f5' : '' }}
     >
       <Flex justify='space-between'>
         <Indicator
