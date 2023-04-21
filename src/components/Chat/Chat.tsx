@@ -55,7 +55,7 @@ const Chat: FC = () => {
     }
   }, [normalizedMessages]);
 
-  console.log(normalizedMessages);
+  // console.log(normalizedMessages);
 
   return (
     <Flex justify='center' h='100%' className={cG.borderX}>

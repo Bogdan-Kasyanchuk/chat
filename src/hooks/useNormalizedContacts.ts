@@ -1,18 +1,26 @@
-// import { collection } from 'firebase/firestore';
+import { collection, orderBy, query, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
 
-// import { useCollectionData } from 'react-firebase-hooks/firestore';
-// import { firebaseDB } from '@/service/firebase';
+import { firebaseDB } from '@/service/firebase';
+
 import { useUser } from '@/hooks';
 
 import type { IContact } from '@/interfaces';
 
-import contacts from '@/data/contacts.json';
-
 const useNormalizedContacts = () => {
   const { idUser } = useUser();
-  // const [contacts] = useCollectionData(collection(firebaseDB, 'contacts'));
+  console.log(idUser);
+
+  const queryMessages = query(
+    collection(firebaseDB, 'contacts'),
+    where('status', '==', 'offline'),
+    // orderBy('name', 'asc'),
+  );
+  const [contacts] = useCollectionData(queryMessages, { initialValue: [] });
   const [normalizedContacts, setNormalizedContacts] = useState<IContact[]>([]);
+
+  console.log('--contacts--', contacts);
 
   useEffect(() => {
     if (!contacts) {
