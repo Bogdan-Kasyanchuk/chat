@@ -1,4 +1,4 @@
-import type { TSetIdActiveContact } from '@/types/TSetIdActiveContact';
-import type { TStatusUser } from '@/types/TStatusUser';
+import type { TSetIdActiveContact } from './TSetIdActiveContact';
+import type { TStatusUser } from './TStatusUser';
 
 export type { TSetIdActiveContact, TStatusUser };

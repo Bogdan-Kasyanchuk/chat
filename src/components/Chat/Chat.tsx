@@ -55,8 +55,6 @@ const Chat: FC = () => {
     }
   }, [normalizedMessages]);
 
-  console.log(normalizedMessages);
-
   return (
     <Flex justify='center' h='100%' className={cG.borderX}>
       {min_768 ? (
@@ -65,13 +63,6 @@ const Chat: FC = () => {
             idActiveContact={idActiveContact}
             setIdActiveContact={setIdActiveContact}
           />
-          {/* <button
-            onClick={() =>
-              showLastMessage(normalizedMessages[normalizedMessages.length - 1], normalizedContacts)
-            }
-          >
-            fdgfgf
-          </button> */}
           {idActiveContact ? (
             <MessagesBoard
               idActiveContact={idActiveContact}
@@ -84,7 +75,7 @@ const Chat: FC = () => {
       ) : idActiveContact ? (
         <MessagesBoard idActiveContact={idActiveContact} setIdActiveContact={setIdActiveContact} />
       ) : (
-        <ContactsBoard setIdActiveContact={setIdActiveContact} />
+        <ContactsBoard idActiveContact={idActiveContact} setIdActiveContact={setIdActiveContact} />
       )}
     </Flex>
   );

@@ -28,10 +28,10 @@ const ModalConfirm: FC<IModalConfirmProps> = ({
     >
       {children}
       <Group position='center' spacing={50} mt={30}>
-        <Button type='button' variant='filled-grey' compact size='lg' uppercase onClick={onConfirm}>
+        <Button type='button' variant='filled-grey' size='md' uppercase onClick={onConfirm}>
           Ok
         </Button>
-        <Button type='button' variant='filled-grey' compact size='lg' uppercase onClick={onClose}>
+        <Button type='button' variant='filled-grey' size='md' uppercase onClick={onClose}>
           Cancel
         </Button>
       </Group>

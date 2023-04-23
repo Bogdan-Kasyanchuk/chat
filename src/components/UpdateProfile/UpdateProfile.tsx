@@ -10,8 +10,10 @@ import { updateUser } from '@/service/firebase';
 import { Button } from '@/components';
 
 import type IUpdateProfileProps from './IUpdateProfileProps';
+import useStyles from './UpdateProfile.styles';
 
 const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, isOpened, onClose }) => {
+  const { classes: c } = useStyles();
   const form = useForm({
     initialValues: {
       name: '',
@@ -19,7 +21,13 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, isOpened, onClose }) =
   });
 
   return (
-    <Modal title='Update profile' opened={isOpened} onClose={onClose} centered>
+    <Modal
+      title='Update profile'
+      opened={isOpened}
+      onClose={onClose}
+      centered
+      classNames={{ title: c.title, close: c.closeButton }}
+    >
       <Box
         component='form'
         onSubmit={form.onSubmit(({ name }) => {
@@ -33,19 +41,18 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, isOpened, onClose }) =
       >
         <TextInput
           type='text'
-          size='lg'
-          withAsterisk
+          size='md'
           label='Name'
           placeholder='Your name'
           iconWidth={40}
-          icon={<IconUser size={18} stroke={1.5} />}
+          icon={<IconUser size={16} stroke={1.5} />}
           {...form.getInputProps('name')}
         />
-        <Group position='center' spacing={30}>
-          <Button type='submit' variant='filled-grey' size='lg' uppercase>
+        <Group position='center' spacing={50} mt={30}>
+          <Button type='submit' variant='filled-grey' size='md' uppercase>
             Ok
           </Button>
-          <Button type='button' variant='filled-grey' size='lg' uppercase onClick={onClose}>
+          <Button type='button' variant='filled-grey' size='md' uppercase onClick={onClose}>
             Cancel
           </Button>
         </Group>
