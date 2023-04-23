@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, memo } from 'react';
 
 import { MessageItem } from '@/components';
 
@@ -22,4 +22,4 @@ const MessagesList = forwardRef<HTMLLIElement, IMessagesListProps>(
   },
 );
 
-export default MessagesList;
+export default memo(MessagesList);

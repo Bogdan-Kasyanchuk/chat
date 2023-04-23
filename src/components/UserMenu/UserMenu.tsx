@@ -155,6 +155,7 @@ const UserMenu: FC = () => {
       </ModalConfirm>
       <UpdateProfile
         idUser={idUser}
+        avatar={avatar}
         isOpened={state.update}
         onClose={() => {
           setState({ update: false });

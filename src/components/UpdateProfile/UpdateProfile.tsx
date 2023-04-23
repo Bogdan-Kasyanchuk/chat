@@ -1,10 +1,12 @@
 import type { FC } from 'react';
+import { useRef, useState } from 'react';
 
-import { Box, Group, Modal, TextInput } from '@mantine/core';
+import { Avatar, Box, FileButton, Flex, Group, Modal, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 
 import { IconUser } from '@tabler/icons-react';
 
+import cloudinaryImageUpload from '@/service/cloudinary/cloudinaryImageUpload';
 import { updateUser } from '@/service/firebase';
 
 import { Button } from '@/components';
@@ -12,13 +14,35 @@ import { Button } from '@/components';
 import type IUpdateProfileProps from './IUpdateProfileProps';
 import useStyles from './UpdateProfile.styles';
 
-const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, isOpened, onClose }) => {
+const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onClose }) => {
   const { classes: c } = useStyles();
+  const [loadAvatar, setLoadAvatar] = useState<null | File>(null);
+  const [previewAvatar, setPreviewAvatar] = useState<string | ArrayBuffer | null>(null);
+  const resetAvatar = useRef<() => void>(null);
   const form = useForm({
     initialValues: {
       name: '',
     },
   });
+
+  const hundlerPreviewAvatar = (file: File) => {
+    let reader = new FileReader();
+    reader.onload = () => {
+      setPreviewAvatar(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const updateCredentials = (name: string) => {
+    cloudinaryImageUpload(loadAvatar as File).then((url) => {
+      updateUser(idUser, {
+        name,
+        avatar: url,
+      });
+      onClose();
+      form.reset();
+    });
+  };
 
   return (
     <Modal
@@ -31,12 +55,7 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, isOpened, onClose }) =
       <Box
         component='form'
         onSubmit={form.onSubmit(({ name }) => {
-          updateUser(idUser, {
-            name,
-            avatar: 'https://i.stack.imgur.com/kpHGQ.jpg?s=64&g=1',
-          });
-          onClose();
-          form.reset();
+          updateCredentials(name);
         })}
       >
         <TextInput
@@ -48,6 +67,45 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, isOpened, onClose }) =
           icon={<IconUser size={16} stroke={1.5} />}
           {...form.getInputProps('name')}
         />
+        <Flex justify='space-around' align='center' mt={20}>
+          <Avatar
+            size={100}
+            radius='50%'
+            src={previewAvatar ? (previewAvatar as string) : avatar}
+            alt='Avatar'
+          />
+          <Flex direction='column' gap={20}>
+            <FileButton
+              resetRef={resetAvatar}
+              onChange={(file) => {
+                setLoadAvatar(file);
+                hundlerPreviewAvatar(file as File);
+              }}
+              accept='image/png,image/jpeg'
+            >
+              {(props) => (
+                <Button type='button' variant='filled-grey' size='md' compact uppercase {...props}>
+                  Upload image
+                </Button>
+              )}
+            </FileButton>
+            <Button
+              type='button'
+              variant='filled-grey'
+              size='md'
+              compact
+              uppercase
+              disabled={!loadAvatar}
+              onClick={() => {
+                setLoadAvatar(null);
+                setPreviewAvatar(null);
+                resetAvatar.current?.();
+              }}
+            >
+              Reset
+            </Button>
+          </Flex>
+        </Flex>
         <Group position='center' spacing={50} mt={30}>
           <Button type='submit' variant='filled-grey' size='md' uppercase>
             Ok
@@ -60,5 +118,4 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, isOpened, onClose }) =
     </Modal>
   );
 };
-
 export default UpdateProfile;

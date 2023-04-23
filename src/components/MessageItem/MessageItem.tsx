@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, memo } from 'react';
 
 import { Avatar, Flex, Text } from '@mantine/core';
 
@@ -52,4 +52,4 @@ const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
   },
 );
 
-export default MessageItem;
+export default memo(MessageItem);

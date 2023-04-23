@@ -6,8 +6,8 @@ import { Container, Flex, Text } from '@mantine/core';
 import { useNormalizedContacts, useUser } from '@/hooks';
 
 const Footer: FC = () => {
-  const { user } = useUser();
-  const { normalizedContacts } = useNormalizedContacts();
+  const { user, idUser } = useUser();
+  const { normalizedContacts } = useNormalizedContacts(idUser);
   const matchChat = useMatch('/chat');
 
   return (

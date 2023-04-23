@@ -11,6 +11,7 @@ import {
   useNormalizedContacts,
   useNormalizedMessages,
   useStylesGlobal,
+  useTransformedData,
   useUser,
 } from '@/hooks';
 
@@ -28,7 +29,12 @@ const Chat: FC = () => {
   useKeyDown(() => setIdActiveContact(''));
   const { name, avatar, idUser, status } = useUser();
   const { normalizedMessages } = useNormalizedMessages();
-  const { normalizedContacts } = useNormalizedContacts();
+  const { normalizedContacts } = useNormalizedContacts(idUser);
+  const { transformedContacts } = useTransformedData(
+    normalizedContacts,
+    normalizedMessages,
+    idUser,
+  );
 
   const audio = new Audio(newMessageAudio);
 
@@ -60,11 +66,13 @@ const Chat: FC = () => {
       {min_768 ? (
         <>
           <ContactsBoard
+            transformedContacts={transformedContacts}
             idActiveContact={idActiveContact}
             setIdActiveContact={setIdActiveContact}
           />
           {idActiveContact ? (
             <MessagesBoard
+              transformedContacts={transformedContacts}
               idActiveContact={idActiveContact}
               setIdActiveContact={setIdActiveContact}
             />
@@ -73,9 +81,17 @@ const Chat: FC = () => {
           )}
         </>
       ) : idActiveContact ? (
-        <MessagesBoard idActiveContact={idActiveContact} setIdActiveContact={setIdActiveContact} />
+        <MessagesBoard
+          transformedContacts={transformedContacts}
+          idActiveContact={idActiveContact}
+          setIdActiveContact={setIdActiveContact}
+        />
       ) : (
-        <ContactsBoard idActiveContact={idActiveContact} setIdActiveContact={setIdActiveContact} />
+        <ContactsBoard
+          transformedContacts={transformedContacts}
+          idActiveContact={idActiveContact}
+          setIdActiveContact={setIdActiveContact}
+        />
       )}
     </Flex>
   );

@@ -1,14 +1,12 @@
-import { useNormalizedContacts, useNormalizedMessages, useUser } from '@/hooks';
-
 import { getTime } from '@/helpers';
 
-import type { ITransformedContact } from '@/interfaces';
+import type { IContact, IMessage, ITransformedContact } from '@/interfaces';
 
-const useTransformedData = (id?: string) => {
-  const { idUser } = useUser();
-  const { normalizedContacts } = useNormalizedContacts();
-  const { normalizedMessages } = useNormalizedMessages();
-
+const useTransformedData = (
+  normalizedContacts: IContact[],
+  normalizedMessages: IMessage[],
+  idUser: string,
+) => {
   const transformedContacts: ITransformedContact[] = normalizedContacts
     .map(({ idContact, name, avatar, status }) => {
       const filteredMessagesByContacts = normalizedMessages.filter(
@@ -34,11 +32,7 @@ const useTransformedData = (id?: string) => {
     })
     .sort((a, b) => getTime(b.lastMessageDate) - getTime(a.lastMessageDate));
 
-  const transformedContact = transformedContacts.find(
-    (el) => el.idContact === id,
-  ) as ITransformedContact;
-
-  return { transformedContact, transformedContacts };
+  return { transformedContacts };
 };
 
 export default useTransformedData;

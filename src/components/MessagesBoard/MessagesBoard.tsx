@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import {
   ActionIcon,
@@ -12,34 +13,37 @@ import {
   rem,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useDidUpdate, useMediaQuery, useScrollIntoView } from '@mantine/hooks';
+import { useMediaQuery, useScrollIntoView } from '@mantine/hooks';
 
 import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
 
 import { createMessage } from '@/service/firebase';
 
-import { useClassStatus, useStylesGlobal, useTransformedData, useUser } from '@/hooks';
+import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
 
 import { CreateMessage } from '@/lib';
 
 import { MessagesList } from '@/components';
 
-import type { IMessage } from '@/interfaces';
+import type { IMessage, ITransformedContact } from '@/interfaces';
 
 import IMessagesBoardProps from './IMessagesBoardProps';
 import useStyles from './MessagesBoard.styles';
 
-const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveContact }) => {
+const MessagesBoard: FC<IMessagesBoardProps> = ({
+  transformedContacts,
+  idActiveContact,
+  setIdActiveContact,
+}) => {
   const { classes: cG } = useStylesGlobal();
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
   const { idUser } = useUser();
-  const { transformedContact, transformedContacts } = useTransformedData(idActiveContact);
   const { allStatus } = useClassStatus();
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLLIElement,
     HTMLDivElement
-  >({ duration: 500 });
+  >({ duration: 0 });
 
   const form = useForm({
     initialValues: {
@@ -47,31 +51,38 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
     },
   });
 
-  const idFirstNotReadMessage = transformedContact?.messages.find(
-    (el) => el.read === false && el.idOwner === idActiveContact,
-  );
+  const transformedContact = useMemo(() => {
+    return transformedContacts.find(
+      (el) => el.idContact === idActiveContact,
+    ) as ITransformedContact;
+  }, [transformedContacts]);
+
+  const idFirstNotReadMessage = useMemo(() => {
+    return transformedContact.messages.find(
+      (el) => el.read === false && el.idOwner === idActiveContact,
+    );
+  }, [transformedContact.messages]);
 
   const scrollToBottom = () => {
     scrollableRef.current?.scrollTo({
       top: scrollableRef.current.scrollHeight,
-      behavior: 'smooth',
     });
   };
 
   const addMessage = (body: string) => {
-    const newMessage: IMessage = new CreateMessage(body, idUser, transformedContact?.idContact);
+    const newMessage: IMessage = new CreateMessage(body, idUser, transformedContact.idContact);
     createMessage(newMessage.id, { ...newMessage });
   };
 
-  // useDidUpdate(() => {
-  //   if (idFirstNotReadMessage) {
-  //     console.log('--scrollIntoView--');
-  //     scrollIntoView();
-  //   } else {
-  //     console.log('--scrollToBottom--');
-  //     scrollToBottom();
-  //   }
-  // }, [transformedContacts]);
+  useEffect(() => {
+    if (idFirstNotReadMessage) {
+      console.log('--scrollIntoView--');
+      scrollIntoView();
+    } else {
+      console.log('--scrollToBottom--');
+      scrollToBottom();
+    }
+  }, [transformedContacts]);
 
   return (
     <Box className={c.boardBox}>
@@ -87,12 +98,12 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
           <Avatar
             size={50}
             radius='xl'
-            src={transformedContact?.avatar}
-            alt={transformedContact?.name}
+            src={transformedContact.avatar}
+            alt={transformedContact.name}
           />
         </Indicator>
         <Text lineClamp={1} component='p' fz={24} fw={600}>
-          {transformedContact?.name}
+          {transformedContact.name}
         </Text>
         {!min_768 && (
           <ActionIcon type='button' size={40} ml='auto' onClick={() => setIdActiveContact('')}>
@@ -102,7 +113,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
       </Flex>
       <ScrollArea h='calc(100% - 81px - 81px)' viewportRef={scrollableRef}>
         <MessagesList
-          messages={transformedContact?.messages}
+          messages={transformedContact.messages}
           contact={transformedContact}
           idFirstNotReadMessage={idFirstNotReadMessage?.id}
           ref={targetRef}
@@ -111,6 +122,9 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({ idActiveContact, setIdActiveCo
       <Box
         component='form'
         onSubmit={form.onSubmit(({ message }) => {
+          if (!message) {
+            return;
+          }
           addMessage(message);
           form.reset();
         })}

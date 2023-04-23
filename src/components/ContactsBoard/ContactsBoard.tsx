@@ -5,16 +5,19 @@ import { useInputState } from '@mantine/hooks';
 
 import { IconSearch } from '@tabler/icons-react';
 
-import { useFilteredContacts, useStylesGlobal, useTransformedData } from '@/hooks';
+import { useFilteredContacts, useStylesGlobal } from '@/hooks';
 
 import { ContactsList } from '@/components';
 
 import useStyles from './ContactsBoard.styles';
 import type IContactsBoardProps from './IContactsBoardProps';
 
-const ContactsBoard: FC<IContactsBoardProps> = ({ idActiveContact, setIdActiveContact }) => {
+const ContactsBoard: FC<IContactsBoardProps> = ({
+  transformedContacts,
+  idActiveContact,
+  setIdActiveContact,
+}) => {
   const [value, setValue] = useInputState('');
-  const { transformedContacts } = useTransformedData();
   const { filteredContacts } = useFilteredContacts(transformedContacts, value);
   const { classes: cG } = useStylesGlobal();
   const { classes: c, cx } = useStyles();
