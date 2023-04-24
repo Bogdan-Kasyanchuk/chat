@@ -1,4 +1,4 @@
-import showError from './showError';
+import { showError } from '@/lib';
 
 async function tryCatch<T>(func: T) {
   try {

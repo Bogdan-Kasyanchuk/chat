@@ -2,7 +2,7 @@ import type { User } from 'firebase/auth';
 import { deleteUser as delUser, updateProfile } from 'firebase/auth';
 import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
-import { tryCatch } from '@/lib';
+import { tryCatch } from '@/middlewares';
 
 import { IContact, IMessage } from '@/interfaces';
 

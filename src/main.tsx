@@ -56,9 +56,41 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 input: {
                   border: `${rem(1)} solid ${theme.colors.gray[4]}`,
                   transition: 'border-color 100ms ease, box-shadow 100ms ease',
+                  '&[data-invalid]': {
+                    outline: 'none',
+                    borderColor: theme.colors.dark[5],
+                    boxShadow: `inset 0 0 0 1px ${theme.colors.dark[5]}`,
+                    color: theme.colors.dark[5],
+                    '&::placeholder': {
+                      color: theme.colors.gray[5],
+                    },
+                  },
+                },
+                icon: {
+                  color: theme.colors.gray[5],
                 },
               }),
             },
+
+            PasswordInput: {
+              styles: (theme) => ({
+                innerInput: {
+                  '&[data-with-icon]': {
+                    paddingLeft: rem(40),
+                  },
+                  '&[data-invalid]': {
+                    color: theme.colors.dark[5],
+                    '&::placeholder': {
+                      color: theme.colors.gray[5],
+                    },
+                  },
+                },
+                // icon: {
+                //   color: theme.colors.gray[5],
+                // },
+              }),
+            },
+
             ActionIcon: {
               styles: () => ({
                 root: {
