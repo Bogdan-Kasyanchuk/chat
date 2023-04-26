@@ -17,6 +17,7 @@ import useStyles from './UpdateProfile.styles';
 const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onClose }) => {
   const { classes: c } = useStyles();
   const [loadAvatar, setLoadAvatar] = useState<null | File>(null);
+  const [isLoadAvatar, setIsLoadAvatar] = useState(false);
   const [previewAvatar, setPreviewAvatar] = useState<string | ArrayBuffer | null>(null);
   const resetAvatar = useRef<() => void>(null);
   const form = useForm({
@@ -34,11 +35,13 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
   };
 
   const updateCredentials = (name: string) => {
+    setIsLoadAvatar(true);
     cloudinaryImageUpload(loadAvatar as File).then((url) => {
       updateUser(idUser, {
         name,
         avatar: url,
       });
+      setIsLoadAvatar(false);
       onClose();
       form.reset();
     });
@@ -48,7 +51,11 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
     <Modal
       title='Update profile'
       opened={isOpened}
-      onClose={onClose}
+      onClose={() => {
+        onClose();
+        setPreviewAvatar(null);
+        resetAvatar.current?.();
+      }}
       centered
       classNames={{ title: c.title, close: c.closeButton }}
     >
@@ -107,10 +114,27 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
           </Flex>
         </Flex>
         <Group position='center' spacing={50} mt={30}>
-          <Button type='submit' variant='filled-grey' size='md' uppercase>
+          <Button
+            loading={isLoadAvatar}
+            loaderProps={{ color: 'dark.5' }}
+            type='submit'
+            variant='filled-grey'
+            size='md'
+            uppercase
+          >
             Ok
           </Button>
-          <Button type='button' variant='filled-grey' size='md' uppercase onClick={onClose}>
+          <Button
+            type='button'
+            variant='filled-grey'
+            size='md'
+            uppercase
+            onClick={() => {
+              onClose();
+              setPreviewAvatar(null);
+              resetAvatar.current?.();
+            }}
+          >
             Cancel
           </Button>
         </Group>

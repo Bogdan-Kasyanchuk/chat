@@ -1,12 +1,8 @@
 import type { FC } from 'react';
 
-import { Box, PasswordInput, TextInput } from '@mantine/core';
-import { Flex } from '@mantine/core';
-import { joiResolver, useForm } from '@mantine/form';
+import { Box, Flex, PasswordInput, TextInput } from '@mantine/core';
 
 import { IconAt, IconLock } from '@tabler/icons-react';
-
-import joiSchema from '@/service/joi/registerUserJoiSchema';
 
 import { TITLE_FORM } from '@/helpers';
 
@@ -14,18 +10,7 @@ import { Button } from '@/components';
 
 import type IFormProps from './IFormProps';
 
-const Form: FC<IFormProps> = ({ submitForm, childrenButton }) => {
-  const form = useForm({
-    validate: joiResolver(joiSchema),
-    validateInputOnChange: true,
-    validateInputOnBlur: true,
-    initialValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
-  });
-
+const Form: FC<IFormProps> = ({ form, submitForm, isRegister, childrenButton }) => {
   return (
     <Box
       noValidate
@@ -33,7 +18,7 @@ const Form: FC<IFormProps> = ({ submitForm, childrenButton }) => {
       w='fit-content'
       mx='auto'
       onSubmit={form.onSubmit(({ email, password }) => {
-        submitForm(email, password);
+        submitForm({ email, password });
         form.reset();
       })}
       h='100%'
@@ -61,17 +46,19 @@ const Form: FC<IFormProps> = ({ submitForm, childrenButton }) => {
           icon={<IconLock size={18} stroke={1.5} />}
           {...form.getInputProps('password')}
         />
-        <PasswordInput
-          title={TITLE_FORM.PASSWORD}
-          w='100%'
-          size='lg'
-          withAsterisk
-          label='Confirm password'
-          placeholder='Your confirm password'
-          iconWidth={40}
-          icon={<IconLock size={18} stroke={1.5} />}
-          {...form.getInputProps('confirmPassword')}
-        />
+        {isRegister && (
+          <PasswordInput
+            title={TITLE_FORM.PASSWORD}
+            w='100%'
+            size='lg'
+            withAsterisk
+            label='Confirm password'
+            placeholder='Your confirm password'
+            iconWidth={40}
+            icon={<IconLock size={18} stroke={1.5} />}
+            {...form.getInputProps('confirmPassword')}
+          />
+        )}
         <Button type='submit' variant='filled-grey' size='lg' uppercase>
           {childrenButton}
         </Button>

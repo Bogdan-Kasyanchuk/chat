@@ -1,20 +1,24 @@
 import type { FC } from 'react';
 
+import { joiResolver, useForm } from '@mantine/form';
+
 import { loginUserEmail } from '@/service/firebase';
+import { loginUserJoiSchema } from '@/service/joi';
 
 import { Form } from '@/components';
 
-import type { ICredential } from '@/interfaces';
-
 const Login: FC = () => {
-  return (
-    <Form
-      submitForm={(email: ICredential['email'], password: ICredential['password']) => {
-        loginUserEmail({ email, password });
-      }}
-      childrenButton='Login'
-    />
-  );
+  const form = useForm({
+    validate: joiResolver(loginUserJoiSchema),
+    validateInputOnChange: true,
+    validateInputOnBlur: true,
+    initialValues: {
+      email: '',
+      password: '',
+    },
+  });
+
+  return <Form form={form} submitForm={loginUserEmail} childrenButton='Login' />;
 };
 
 export default Login;
