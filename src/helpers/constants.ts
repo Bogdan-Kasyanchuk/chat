@@ -5,9 +5,14 @@ export const TITLE_FORM = {
     'The password must be digits and letters and capital letters and special characters. For example: ex1A3m@pL8e',
 };
 
-// export const LIMIT = {
-//   NAME_MIN: 3,
-//   PASSWORD_MIN: 8,
-//   PHONE_MIN: 10,
-// };
-// #adb5bd
+export const STATUS = {
+  ONLINE: 'online',
+  OFFLINE: 'offline',
+  DO_NOT_DISTURB: 'do not disturb',
+  OUT_OF_PLACE: 'out of place',
+};
+
+export const COLECTIONS = {
+  CONTACTS: 'contacts',
+  MESSAGES: 'messages',
+};

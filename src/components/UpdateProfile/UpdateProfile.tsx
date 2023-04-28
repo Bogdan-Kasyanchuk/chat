@@ -6,7 +6,7 @@ import { useForm } from '@mantine/form';
 
 import { IconUser } from '@tabler/icons-react';
 
-import cloudinaryImageUpload from '@/service/cloudinary/cloudinaryImageUpload';
+import { cloudinaryImageUpload } from '@/service/cloudinary';
 import { updateUser } from '@/service/firebase';
 
 import { Button } from '@/components';

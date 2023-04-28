@@ -4,6 +4,8 @@ import { deleteDoc, doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 
 import { tryCatch } from '@/middlewares';
 
+import { COLECTIONS } from '@/helpers';
+
 import { IContact, IMessage } from '@/interfaces';
 
 import firebaseAuth from './firebaseAuth';
@@ -14,11 +16,11 @@ const currentUser = () => {
 };
 
 export const createUser = async (id: string, data: IContact) => {
-  await tryCatch(setDoc(doc(firebaseDB, 'contacts', id), data));
+  await tryCatch(setDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), data));
 };
 
 export async function checkUser(id: string) {
-  return tryCatch(getDoc(doc(firebaseDB, 'contacts', id)));
+  return tryCatch(getDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id)));
 }
 
 export const updateUser = async (id: string, data: Pick<IContact, 'name' | 'avatar'>) => {
@@ -28,18 +30,22 @@ export const updateUser = async (id: string, data: Pick<IContact, 'name' | 'avat
       photoURL: data.avatar,
     }),
   );
-  await tryCatch(updateDoc(doc(firebaseDB, 'contacts', id), data));
+  await tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), data));
 };
 
-export const updateStatusUser = async (id: string, status: IContact['status']) => {
-  await tryCatch(updateDoc(doc(firebaseDB, 'contacts', id), { status }));
+export const updateStatusUser = async (id: string, status: string) => {
+  await tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), { status }));
 };
 
 export const deleteUser = async (id: string) => {
-  await tryCatch(deleteDoc(doc(firebaseDB, 'contacts', id)));
+  await tryCatch(deleteDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id)));
   await tryCatch(delUser(currentUser()));
 };
 
 export const createMessage = async (id: string, data: IMessage) => {
-  await tryCatch(setDoc(doc(firebaseDB, 'messages', id), data));
+  await tryCatch(setDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), data));
+};
+
+export const updateReadMessasge = async (id: string, read: boolean) => {
+  await tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), { read }));
 };

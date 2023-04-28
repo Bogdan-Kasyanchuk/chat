@@ -4,19 +4,20 @@ import { useCollectionData } from 'react-firebase-hooks/firestore';
 
 import { firebaseAuth, firebaseDB } from '@/service/firebase';
 
+import { COLECTIONS, STATUS } from '@/helpers';
+
 import type { IContact } from '@/interfaces';
 
 import dataUser from '@/data/dataUser.json';
 
 const useUser = () => {
   const [user, loading] = useAuthState(firebaseAuth);
-  const [contacts] = useCollectionData(collection(firebaseDB, 'contacts'));
+  const [contacts] = useCollectionData(collection(firebaseDB, COLECTIONS.CONTACTS));
 
   const name = user?.displayName ?? dataUser.name;
   const avatar = user?.photoURL ?? dataUser.image;
   const idUser = user?.uid as IContact['idContact'];
-  const status = (contacts?.find((el) => el.idContact === idUser)?.status ??
-    'online') as IContact['status'];
+  const status = contacts?.find((el) => el.idContact === idUser)?.status ?? STATUS.ONLINE;
 
   return { user, loading, name, avatar, idUser, status };
 };

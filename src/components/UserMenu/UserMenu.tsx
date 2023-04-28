@@ -15,8 +15,6 @@ import { firstTUC } from '@/helpers';
 
 import { ModalConfirm, UpdateProfile } from '@/components';
 
-import type { TStatusUser } from '@/types';
-
 import useStyles from './UserMenu.styles';
 
 const UserMenu: FC = () => {
@@ -39,10 +37,10 @@ const UserMenu: FC = () => {
   }, [status]);
 
   const setStatus = (e: MouseEvent<HTMLButtonElement>) => {
-    const status = (e.target as HTMLButtonElement).textContent?.toLowerCase() as TStatusUser;
+    const status = (e.target as HTMLButtonElement).textContent?.toLowerCase();
 
-    setUserStatus(status);
-    updateStatusUser(idUser, status);
+    setUserStatus(status as string);
+    updateStatusUser(idUser, status as string);
   };
 
   return (
@@ -88,7 +86,7 @@ const UserMenu: FC = () => {
           {Object.keys(allStatus).map((el) => (
             <Menu.Item
               key={el}
-              icon={<div className={cx(c.userStatus, allStatus[`${el as TStatusUser}`])} />}
+              icon={<div className={cx(c.userStatus, allStatus[`${el}`])} />}
               onClick={setStatus}
               fw={500}
             >

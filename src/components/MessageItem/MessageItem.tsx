@@ -10,7 +10,15 @@ import useStyles from './MessageItem.styles';
 const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
   ({ message, contact, idFirstNotReadMessage }, ref) => {
     const { classes: c } = useStyles();
+
     const checkId = message.idOwner === contact.idContact;
+    const normalizedDate = getLocaleDate(message.date, {
+      day: 'numeric',
+      month: 'numeric',
+      year: '2-digit',
+      hour: 'numeric',
+      minute: 'numeric',
+    });
 
     return (
       <>
@@ -36,13 +44,7 @@ const MessageItem = forwardRef<HTMLLIElement, IMessageItemProps>(
                 {message.body}
               </Text>
               <Text component='time' fz={14} color='gray.6' px={15}>
-                {getLocaleDate(message.date, {
-                  day: 'numeric',
-                  month: 'numeric',
-                  year: '2-digit',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                })}
+                {normalizedDate}
               </Text>
             </Flex>
           </Flex>

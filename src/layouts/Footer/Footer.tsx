@@ -5,10 +5,14 @@ import { Container, Flex, Text } from '@mantine/core';
 
 import { useNormalizedContacts, useUser } from '@/hooks';
 
+import { STATUS } from '@/helpers';
+
 const Footer: FC = () => {
   const { user, idUser } = useUser();
   const { normalizedContacts } = useNormalizedContacts(idUser);
   const matchChat = useMatch('/chat');
+
+  const onlineUsers = normalizedContacts.filter((el) => el.status === STATUS.ONLINE).length;
 
   return (
     <Container h={60} p={10} bg='dark.5'>
@@ -18,7 +22,7 @@ const Footer: FC = () => {
             All users: {normalizedContacts.length}
           </Text>
           <Text component='p' color='green.7'>
-            Online users: {normalizedContacts.filter((el) => el.status === 'online').length}
+            Online users: {onlineUsers}
           </Text>
         </Flex>
       )}

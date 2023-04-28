@@ -13,6 +13,12 @@ const ContactItem: FC<IContactItemProps> = ({ contact, idActiveContact, setIdAct
   const { classes: c } = useStyles();
   const { userStatus } = useClassStatus(contact.status);
 
+  const notmalizedDate = getLocaleDate(contact.lastMessageDate, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+
   return (
     <li
       className={c.item}
@@ -45,11 +51,7 @@ const ContactItem: FC<IContactItemProps> = ({ contact, idActiveContact, setIdAct
         <Box className={c.paramsBox}>
           {contact.lastMessageBody && (
             <Text component='time' display='block' color='gray.6'>
-              {getLocaleDate(contact.lastMessageDate, {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
+              {notmalizedDate}
             </Text>
           )}
           {!!contact.unreadCountMessages && (

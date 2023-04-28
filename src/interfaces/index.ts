@@ -3,7 +3,6 @@ import ICredential from './ICredential';
 import IMessage from './IMessage';
 import IOptionsLocaleDate from './IOptionsLocaleDate';
 import IRouteProps from './IRouteProps';
-import IStatus from './IStatus';
 import ITransformedContact from './ITransformedContact';
 
 export type {
@@ -12,6 +11,5 @@ export type {
   IOptionsLocaleDate,
   IRouteProps,
   ITransformedContact,
-  IStatus,
   IContact,
 };
