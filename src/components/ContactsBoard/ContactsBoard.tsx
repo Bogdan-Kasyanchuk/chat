@@ -1,11 +1,12 @@
 import type { FC } from 'react';
+import { useRef, useState } from 'react';
 
 import { Box, ScrollArea, TextInput } from '@mantine/core';
 import { useInputState } from '@mantine/hooks';
 
 import { IconSearch } from '@tabler/icons-react';
 
-import { useFilteredContacts, useStylesGlobal } from '@/hooks';
+import { useButtonScroll, useFilteredContacts, useStylesGlobal } from '@/hooks';
 
 import { ContactsList } from '@/components';
 
@@ -19,8 +20,13 @@ const ContactsBoard: FC<IContactsBoardProps> = ({
 }) => {
   const [value, setValue] = useInputState('');
   const { filteredContacts } = useFilteredContacts(transformedContacts, value);
+  const viewport = useRef<HTMLDivElement>(null);
+  const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
+  const { isButton } = useButtonScroll(viewport, scrollPosition.y, false);
   const { classes: cG } = useStylesGlobal();
   const { classes: c, cx } = useStyles();
+
+  console.log(isButton);
 
   return (
     <Box className={cx(c.boardBox, cG.borderR)}>
@@ -36,7 +42,11 @@ const ContactsBoard: FC<IContactsBoardProps> = ({
           onChange={setValue}
         />
       </Box>
-      <ScrollArea h='calc(100% - 81px)'>
+      <ScrollArea
+        h='calc(100% - 81px)'
+        viewportRef={viewport}
+        onScrollPositionChange={onScrollPositionChange}
+      >
         <ContactsList
           contacts={filteredContacts}
           idActiveContact={idActiveContact}
