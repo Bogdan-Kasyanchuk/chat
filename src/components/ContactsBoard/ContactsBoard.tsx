@@ -29,34 +29,32 @@ const ContactsBoard: FC<IContactsBoardProps> = ({
   const scrollToTop = () => viewport.current?.scrollTo({ top: 0 });
 
   return (
-    <>
-      <Box className={cx(c.boardBox, cG.borderR)}>
-        <Box bg='gray.2' p={15} className={cG.borderB}>
-          <TextInput
-            type='search'
-            radius={16}
-            size='lg'
-            placeholder='Search chat'
-            iconWidth={40}
-            icon={<IconSearch size={18} stroke={1.5} />}
-            value={value}
-            onChange={setValue}
-          />
-        </Box>
-        <ScrollArea
-          h='calc(100% - 81px)'
-          viewportRef={viewport}
-          onScrollPositionChange={onScrollPositionChange}
-        >
-          <ContactsList
-            contacts={filteredContacts}
-            idActiveContact={idActiveContact}
-            setIdActiveContact={setIdActiveContact}
-          />
-        </ScrollArea>
+    <Box className={cx(c.boardBox, cG.borderR)}>
+      <Box bg='gray.2' p={15} className={cG.borderB}>
+        <TextInput
+          type='search'
+          radius={16}
+          size='lg'
+          placeholder='Search chat'
+          iconWidth={40}
+          icon={<IconSearch size={18} stroke={1.5} />}
+          value={value}
+          onChange={setValue}
+        />
       </Box>
-      <ButtonScroll isShow={isButtonShow} scrollTo={scrollToTop} />
-    </>
+      <ScrollArea
+        h='calc(100% - 81px)'
+        viewportRef={viewport}
+        onScrollPositionChange={onScrollPositionChange}
+      >
+        <ContactsList
+          contacts={filteredContacts}
+          idActiveContact={idActiveContact}
+          setIdActiveContact={setIdActiveContact}
+        />
+        <ButtonScroll isShow={isButtonShow} scrollTo={scrollToTop} buttonDirection='top' />
+      </ScrollArea>
+    </Box>
   );
 };
 

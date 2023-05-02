@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 
 import { Avatar, Box, Flex, Indicator, Text } from '@mantine/core';
+import { useDidUpdate } from '@mantine/hooks';
 
 import { useClassStatus } from '@/hooks';
 
@@ -11,7 +12,14 @@ import type IContactItemProps from './IContactItemProps';
 
 const ContactItem: FC<IContactItemProps> = ({ contact, idActiveContact, setIdActiveContact }) => {
   const { classes: c } = useStyles();
-  const { userStatus } = useClassStatus(contact.status);
+  const { userStatus, setUserStatus } = useClassStatus(contact.status);
+
+  useDidUpdate(() => {
+    if (!contact.status) {
+    }
+
+    setUserStatus(contact.status);
+  }, [contact.status]);
 
   const notmalizedDate = getLocaleDate(contact.lastMessageDate, {
     year: 'numeric',
@@ -39,7 +47,7 @@ const ContactItem: FC<IContactItemProps> = ({ contact, idActiveContact, setIdAct
           <Avatar size={50} radius='xl' src={contact.avatar} alt={contact.name} />
         </Indicator>
         <Flex direction='column' justify='center' mx={12}>
-          <Text lineClamp={1} component='p' fz={20} lh={1.3}>
+          <Text lineClamp={1} component='p' fz={20} lh={1.5}>
             {contact.name}
           </Text>
           {contact.lastMessageBody && (

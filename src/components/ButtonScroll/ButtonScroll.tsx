@@ -6,16 +6,23 @@ import { IconArrowBigUpFilled } from '@tabler/icons-react';
 
 import type IButtonScrollProps from './IButtonScrollProps';
 
-const ButtonScroll: FC<IButtonScrollProps> = ({ isShow, scrollTo }) => {
+const ButtonScroll: FC<IButtonScrollProps> = ({ isShow, scrollTo, buttonDirection }) => {
   return (
-    <Transition mounted={isShow} transition='slide-left' duration={200} timingFunction='ease'>
+    <Transition mounted={isShow} transition='slide-left' duration={200}>
       {(styles) => (
         <ActionIcon
           onClick={scrollTo}
           size={40}
-          style={{ position: 'fixed', left: '50px', bottom: '50px', ...styles }}
+          pos='absolute'
+          right={20}
+          bottom={20}
+          style={{ ...styles }}
+          color='dark.5'
         >
-          <IconArrowBigUpFilled size={40} style={{ transform: 'rotate(0deg)' }} />
+          <IconArrowBigUpFilled
+            size={40}
+            style={{ transform: buttonDirection === 'top' ? 'rotate(0deg)' : 'rotate(180deg)' }}
+          />
         </ActionIcon>
       )}
     </Transition>

@@ -1,7 +1,5 @@
 import type { RefObject } from 'react';
-import { useState } from 'react';
-
-import { useDidUpdate } from '@mantine/hooks';
+import { useEffect, useState } from 'react';
 
 const useButtonScroll = (
   viewport: RefObject<HTMLDivElement>,
@@ -10,25 +8,27 @@ const useButtonScroll = (
 ) => {
   const [isButtonShow, setIsButtonShow] = useState(false);
 
-  useDidUpdate(() => {
+  useEffect(() => {
     const { scrollHeight, clientHeight } = viewport.current as HTMLDivElement;
 
-    if (scrollDirection === 'top' && scrollHeight - clientHeight >= 100) {
-      if (scrollHeight - 100 - clientHeight <= scrollPositionY) {
+    const differenceHeights = scrollHeight - clientHeight;
+
+    if (scrollDirection === 'top') {
+      if (differenceHeights >= 100 && differenceHeights - 100 <= scrollPositionY) {
         setIsButtonShow(true);
       } else {
         setIsButtonShow(false);
       }
     }
 
-    if (scrollDirection === 'bottom' && scrollHeight - clientHeight >= 100) {
-      if (scrollHeight - 100 - clientHeight >= scrollPositionY) {
+    if (scrollDirection === 'bottom') {
+      if (differenceHeights >= 100 && differenceHeights - 100 >= scrollPositionY) {
         setIsButtonShow(true);
       } else {
         setIsButtonShow(false);
       }
     }
-  }, [scrollPositionY]);
+  });
 
   return { isButtonShow };
 };
