@@ -1,4 +1,5 @@
 import Button from './Button';
+import ButtonScroll from './ButtonScroll';
 import Chat from './Chat';
 import ContactItem from './ContactItem';
 import ContactsBoard from './ContactsBoard';
@@ -18,6 +19,7 @@ import UserMenu from './UserMenu';
 
 export {
   Button,
+  ButtonScroll,
   Chat,
   ContactsBoard,
   ContactItem,

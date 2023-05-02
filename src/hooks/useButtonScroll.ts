@@ -6,24 +6,31 @@ import { useDidUpdate } from '@mantine/hooks';
 const useButtonScroll = (
   viewport: RefObject<HTMLDivElement>,
   scrollPositionY: number,
-  defaultValue: boolean,
+  scrollDirection: 'top' | 'bottom',
 ) => {
-  const [isButton, setIsButton] = useState(defaultValue);
+  const [isButtonShow, setIsButtonShow] = useState(false);
 
   useDidUpdate(() => {
     const { scrollHeight, clientHeight } = viewport.current as HTMLDivElement;
 
-    if (
-      scrollHeight - clientHeight >= 100 &&
-      scrollHeight - 100 - clientHeight <= scrollPositionY
-    ) {
-      setIsButton(true);
-    } else {
-      setIsButton(false);
+    if (scrollDirection === 'top' && scrollHeight - clientHeight >= 100) {
+      if (scrollHeight - 100 - clientHeight <= scrollPositionY) {
+        setIsButtonShow(true);
+      } else {
+        setIsButtonShow(false);
+      }
+    }
+
+    if (scrollDirection === 'bottom' && scrollHeight - clientHeight >= 100) {
+      if (scrollHeight - 100 - clientHeight >= scrollPositionY) {
+        setIsButtonShow(true);
+      } else {
+        setIsButtonShow(false);
+      }
     }
   }, [scrollPositionY]);
 
-  return { isButton };
+  return { isButtonShow };
 };
 
 export default useButtonScroll;

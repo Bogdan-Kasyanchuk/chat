@@ -10,7 +10,7 @@ import {
   createMessage,
   createUser,
   deleteUser,
-  updateReadMessasge,
+  updateReadMessage,
   updateStatusUser,
   updateUser,
 } from './firebaseOperations';
@@ -28,7 +28,7 @@ export {
   createMessage,
   createUser,
   deleteUser,
-  updateReadMessasge,
+  updateReadMessage,
   updateStatusUser,
   updateUser,
 };

@@ -85,9 +85,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     },
                   },
                 },
-                // icon: {
-                //   color: theme.colors.gray[5],
-                // },
               }),
             },
 

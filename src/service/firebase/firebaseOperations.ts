@@ -46,6 +46,6 @@ export const createMessage = async (id: string, data: IMessage) => {
   await tryCatch(setDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), data));
 };
 
-export const updateReadMessasge = async (id: string, read: boolean) => {
-  await tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), { read }));
+export const updateReadMessage = async (id: string) => {
+  await tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), { read: true }));
 };

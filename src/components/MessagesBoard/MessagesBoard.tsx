@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import {
   ActionIcon,
@@ -17,13 +17,13 @@ import { useMediaQuery, useScrollIntoView } from '@mantine/hooks';
 
 import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
 
-import { createMessage } from '@/service/firebase';
+import { createMessage, updateReadMessage } from '@/service/firebase';
 
-import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
+import { useButtonScroll, useClassStatus, useStylesGlobal, useUser } from '@/hooks';
 
 import { CreateMessage } from '@/lib';
 
-import { MessagesList } from '@/components';
+import { ButtonScroll, MessagesList } from '@/components';
 
 import type { IMessage, ITransformedContact } from '@/interfaces';
 
@@ -44,6 +44,9 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
     HTMLLIElement,
     HTMLDivElement
   >({ duration: 0 });
+  const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
+  const [idFirstNotReadMessage, setIdFirstNotReadMessage] = useState('');
+  const { isButtonShow } = useButtonScroll(scrollableRef, scrollPosition.y, 'bottom');
 
   const form = useForm({
     initialValues: {
@@ -57,21 +60,22 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
     ) as ITransformedContact;
   }, [transformedContacts]);
 
-  const idFirstNotReadMessage = useMemo(() => {
-    return transformedContact.messages.find(
+  useEffect(() => {
+    const firstNotReadMessage = transformedContact.messages.find(
       (el) => el.read === false && el.idOwner === idActiveContact,
     );
-  }, [transformedContact.messages]);
+    setIdFirstNotReadMessage(firstNotReadMessage?.id as string);
+  }, []);
 
   const scrollToBottom = () => {
-    scrollableRef.current?.scrollTo({
-      top: scrollableRef.current.scrollHeight,
-    });
+    const { scrollTo, scrollHeight } = scrollableRef.current;
+
+    scrollTo({ top: scrollHeight });
   };
 
   const addMessage = (body: string) => {
     const newMessage: IMessage = new CreateMessage(body, idUser, transformedContact.idContact);
-    createMessage(newMessage.id, { ...newMessage });
+    createMessage(newMessage.id, { ...newMessage }).finally(scrollToBottom);
   };
 
   useEffect(() => {
@@ -82,72 +86,95 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
       console.log('--scrollToBottom--');
       scrollToBottom();
     }
-  }, [transformedContacts]);
+  }, [idFirstNotReadMessage]);
+
+  useEffect(() => {
+    if (!idFirstNotReadMessage) {
+      return;
+    }
+    const notReadMessages = transformedContact.messages.filter(
+      (el) => el.read === false && el.idOwner === idActiveContact,
+    );
+
+    setTimeout(() => {
+      notReadMessages.forEach((el) => {
+        updateReadMessage(el.id);
+      });
+      setIdFirstNotReadMessage('');
+    }, 2000);
+  }, [idFirstNotReadMessage]);
 
   return (
-    <Box className={c.boardBox}>
-      <Flex align='center' gap={15} bg='gray.2' p={15} h={81} className={cG.borderB}>
-        <Indicator
-          inline
-          size={20}
-          offset={7}
-          position='bottom-end'
-          withBorder
-          classNames={{ indicator: allStatus[`${transformedContact?.status}`] }}
-        >
-          <Avatar
-            size={50}
-            radius='xl'
-            src={transformedContact.avatar}
-            alt={transformedContact.name}
-          />
-        </Indicator>
-        <Text lineClamp={1} component='p' fz={24} fw={600}>
-          {transformedContact.name}
-        </Text>
-        {!min_768 && (
-          <ActionIcon type='button' size={40} ml='auto' onClick={() => setIdActiveContact('')}>
-            <IconArrowBigLeftFilled size={40} />
-          </ActionIcon>
-        )}
-      </Flex>
-      <ScrollArea h='calc(100% - 81px - 81px)' viewportRef={scrollableRef}>
-        <MessagesList
-          messages={transformedContact.messages}
-          contact={transformedContact}
-          idFirstNotReadMessage={idFirstNotReadMessage?.id}
-          ref={targetRef}
-        />
-      </ScrollArea>
-      <Box
-        component='form'
-        onSubmit={form.onSubmit(({ message }) => {
-          if (!message) {
-            return;
-          }
-          addMessage(message);
-          form.reset();
-        })}
-        bg='gray.2'
-        p={15}
-        className={cG.borderT}
-      >
-        <Flex gap={20} align='center' pos='relative'>
-          <TextInput
-            type='text'
-            radius={16}
-            w='100%'
-            size='lg'
-            placeholder='Type your message'
-            {...form.getInputProps('message')}
-            classNames={{ input: c.boardInput }}
-          />
-          <ActionIcon type='submit' size={30} pos='absolute' right={16}>
-            <IconBrandTelegram size={30} stroke={1.5} />
-          </ActionIcon>
+    <>
+      <Box className={c.boardBox}>
+        <Flex align='center' gap={15} bg='gray.2' p={15} h={81} className={cG.borderB}>
+          <Indicator
+            inline
+            size={20}
+            offset={7}
+            position='bottom-end'
+            withBorder
+            classNames={{ indicator: allStatus[`${transformedContact?.status}`] }}
+          >
+            <Avatar
+              size={50}
+              radius='xl'
+              src={transformedContact.avatar}
+              alt={transformedContact.name}
+            />
+          </Indicator>
+          <Text lineClamp={1} component='p' fz={24} fw={600}>
+            {transformedContact.name}
+          </Text>
+          {!min_768 && (
+            <ActionIcon type='button' size={40} ml='auto' onClick={() => setIdActiveContact('')}>
+              <IconArrowBigLeftFilled size={40} />
+            </ActionIcon>
+          )}
         </Flex>
+        <ScrollArea
+          h='calc(100% - 81px - 81px)'
+          viewportRef={scrollableRef}
+          onScrollPositionChange={onScrollPositionChange}
+        >
+          <MessagesList
+            messages={transformedContact.messages}
+            contact={transformedContact}
+            idFirstNotReadMessage={idFirstNotReadMessage}
+            ref={targetRef}
+          />
+        </ScrollArea>
+        <Box
+          component='form'
+          onSubmit={form.onSubmit(({ message }) => {
+            if (!message) {
+              return;
+            }
+            addMessage(message);
+            form.reset();
+          })}
+          bg='gray.2'
+          p={15}
+          className={cG.borderT}
+        >
+          <Flex gap={20} align='center' pos='relative'>
+            <TextInput
+              type='text'
+              radius={16}
+              w='100%'
+              size='lg'
+              placeholder='Type your message'
+              {...form.getInputProps('message')}
+              classNames={{ input: c.boardInput }}
+            />
+            <ActionIcon type='submit' size={30} pos='absolute' right={16}>
+              <IconBrandTelegram size={30} stroke={1.5} />
+            </ActionIcon>
+          </Flex>
+        </Box>
       </Box>
-    </Box>
+      <ButtonScroll isShow={isButtonShow} scrollTo={scrollToBottom} />
+    </>
   );
 };
 export default MessagesBoard;
