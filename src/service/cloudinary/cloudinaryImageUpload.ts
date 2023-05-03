@@ -3,7 +3,7 @@ import { showError } from '@/lib';
 const cloudinaryImageUpload = async (loadAvatar: File) => {
   const data = new FormData();
   data.append('file', loadAvatar);
-  data.append('upload_preset', 'mihazhrm');
+  data.append('upload_preset', import.meta.env.VITE_UPLOAD_PRESET);
   data.append('cloud_name', import.meta.env.VITE_CLOUD_NAME);
   try {
     const res = await fetch(

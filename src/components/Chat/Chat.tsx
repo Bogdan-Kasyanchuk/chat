@@ -4,7 +4,7 @@ import type { FC } from 'react';
 import { Flex, rem } from '@mantine/core';
 import { useDidUpdate, useMediaQuery } from '@mantine/hooks';
 
-import { checkUser, createUser } from '@/service/firebase';
+import { checkUser, createUser, updateStatusUser } from '@/service/firebase';
 
 import {
   useKeyDown,
@@ -16,6 +16,8 @@ import {
 } from '@/hooks';
 
 import { showLastMessage } from '@/lib';
+
+import { STATUS } from '@/helpers';
 
 import newMessageAudio from '@/assets/newMessage.mp3';
 
@@ -41,6 +43,7 @@ const Chat: FC = () => {
   useEffect(() => {
     checkUser(idUser).then((docSnap) => {
       if (docSnap?.exists()) {
+        updateStatusUser(idUser, STATUS.ONLINE);
         return;
       }
 

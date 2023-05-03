@@ -26,8 +26,8 @@ export const checkUser = async (id: string) => {
 export const updateUser = async (id: string, data: Pick<IContact, 'name' | 'avatar'>) => {
   await tryCatch(
     updateProfile(currentUser(), {
-      displayName: data.name,
-      photoURL: data.avatar,
+      displayName: data.name || null,
+      photoURL: data.avatar || null,
     }),
   );
   tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), data));

@@ -11,7 +11,7 @@ import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
 
 import { showError } from '@/lib';
 
-import { firstTUC } from '@/helpers';
+import { STATUS, firstTUC } from '@/helpers';
 
 import { ModalConfirm, UpdateProfile } from '@/components';
 
@@ -131,7 +131,7 @@ const UserMenu: FC = () => {
           setState({ logOut: false });
         }}
         onConfirm={async () => {
-          await updateStatusUser(idUser, 'offline');
+          await updateStatusUser(idUser, STATUS.OFFLINE);
           firebaseAuth.signOut().catch((error) => {
             showError(error);
           });

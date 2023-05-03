@@ -19,7 +19,6 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
   const [loadAvatar, setLoadAvatar] = useState<null | File>(null);
   const [isLoadAvatar, setIsLoadAvatar] = useState(false);
   const [previewAvatar, setPreviewAvatar] = useState<string | ArrayBuffer | null>(null);
-  const resetAvatar = useRef<() => void>(null);
   const form = useForm({
     initialValues: {
       name: '',
@@ -34,27 +33,21 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
     reader.readAsDataURL(file);
   };
 
-  const updateCredentials = (name: string) => {
-    setIsLoadAvatar(true);
+  const updateCredentials = async (name: string) => {
+    let url = '';
     if (loadAvatar) {
-      cloudinaryImageUpload(loadAvatar as File).then((url) => {
-        updateUser(idUser, {
-          name,
-          avatar: url,
-        });
-        setIsLoadAvatar(false);
-        onClose();
-        form.reset();
-      });
-    } else {
-      updateUser(idUser, {
-        name,
-        avatar,
-      });
+      setIsLoadAvatar(true);
+      url = await cloudinaryImageUpload(loadAvatar as File);
       setIsLoadAvatar(false);
-      onClose();
-      form.reset();
     }
+    updateUser(idUser, {
+      name,
+      avatar: url,
+    });
+    onClose();
+    setPreviewAvatar(null);
+    setLoadAvatar(null);
+    form.reset();
   };
 
   return (
@@ -64,7 +57,7 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
       onClose={() => {
         onClose();
         setPreviewAvatar(null);
-        resetAvatar.current?.();
+        setLoadAvatar(null);
         form.reset();
       }}
       centered
@@ -94,7 +87,6 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
           />
           <Flex direction='column' gap={20}>
             <FileButton
-              resetRef={resetAvatar}
               onChange={(file) => {
                 setLoadAvatar(file);
                 hundlerPreviewAvatar(file as File);
@@ -115,9 +107,8 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
               uppercase
               disabled={!loadAvatar}
               onClick={() => {
-                setLoadAvatar(null);
                 setPreviewAvatar(null);
-                resetAvatar.current?.();
+                setLoadAvatar(null);
               }}
             >
               Reset
@@ -132,6 +123,7 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
             variant='filled-grey'
             size='md'
             uppercase
+            disabled={!loadAvatar && !form.values.name}
           >
             Ok
           </Button>
@@ -143,7 +135,8 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
             onClick={() => {
               onClose();
               setPreviewAvatar(null);
-              resetAvatar.current?.();
+              setLoadAvatar(null);
+              form.reset();
             }}
           >
             Cancel
