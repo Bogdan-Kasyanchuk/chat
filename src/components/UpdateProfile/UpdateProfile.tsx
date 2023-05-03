@@ -36,15 +36,25 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
 
   const updateCredentials = (name: string) => {
     setIsLoadAvatar(true);
-    cloudinaryImageUpload(loadAvatar as File).then((url) => {
+    if (loadAvatar) {
+      cloudinaryImageUpload(loadAvatar as File).then((url) => {
+        updateUser(idUser, {
+          name,
+          avatar: url,
+        });
+        setIsLoadAvatar(false);
+        onClose();
+        form.reset();
+      });
+    } else {
       updateUser(idUser, {
         name,
-        avatar: url,
+        avatar,
       });
       setIsLoadAvatar(false);
       onClose();
       form.reset();
-    });
+    }
   };
 
   return (
@@ -55,6 +65,7 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
         onClose();
         setPreviewAvatar(null);
         resetAvatar.current?.();
+        form.reset();
       }}
       centered
       classNames={{ title: c.title, close: c.closeButton }}

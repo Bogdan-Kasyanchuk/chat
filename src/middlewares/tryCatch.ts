@@ -2,7 +2,7 @@ import { showError } from '@/lib';
 
 async function tryCatch<T>(func: T) {
   try {
-    return func;
+    return await func;
   } catch (error) {
     showError(error);
   }

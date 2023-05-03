@@ -16,12 +16,12 @@ const currentUser = () => {
 };
 
 export const createUser = async (id: string, data: IContact) => {
-  await tryCatch(setDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), data));
+  tryCatch(setDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), data));
 };
 
-export async function checkUser(id: string) {
+export const checkUser = async (id: string) => {
   return tryCatch(getDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id)));
-}
+};
 
 export const updateUser = async (id: string, data: Pick<IContact, 'name' | 'avatar'>) => {
   await tryCatch(
@@ -30,22 +30,22 @@ export const updateUser = async (id: string, data: Pick<IContact, 'name' | 'avat
       photoURL: data.avatar,
     }),
   );
-  await tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), data));
+  tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), data));
 };
 
 export const updateStatusUser = async (id: string, status: string) => {
-  await tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), { status }));
+  tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id), { status }));
 };
 
 export const deleteUser = async (id: string) => {
   await tryCatch(deleteDoc(doc(firebaseDB, COLECTIONS.CONTACTS, id)));
-  await tryCatch(delUser(currentUser()));
+  tryCatch(delUser(currentUser()));
 };
 
 export const createMessage = async (id: string, data: IMessage) => {
-  await tryCatch(setDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), data));
+  tryCatch(setDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), data));
 };
 
 export const updateReadMessage = async (id: string) => {
-  await tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), { read: true }));
+  tryCatch(updateDoc(doc(firebaseDB, COLECTIONS.MESSAGES, id), { read: true }));
 };

@@ -1,15 +1,13 @@
 import { GithubAuthProvider, signInWithPopup } from 'firebase/auth';
 
-import { showError } from '@/lib';
+import { tryCatch } from '@/middlewares';
 
 import firebaseAuth from './firebaseAuth';
 
 const gitHubProvider = new GithubAuthProvider();
 
-const firebaseGitHubAuth = () => {
-  signInWithPopup(firebaseAuth, gitHubProvider).catch((error) => {
-    showError(error);
-  });
+const firebaseGitHubAuth = async () => {
+  tryCatch(signInWithPopup(firebaseAuth, gitHubProvider));
 };
 
 export default firebaseGitHubAuth;

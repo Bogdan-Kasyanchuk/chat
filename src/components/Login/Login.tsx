@@ -9,9 +9,9 @@ import { Form } from '@/components';
 
 const Login: FC = () => {
   const form = useForm({
-    validate: joiResolver(loginUserJoiSchema),
-    validateInputOnChange: true,
-    validateInputOnBlur: true,
+    // validate: joiResolver(loginUserJoiSchema),
+    // validateInputOnChange: true,
+    // validateInputOnBlur: true,
     initialValues: {
       email: '',
       password: '',

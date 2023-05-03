@@ -39,7 +39,6 @@ const UserMenu: FC = () => {
   const setStatus = (e: MouseEvent<HTMLButtonElement>) => {
     const status = (e.target as HTMLButtonElement).textContent?.toLowerCase();
 
-    setUserStatus(status as string);
     updateStatusUser(idUser, status as string);
   };
 
@@ -131,7 +130,8 @@ const UserMenu: FC = () => {
         onClose={() => {
           setState({ logOut: false });
         }}
-        onConfirm={() => {
+        onConfirm={async () => {
+          await updateStatusUser(idUser, 'offline');
           firebaseAuth.signOut().catch((error) => {
             showError(error);
           });

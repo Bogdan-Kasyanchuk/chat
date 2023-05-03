@@ -1,15 +1,13 @@
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 
-import { showError } from '@/lib';
+import { tryCatch } from '@/middlewares';
 
 import firebaseAuth from './firebaseAuth';
 
 const googleProvider = new GoogleAuthProvider();
 
-const firebaseGoogleAuth = () => {
-  signInWithPopup(firebaseAuth, googleProvider).catch((error) => {
-    showError(error);
-  });
+const firebaseGoogleAuth = async () => {
+  tryCatch(signInWithPopup(firebaseAuth, googleProvider));
 };
 
 export default firebaseGoogleAuth;
