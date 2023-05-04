@@ -3,6 +3,7 @@ import { createStyles, rem } from '@mantine/core';
 const useStyles = createStyles((theme) => ({
   item: {
     padding: rem(15),
+    position: 'relative',
   },
 
   message: {

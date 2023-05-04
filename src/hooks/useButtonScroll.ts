@@ -11,22 +11,15 @@ const useButtonScroll = (
   useEffect(() => {
     const { scrollHeight, clientHeight } = viewport.current as HTMLDivElement;
 
-    const differenceHeights = scrollHeight - clientHeight;
-
-    if (scrollDirection === 'top') {
-      if (differenceHeights >= 100 && differenceHeights - 100 <= scrollPositionY) {
-        setIsButtonShow(true);
-      } else {
-        setIsButtonShow(false);
-      }
-    }
-
-    if (scrollDirection === 'bottom') {
-      if (differenceHeights >= 100 && differenceHeights - 100 >= scrollPositionY) {
-        setIsButtonShow(true);
-      } else {
-        setIsButtonShow(false);
-      }
+    if (scrollDirection === 'top' && scrollPositionY >= 100) {
+      setIsButtonShow(true);
+    } else if (
+      scrollDirection === 'bottom' &&
+      scrollHeight - clientHeight - 100 >= scrollPositionY
+    ) {
+      setIsButtonShow(true);
+    } else {
+      setIsButtonShow(false);
     }
   });
 

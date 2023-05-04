@@ -58,6 +58,10 @@ const Chat: FC = () => {
 
     const lastMessage = normalizedMessages[normalizedMessages.length - 1];
 
+    if (idActiveContact === lastMessage?.idOwner) {
+      return;
+    }
+
     if (normalizedMessages && isMounted && lastMessage.idInterlocutor === idUser) {
       audio.play();
       showLastMessage(lastMessage, normalizedContacts);

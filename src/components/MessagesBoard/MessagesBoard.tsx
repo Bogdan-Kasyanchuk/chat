@@ -13,7 +13,7 @@ import {
   rem,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useMediaQuery, useScrollIntoView } from '@mantine/hooks';
+import { useMediaQuery, usePrevious, useScrollIntoView } from '@mantine/hooks';
 
 import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
 
@@ -41,12 +41,13 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
   const { idUser } = useUser();
   const { allStatus } = useClassStatus();
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
-    HTMLLIElement,
+    HTMLDivElement,
     HTMLDivElement
-  >({ duration: 0 });
+  >({ duration: 0, offset: 100 });
   const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
   const [idFirstNotReadMessage, setIdFirstNotReadMessage] = useState('');
   const { isButtonShow } = useButtonScroll(scrollableRef, scrollPosition.y, 'bottom');
+  const previousIdActiveContact = usePrevious(idActiveContact);
 
   const form = useForm({
     initialValues: {
@@ -59,7 +60,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
   };
 
   const transformedContact = useMemo(() => {
-    console.log(1);
+    // console.log(1);
 
     return transformedContacts.find(
       (el) => el.idContact === idActiveContact,
@@ -72,7 +73,11 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
   };
 
   useEffect(() => {
-    console.log(2);
+    if (idActiveContact === previousIdActiveContact) {
+      return;
+    }
+
+    // console.log(2);
     const firstNotReadMessage = transformedContact.messages.find(
       (el) => el.read === false && el.idOwner === idActiveContact,
     );
@@ -80,7 +85,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
   }, [transformedContact]);
 
   useEffect(() => {
-    console.log('---idFirstNotReadMessage---', idFirstNotReadMessage);
+    // console.log('---idFirstNotReadMessage---', idFirstNotReadMessage);
 
     if (idFirstNotReadMessage) {
       console.log('--scrollIntoView--');
@@ -89,23 +94,25 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
       console.log('--scrollToBottom--');
       scrollToBottom();
     }
-  }, [transformedContacts, idFirstNotReadMessage]);
+  }, [transformedContact, idFirstNotReadMessage]);
 
-  // useEffect(() => {
-  //   if (!idFirstNotReadMessage) {
-  //     return;
-  //   }
-  //   const notReadMessages = transformedContact.messages.filter(
-  //     (el) => el.read === false && el.idOwner === idActiveContact,
-  //   );
+  useEffect(() => {
+    console.log('------------111------------');
 
-  //   setTimeout(() => {
-  //     notReadMessages.forEach((el) => {
-  //       updateReadMessage(el.id);
-  //     });
-  //     setIdFirstNotReadMessage('');
-  //   }, 2000);
-  // }, [idFirstNotReadMessage]);
+    const notReadMessages = transformedContact.messages.filter(
+      (el) => el.read === false && el.idOwner === idActiveContact,
+    );
+
+    if (notReadMessages.length > 0) {
+      console.log('------------222------------');
+      setTimeout(() => {
+        notReadMessages.forEach((el) => {
+          updateReadMessage(el.id);
+        });
+        setIdFirstNotReadMessage('');
+      }, 3000);
+    }
+  }, [transformedContact]);
 
   return (
     <Box className={c.boardBox}>

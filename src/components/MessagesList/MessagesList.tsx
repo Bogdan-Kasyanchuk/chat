@@ -4,7 +4,7 @@ import { MessageItem } from '@/components';
 
 import type IMessagesListProps from './IMessagesListProps';
 
-const MessagesList = forwardRef<HTMLLIElement, IMessagesListProps>(
+const MessagesList = forwardRef<HTMLDivElement, IMessagesListProps>(
   ({ messages, contact, idFirstNotReadMessage }, ref) => {
     return (
       <ul>

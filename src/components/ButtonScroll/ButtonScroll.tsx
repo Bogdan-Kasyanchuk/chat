@@ -8,7 +8,7 @@ import type IButtonScrollProps from './IButtonScrollProps';
 
 const ButtonScroll: FC<IButtonScrollProps> = ({ isShow, scrollTo, buttonDirection }) => {
   return (
-    <Transition mounted={isShow} transition='slide-left' duration={200}>
+    <Transition mounted={isShow} transition='slide-left' duration={150}>
       {(styles) => (
         <ActionIcon
           onClick={scrollTo}
