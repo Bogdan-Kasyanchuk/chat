@@ -55,7 +55,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
   });
 
   const scrollToBottom = () => {
-    scrollableRef.current.scrollTo({ top: scrollableRef.current.scrollHeight, behavior: 'smooth' });
+    scrollableRef.current.scrollTo({ top: scrollableRef.current.scrollHeight });
   };
 
   const transformedContact = useMemo(() => {
@@ -79,17 +79,17 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
     setIdFirstNotReadMessage(firstNotReadMessage?.id as string);
   }, [transformedContact]);
 
-  // useEffect(() => {
-  //   console.log('---idFirstNotReadMessage---', idFirstNotReadMessage);
+  useEffect(() => {
+    console.log('---idFirstNotReadMessage---', idFirstNotReadMessage);
 
-  //   if (idFirstNotReadMessage) {
-  //     console.log('--scrollIntoView--');
-  //     scrollIntoView();
-  //   } else {
-  //     console.log('--scrollToBottom--');
-  //     scrollToBottom();
-  //   }
-  // }, [transformedContacts]);
+    if (idFirstNotReadMessage) {
+      console.log('--scrollIntoView--');
+      scrollIntoView();
+    } else {
+      console.log('--scrollToBottom--');
+      scrollToBottom();
+    }
+  }, [transformedContacts, idFirstNotReadMessage]);
 
   // useEffect(() => {
   //   if (!idFirstNotReadMessage) {
