@@ -7,7 +7,7 @@ import type IMessagesListProps from './IMessagesListProps';
 const MessagesList = forwardRef<HTMLDivElement, IMessagesListProps>(
   ({ messages, contact, idFirstNotReadMessage }, ref) => {
     return (
-      <ul>
+      <ul style={{ paddingTop: messages.length === 1 && idFirstNotReadMessage ? '15px' : '0' }}>
         {messages?.map((message) => (
           <MessageItem
             key={message.id}
@@ -19,7 +19,7 @@ const MessagesList = forwardRef<HTMLDivElement, IMessagesListProps>(
         ))}
       </ul>
     );
-  },
+  }
 );
 
 export default memo(MessagesList);
