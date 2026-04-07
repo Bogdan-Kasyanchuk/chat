@@ -17,7 +17,7 @@ const ButtonScroll: FC<IButtonScrollProps> = ({ isShow, scrollTo, buttonDirectio
           right={20}
           bottom={20}
           style={{ ...styles }}
-          color='dark.5'
+          color='red.7'
         >
           <IconArrowBigUpFilled
             size={40}

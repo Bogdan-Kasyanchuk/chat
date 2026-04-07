@@ -61,7 +61,8 @@ const UpdateProfile: FC<IUpdateProfileProps> = ({ idUser, avatar, isOpened, onCl
         form.reset();
       }}
       centered
-      classNames={{ title: c.title, close: c.closeButton }}
+      transitionProps={{ duration: 150 }}
+      classNames={{ title: c.title, close: c.closeButton, content: c.content }}
     >
       <Box
         component='form'

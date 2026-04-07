@@ -16,7 +16,7 @@ const Error_404: FC = () => {
       <div className={c.label}>404</div>
       <Box>
         <Title className={c.title}>Something is not right...</Title>
-        <Text fz={18} maw={500} color='gray.6'>
+        <Text fz={18} maw={500}>
           Page you are trying to open does not exist. You may have mistyped the address, or the page
           has been moved to another URL. If you think this is an error contact support.
         </Text>

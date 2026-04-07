@@ -2,18 +2,19 @@ import type { FC } from 'react';
 
 import { Center, Text } from '@mantine/core';
 
-import { useStylesGlobal } from '@/hooks';
-
 import useStyles from './StartViewChat.styles';
 
 const StartViewChat: FC = () => {
-  const { classes: cG } = useStylesGlobal();
   const { classes: c } = useStyles();
 
   return (
-    <Center className={c.startViewbox}>
-      <Text component='p' w='max-content' fz={18} p={16} bg='gray.2' className={cG.border}>
-        Choose who you would like to write to
+    <Center
+      className={c.startViewbox}
+      p={20}
+      sx={{ boxShadow: '0px 4px 5px 2px rgba(18, 18, 18, 0.35)' }}
+    >
+      <Text component='p' fz={20} fw={500} align='center'>
+        Choose who you would like to write&nbsp;to
       </Text>
     </Center>
   );

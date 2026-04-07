@@ -5,9 +5,13 @@ const useStyles = createStyles((theme) => ({
     transition: 'background-color 150ms ease',
   },
 
-  userIcon: {
-    marginRight: rem(-5),
-    color: theme.white,
+  userAvatar: {
+    border: `${rem(2)} solid ${theme.white}`,
+  },
+
+  userDivider: {
+    borderTop: `${rem(2)} solid ${theme.colors.dark[5]}`,
+    margin: `0px ${rem(-1)}`,
   },
 
   userStatus: {
@@ -23,10 +27,17 @@ const useStyles = createStyles((theme) => ({
 
   menuItem: {
     transition: 'background-color 150ms ease',
+    color: theme.colors.dark[5],
+    fontSize: rem(16),
+    fontWeight: 500,
 
     '&[data-hovered]': {
       backgroundColor: theme.colors.gray[4],
     },
+  },
+
+  menuItemDelete: {
+    color: theme.colors.red[7],
   },
 }));
 

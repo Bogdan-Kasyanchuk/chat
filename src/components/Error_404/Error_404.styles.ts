@@ -5,7 +5,7 @@ const useStyles = createStyles((theme) => ({
     fontWeight: 900,
     fontSize: rem(220),
     lineHeight: 1,
-    color: theme.colors.gray[4],
+    color: theme.colors.gray[6],
 
     [theme.fn.smallerThan('md')]: {
       fontSize: rem(120),

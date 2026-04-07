@@ -1,11 +1,9 @@
 import type { FC } from 'react';
 import { Outlet, Route, Routes } from 'react-router-dom';
 
-import { Container, Flex, LoadingOverlay } from '@mantine/core';
+import { Container, LoadingOverlay } from '@mantine/core';
 
 import { useUser } from '@/hooks';
-
-import { Footer, Header } from '@/layouts';
 
 import { ChatPage, Error_404Page, HomePage, LoginPage, RegisterPage } from '@/pages';
 
@@ -17,8 +15,9 @@ const App: FC = () => {
     <>
       <LoadingOverlay
         visible={loading}
+        overlayBlur={3}
         overlayColor='dark.5'
-        overlayOpacity={0.3}
+        overlayOpacity={0.25}
         loaderProps={{ color: 'dark.5', size: 100 }}
       />
       {!loading && (
@@ -26,13 +25,9 @@ const App: FC = () => {
           <Route
             path='/'
             element={
-              <Flex direction='column' h='100%'>
-                <Header />
-                <Container px={0} h='calc(100% - 119px)'>
-                  <Outlet />
-                </Container>
-                <Footer />
-              </Flex>
+              <Container>
+                <Outlet />
+              </Container>
             }
           >
             <Route
@@ -76,11 +71,3 @@ const App: FC = () => {
 };
 
 export default App;
-
-// igor@aa.aa
-// igor@aaA1
-
-// pavlo@aa.aa
-// pavlo@aaA1
-
-//* Відображення кількості контактів у футері при логінізації і реєстрації

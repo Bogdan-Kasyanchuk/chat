@@ -18,13 +18,13 @@ const ModalConfirm: FC<IModalConfirmProps> = ({
 
   return (
     <Modal
+      title={title}
       opened={isOpened}
       onClose={onClose}
-      title={title}
-      centered
       padding={20}
+      centered
       transitionProps={{ duration: 150 }}
-      classNames={{ title: c.title, close: c.closeButton }}
+      classNames={{ title: c.title, close: c.closeButton, content: c.content }}
     >
       {children}
       <Group position='center' spacing={50} mt={30}>

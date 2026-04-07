@@ -18,6 +18,10 @@ const useStyles = createStyles((theme) => ({
       backgroundColor: theme.colors.dark[5],
     },
   },
+
+  content: {
+    boxShadow: '0px 4px 5px 2px rgba(18, 18, 18, 0.35)',
+  },
 }));
 
 export default useStyles;

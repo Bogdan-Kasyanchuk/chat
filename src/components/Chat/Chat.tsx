@@ -35,7 +35,7 @@ const Chat: FC = () => {
   const { transformedContacts } = useTransformedData(
     normalizedContacts,
     normalizedMessages,
-    idUser,
+    idUser
   );
 
   const audio = new Audio(newMessageAudio);
@@ -69,7 +69,7 @@ const Chat: FC = () => {
   }, [normalizedMessages]);
 
   return (
-    <Flex justify='center' h='100%' className={cG.borderX}>
+    <Flex justify='center' h='100%' gap={20}>
       {min_768 ? (
         <>
           <ContactsBoard

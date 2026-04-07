@@ -6,16 +6,23 @@ import {
   Avatar,
   Box,
   Flex,
+  Group,
   Indicator,
   ScrollArea,
   Text,
   TextInput,
   rem,
+  useMantineTheme,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useMediaQuery, usePrevious, useScrollIntoView } from '@mantine/hooks';
 
-import { IconArrowBigLeftFilled, IconBrandTelegram } from '@tabler/icons-react';
+import {
+  IconArrowBigLeftFilled,
+  IconBrandTelegram,
+  IconDotsVertical,
+  IconMoodEmpty,
+} from '@tabler/icons-react';
 
 import { createMessage, updateReadMessage } from '@/service/firebase';
 
@@ -35,6 +42,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
   idActiveContact,
   setIdActiveContact,
 }) => {
+  const theme = useMantineTheme();
   const { classes: cG } = useStylesGlobal();
   const { classes: c } = useStyles();
   const min_768 = useMediaQuery(`(min-width: ${rem(768)})`);
@@ -63,7 +71,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
     // console.log(1);
 
     return transformedContacts.find(
-      (el) => el.idContact === idActiveContact,
+      (el) => el.idContact === idActiveContact
     ) as ITransformedContact;
   }, [transformedContacts]);
 
@@ -79,7 +87,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
 
     // console.log(2);
     const firstNotReadMessage = transformedContact.messages.find(
-      (el) => el.read === false && el.idOwner === idActiveContact,
+      (el) => el.read === false && el.idOwner === idActiveContact
     );
     setIdFirstNotReadMessage(firstNotReadMessage?.id as string);
   }, [transformedContact]);
@@ -100,7 +108,7 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
     console.log('------------111------------');
 
     const notReadMessages = transformedContact.messages.filter(
-      (el) => el.read === false && el.idOwner === idActiveContact,
+      (el) => el.read === false && el.idOwner === idActiveContact
     );
 
     if (notReadMessages.length > 0) {
@@ -115,12 +123,30 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
   }, [transformedContact]);
 
   return (
-    <Box className={c.boardBox}>
-      <Flex align='center' gap={15} bg='gray.2' p={15} h={81} className={cG.borderB}>
+    <Box
+      bg='white'
+      w={{
+        base: '100%',
+        md: '65%',
+      }}
+      sx={{ boxShadow: '0px 4px 5px 2px rgba(18, 18, 18, 0.35)' }}
+    >
+      <Group bg={'gray.4'} p={15} spacing={15} sx={{ borderBottom: '2px solid #2C2E33' }} noWrap>
+        {!min_768 && (
+          <ActionIcon
+            ml={-6}
+            type='button'
+            size={50}
+            color='dark.5'
+            onClick={() => setIdActiveContact('')}
+          >
+            <IconArrowBigLeftFilled size={50} />
+          </ActionIcon>
+        )}
         <Indicator
           inline
-          size={20}
-          offset={7}
+          size={16}
+          offset={8}
           position='bottom-end'
           withBorder
           classNames={{ indicator: allStatus[`${transformedContact?.status}`] }}
@@ -132,23 +158,20 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
             alt={transformedContact.name}
           />
         </Indicator>
-        <Text lineClamp={1} component='p' fz={24} fw={600}>
-          {transformedContact.name}
-        </Text>
-        {!min_768 && (
-          <ActionIcon
-            type='button'
-            size={40}
-            ml='auto'
-            color='dark.5'
-            onClick={() => setIdActiveContact('')}
-          >
-            <IconArrowBigLeftFilled size={40} />
-          </ActionIcon>
-        )}
-      </Flex>
+        <Flex direction='column' justify='center'>
+          <Text lineClamp={1} component='p' fz={22} lh={1.4} fw={500}>
+            {transformedContact.name}
+          </Text>
+          <Text lineClamp={1} component='p' color='gray.6' lh={1.4} fz={13}>
+            {true ? 'Last seen, 2.02pm' : 'Online'}
+          </Text>
+        </Flex>
+        <ActionIcon type='button' size={50} color='dark.5' mr={-18} ml='auto'>
+          <IconDotsVertical size={50} />
+        </ActionIcon>
+      </Group>
       <ScrollArea
-        h='calc(100% - 81px - 81px)'
+        h='calc(100% - 162px)'
         viewportRef={scrollableRef}
         onScrollPositionChange={onScrollPositionChange}
       >
@@ -169,24 +192,26 @@ const MessagesBoard: FC<IMessagesBoardProps> = ({
           addMessage(message);
           form.reset();
         })}
-        bg='gray.2'
         p={15}
-        className={cG.borderT}
       >
-        <Flex gap={20} align='center' pos='relative'>
-          <TextInput
-            type='text'
-            radius={16}
-            w='100%'
-            size='lg'
-            placeholder='Type your message'
-            {...form.getInputProps('message')}
-            classNames={{ input: c.boardInput }}
-          />
-          <ActionIcon type='submit' size={30} pos='absolute' right={16}>
-            <IconBrandTelegram size={30} stroke={1.5} />
-          </ActionIcon>
-        </Flex>
+        <TextInput
+          classNames={{ icon: 'pointer-events-auto' }}
+          size='lg'
+          placeholder='Type your message'
+          {...form.getInputProps('message')}
+          iconWidth={50}
+          icon={
+            <ActionIcon type='button' size={34}>
+              <IconMoodEmpty size={34} stroke={1.5} color={theme.colors.gray[6]} />
+            </ActionIcon>
+          }
+          rightSectionWidth={50}
+          rightSection={
+            <ActionIcon type='submit' size={34}>
+              <IconBrandTelegram size={34} stroke={1.5} color={theme.colors.gray[6]} />
+            </ActionIcon>
+          }
+        />
       </Box>
     </Box>
   );

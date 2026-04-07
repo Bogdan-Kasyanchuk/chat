@@ -15,9 +15,14 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         withGlobalStyles
         withNormalizeCSS
         theme={{
-          globalStyles: () => ({
+          globalStyles: (theme) => ({
             'html, body, #root': {
               height: '100vh',
+            },
+            body: {
+              color: theme.colors.dark[5],
+              backgroundColor: theme.colors.gray[2],
+              backgroundImage: `url('https://www.transparenttextures.com/patterns/type.png')`,
             },
             ul: {
               listStyleType: 'none',
@@ -47,8 +52,13 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           components: {
             Container: {
               defaultProps: {
-                maw: 1440,
+                size: 1440,
+                p: {
+                  xs: 10,
+                  md: 20,
+                },
                 w: '100%',
+                h: '100%',
               },
             },
             Input: {
@@ -56,38 +66,54 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                 input: {
                   border: `${rem(1)} solid ${theme.colors.gray[4]}`,
                   transition: 'border-color 100ms ease, box-shadow 100ms ease',
+                  color: theme.colors.dark[5],
+                  '&::placeholder': {
+                    color: theme.colors.gray[6],
+                  },
                   '&[data-invalid]': {
                     outline: 'none',
                     borderColor: theme.colors.dark[5],
                     boxShadow: `inset 0 0 0 1px ${theme.colors.dark[5]}`,
                     color: theme.colors.dark[5],
                     '&::placeholder': {
-                      color: theme.colors.gray[5],
+                      color: theme.colors.gray[6],
                     },
                   },
                 },
                 icon: {
-                  color: theme.colors.gray[5],
+                  color: theme.colors.gray[6],
                 },
               }),
             },
-
+            TextInput: {
+              styles: (theme) => ({
+                required: {
+                  color: theme.colors.red[7],
+                },
+              }),
+            },
             PasswordInput: {
               styles: (theme) => ({
                 innerInput: {
+                  color: theme.colors.dark[5],
+                  '&::placeholder': {
+                    color: theme.colors.gray[6],
+                  },
                   '&[data-with-icon]': {
                     paddingLeft: rem(40),
                   },
                   '&[data-invalid]': {
                     color: theme.colors.dark[5],
                     '&::placeholder': {
-                      color: theme.colors.gray[5],
+                      color: theme.colors.gray[6],
                     },
                   },
                 },
+                required: {
+                  color: theme.colors.red[7],
+                },
               }),
             },
-
             ActionIcon: {
               styles: () => ({
                 root: {
@@ -128,12 +154,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
                     color: theme.colors.dark[5],
                   },
                 }),
-                'filled-white': (theme) => ({
-                  root: {
-                    backgroundColor: theme.white,
-                    color: theme.colors.dark[5],
-                  },
-                }),
               },
             },
           },
@@ -143,5 +163,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         <App />
       </MantineProvider>
     </BrowserRouter>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
