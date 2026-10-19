@@ -1,15 +1,16 @@
 import { Center, Loader, Text } from '@mantine/core';
-import { usePaginatedQuery } from 'convex/react';
 import { type FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import DaySeparator from '@/components/DaySeparator';
 import MessageBubble from '@/components/MessageBubble';
+import MessageMenu from '@/components/MessageMenu';
+import type { MessageAction } from '@/components/MessageMenu/messageActions';
 import ScrollDownButton from '@/components/ScrollDownButton';
 import UnreadDivider from '@/components/UnreadDivider';
 import useMarkRead from '@/hooks/useMarkRead';
+import type { MessageHistory } from '@/hooks/useMessageHistory';
 import useNow from '@/hooks/useNow';
 import type { MessageView } from '@/types/chat';
-import { api } from '@convex/_generated/api';
 import type { Id } from '@convex/_generated/dataModel';
 
 import buildRows, { firstUnreadId } from './buildRows';
@@ -17,15 +18,19 @@ import classes from './MessageList.module.css';
 
 type MessageListProps = {
     chatId: Id<'chats'>,
+    history: MessageHistory,
     partnerName: string,
+    // Чат з видаленим акаунтом: ні відповіді, ні редагування
+    canSend: boolean,
     // Поточна позначка прочитаного: від неї лічильник на кнопці «донизу» і потреба в markRead
     lastReadAt: number,
     // Знімок позначки на момент відкриття: від нього розділювач «Unread messages»
     lastReadAtOnOpen: number,
-    onReply: (message: MessageView) => void
+    // Непорожній — режим вибору: клік перемикає вибір, меню й відповідь подвійним кліком вимкнені
+    selected: ReadonlySet<MessageView[ 'id' ]>,
+    onAction: (action: MessageAction, message: MessageView) => void
 };
 
-const PAGE_SIZE = 30;
 // Старіші сторінки підвантажуються, коли до верху лишається менше LOAD_MORE_PX
 const LOAD_MORE_PX = 200;
 // Вважаємо, що людина внизу, якщо до кінця менше BOTTOM_PX
@@ -37,11 +42,10 @@ const DIVIDER_GAP = 8;
 
 const rowOf = (container: HTMLElement, id: string) => container.querySelector<HTMLElement>(`[data-message-id="${ id }"]`);
 
-const MessageList: FC<MessageListProps> = ({ chatId, partnerName, lastReadAt, lastReadAtOnOpen, onReply }) => {
-    const { results, status, loadMore } = usePaginatedQuery(api.messages.list, { chatId }, { initialNumItems: PAGE_SIZE });
+const MessageList: FC<MessageListProps> = ({ chatId, history, partnerName, canSend, lastReadAt, lastReadAtOnOpen, selected, onAction }) => {
+    const { messages, status, loadMore } = history;
     const now = useNow();
-    // Сервер віддає від нових до старих, стрічка — навпаки
-    const messages = useMemo(() => [ ...results ].reverse(), [ results ]);
+    const selecting = selected.size > 0;
     const oldest = messages.at(0);
     const newest = messages.at(-1);
 
@@ -91,14 +95,14 @@ const MessageList: FC<MessageListProps> = ({ chatId, partnerName, lastReadAt, la
         const el = scrollRef.current;
 
         if (el && positionedRef.current && status === 'CanLoadMore' && el.scrollTop < LOAD_MORE_PX) {
-            loadMore(PAGE_SIZE);
+            loadMore();
         }
     };
 
     // Догружаємо історію до першого непрочитаного, поки стрічка ще прихована
     useEffect(() => {
         if (!ready && status === 'CanLoadMore') {
-            loadMore(PAGE_SIZE);
+            loadMore();
         }
     }, [ ready, status, loadMore ]);
 
@@ -138,8 +142,11 @@ const MessageList: FC<MessageListProps> = ({ chatId, partnerName, lastReadAt, la
 
         const anchorRow = anchor && rowOf(el, anchor.id);
 
-        if (positionedRef.current && anchor && anchorRow) {
-            el.scrollTop += anchorRow.offsetTop - anchor.top;
+        const delta = positionedRef.current && anchor && anchorRow ? anchorRow.offsetTop - anchor.top : 0;
+
+        // Присвоєння scrollTop, навіть того самого, зриває інерційну прокрутку на телефоні
+        if (delta !== 0) {
+            el.scrollTop += delta;
         }
 
         const oldestRow = oldest && rowOf(el, oldest.id);
@@ -231,16 +238,35 @@ const MessageList: FC<MessageListProps> = ({ chatId, partnerName, lastReadAt, la
                             );
                         }
 
+                        const { message } = row;
+
                         return (
-                            <MessageBubble
+                            <MessageMenu
                                 key={ row.key }
-                                message={ row.message }
-                                partnerName={ partnerName }
-                                onQuoteClick={ scrollToMessage }
-                                onDoubleClick={ () => {
-                                    onReply(row.message);
+                                message={ message }
+                                canSend={ canSend }
+                                disabled={ selecting }
+                                onAction={ action => {
+                                    onAction(action, message);
                                 } }
-                            />
+                            >
+                                <MessageBubble
+                                    message={ message }
+                                    partnerName={ partnerName }
+                                    selected={ selected.has(message.id) }
+                                    onQuoteClick={ scrollToMessage }
+                                    onClick={ selecting
+                                        ? () => {
+                                            onAction('select', message);
+                                        }
+                                        : undefined }
+                                    onDoubleClick={ canSend && !selecting
+                                        ? () => {
+                                            onAction('reply', message);
+                                        }
+                                        : undefined }
+                                />
+                            </MessageMenu>
                         );
                     }) }
                 </div>

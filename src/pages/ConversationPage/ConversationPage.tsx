@@ -1,8 +1,8 @@
-import { Center, Loader } from '@mantine/core';
+import { Button, Center, Loader, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from 'convex/react';
-import { type FC, useEffect } from 'react';
-import { Navigate, useParams } from 'react-router';
+import { type FC, useEffect, useState } from 'react';
+import { Link, Navigate, useParams } from 'react-router';
 
 import { api } from '@convex/_generated/api';
 import type { Id } from '@convex/_generated/dataModel';
@@ -26,8 +26,26 @@ const ChatNotFound: FC = () => {
     );
 };
 
+// Непередбачена помилка: чесно кажемо, що щось зламалось, і даємо шлях назад
+const ChatFailed: FC = () => (
+    <Center h="100%">
+        <Stack align="center">
+            <Text>Something went wrong</Text>
+            <Button
+                component={ Link }
+                to="/"
+                variant="default"
+            >
+                Back to chats
+            </Button>
+        </Stack>
+    </Center>
+);
+
 const ConversationLoader: FC<{ chatId: Id<'chats'> }> = ({ chatId }) => {
     const chat = useQuery(api.chats.get, { chatId });
+    // Чат видаляю я сам: його зникнення — не «Chat not found», перехід на «/» уже йде
+    const [ leaving, setLeaving ] = useState(false);
 
     if (chat === undefined) {
         return (
@@ -38,10 +56,24 @@ const ConversationLoader: FC<{ chatId: Id<'chats'> }> = ({ chatId }) => {
     }
 
     if (chat === null) {
-        return <ChatNotFound />;
+        return leaving
+            ? (
+                <Navigate
+                    to="/"
+                    replace
+                />
+            )
+            : <ChatNotFound />;
     }
 
-    return <Conversation chat={ chat } />;
+    return (
+        <Conversation
+            chat={ chat }
+            onLeave={ () => {
+                setLeaving(true);
+            } }
+        />
+    );
 };
 
 const ConversationPage: FC = () => {
@@ -51,7 +83,8 @@ const ConversationPage: FC = () => {
     return (
         <ChatErrorBoundary
             key={ chatId }
-            fallback={ <ChatNotFound /> }
+            notFound={ <ChatNotFound /> }
+            fallback={ <ChatFailed /> }
         >
             <ConversationLoader chatId={ chatId } />
         </ChatErrorBoundary>

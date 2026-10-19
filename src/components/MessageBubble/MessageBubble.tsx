@@ -1,6 +1,6 @@
 import { Text, UnstyledButton } from '@mantine/core';
 import { IconCheck, IconChecks } from '@tabler/icons-react';
-import type { FC, MouseEvent } from 'react';
+import type { FC } from 'react';
 
 import { formatClock } from '@/lib/formatTime';
 import type { MessageView } from '@/types/chat';
@@ -11,20 +11,25 @@ type MessageBubbleProps = {
     message: MessageView,
     partnerName: string,
     selected?: boolean,
-    onContextMenu?: (event: MouseEvent<HTMLDivElement>) => void,
+    // Режим вибору: клік перемикає вибір, цитата нікуди не веде
+    onClick?: () => void,
     onDoubleClick?: () => void,
     onQuoteClick?: (messageId: MessageView[ 'id' ]) => void
 };
 
-const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected = false, onContextMenu, onDoubleClick, onQuoteClick }) => {
+const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected = false, onClick, onDoubleClick, onQuoteClick }) => {
     const { authorIsMe, replyTo } = message;
     // id === null — оригінал видалено: цитата лишається, але нікуди не веде
     const quoteId = replyTo?.id ?? null;
+    const quoteClick = onClick ? undefined : onQuoteClick;
+    // span, а не p: цитата буває кнопкою, а в <button> блочним елементам не місце
     const quoteContent = replyTo && (
         <>
             { replyTo.authorName && (
                 <Text
                     className={ classes.quoteAuthor }
+                    component="span"
+                    display="block"
                     size="xs"
                     truncate
                 >
@@ -32,6 +37,8 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
                 </Text>
             ) }
             <Text
+                component="span"
+                display="block"
                 size="sm"
                 truncate
             >
@@ -45,14 +52,15 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
             className={ classes.row }
             data-mine={ authorIsMe || undefined }
             data-selected={ selected || undefined }
+            data-selectable={ onClick ? true : undefined }
             data-message-id={ message.id }
+            onClick={ onClick }
         >
             <div
                 className={ classes.bubble }
                 role="article"
                 aria-label={ authorIsMe ? 'You' : partnerName }
                 data-mine={ authorIsMe || undefined }
-                onContextMenu={ onContextMenu }
                 onDoubleClick={ onDoubleClick }
             >
                 { message.forwardedFrom && (
@@ -63,12 +71,16 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
                         Forwarded from { message.forwardedFrom }
                     </Text>
                 ) }
-                { replyTo && (quoteId && onQuoteClick
+                { replyTo && (quoteId && quoteClick
                     ? (
                         <UnstyledButton
                             className={ classes.quote }
                             onClick={ () => {
-                                onQuoteClick(quoteId);
+                                quoteClick(quoteId);
+                            } }
+                            // Подвійний клік по цитаті — це два переходи до оригіналу, а не відповідь
+                            onDoubleClick={ event => {
+                                event.stopPropagation();
                             } }
                         >
                             { quoteContent }

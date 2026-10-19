@@ -24,12 +24,24 @@ type ComposerProps = {
 const Composer: FC<ComposerProps> = ({ disabled, replyTo, editing, onCancel, onSubmit }) => {
     const [ value, setValue ] = useState(editing?.body ?? '');
     const [ editingId, setEditingId ] = useState(editing?.id ?? null);
+    // Чернетка, яку відклало редагування: повертається, коли воно закінчиться
+    const [ draft, setDraft ] = useState('');
     const fieldRef = useRef<HTMLTextAreaElement>(null);
 
-    // Нове редагування підставляє текст повідомлення, скасоване — очищає поле
+    // Початок редагування відкладає чернетку й підставляє текст повідомлення, кінець — повертає чернетку
     if ((editing?.id ?? null) !== editingId) {
         setEditingId(editing?.id ?? null);
-        setValue(editing?.body ?? '');
+
+        if (editing) {
+            setValue(editing.body);
+
+            if (editingId === null) {
+                setDraft(value);
+            }
+        } else {
+            setValue(draft);
+            setDraft('');
+        }
     }
 
     useEffect(() => {

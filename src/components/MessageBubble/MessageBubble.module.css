@@ -7,6 +7,12 @@
         justify-content: flex-end;
     }
 
+    &[data-selectable] {
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
     &[data-selected] {
         background-color: var(--mantine-color-gray-3);
     }

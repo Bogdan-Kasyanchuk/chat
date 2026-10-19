@@ -84,3 +84,47 @@ test('MessageBubble renders a deleted reply as Deleted message', () => {
     // Оригіналу немає — цитата не клікабельна
     expect(screen.queryByRole('button')).toBeNull();
 });
+
+test('MessageBubble quote is a button without block children and its double click does not reply', async () => {
+    const onDoubleClick = vi.fn();
+    const onQuoteClick = vi.fn();
+
+    renderWithProviders(
+        <MessageBubble
+            message={ makeMessage({ replyTo: { id: 'm0' as MessageView[ 'id' ], authorName: 'Bob', body: 'Lunch?' } }) }
+            partnerName="Bob"
+            onDoubleClick={ onDoubleClick }
+            onQuoteClick={ onQuoteClick }
+        />
+    );
+
+    const quote = screen.getByRole('button', { name: /Bob/ });
+
+    expect(quote.querySelector('p, div')).toBeNull();
+
+    await userEvent.setup().dblClick(quote);
+
+    expect(onQuoteClick).toHaveBeenCalled();
+    expect(onDoubleClick).not.toHaveBeenCalled();
+});
+
+test('MessageBubble in select mode toggles on click and leaves the quote inert', async () => {
+    const onClick = vi.fn();
+    const onQuoteClick = vi.fn();
+
+    renderWithProviders(
+        <MessageBubble
+            message={ makeMessage({ replyTo: { id: 'm0' as MessageView[ 'id' ], authorName: 'Bob', body: 'Lunch?' } }) }
+            partnerName="Bob"
+            selected
+            onClick={ onClick }
+            onQuoteClick={ onQuoteClick }
+        />
+    );
+
+    await userEvent.setup().click(screen.getByText('Lunch?'));
+
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(onQuoteClick).not.toHaveBeenCalled();
+    expect(screen.getByRole('article').closest('[data-selected]')).toBeTruthy();
+});

@@ -112,3 +112,43 @@ test('Composer replaces the field with a notice when disabled', () => {
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
 });
+
+test('Composer keeps the draft while a message is being edited', async () => {
+    const props = { disabled: false, replyTo: null, onCancel: vi.fn(), onSubmit: vi.fn() };
+    const { rerender } = renderWithProviders(
+        <Composer
+            { ...props }
+            editing={ null }
+        />
+    );
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Message' });
+
+    await userEvent.setup().type(field, 'Half a thought');
+
+    rerender(
+        <Composer
+            { ...props }
+            editing={ { id: 'm1' as MessageView[ 'id' ], body: 'Old text' } }
+        />
+    );
+
+    expect(field.value).toBe('Old text');
+
+    rerender(
+        <Composer
+            { ...props }
+            editing={ { id: 'm2' as MessageView[ 'id' ], body: 'Other text' } }
+        />
+    );
+
+    expect(field.value).toBe('Other text');
+
+    rerender(
+        <Composer
+            { ...props }
+            editing={ null }
+        />
+    );
+
+    expect(field.value).toBe('Half a thought');
+});

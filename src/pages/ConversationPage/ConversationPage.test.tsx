@@ -1,7 +1,9 @@
 import { notifications } from '@mantine/notifications';
-import { screen } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
+import { ConvexError } from 'convex/values';
+import { useSyncExternalStore } from 'react';
 import { Route, Routes } from 'react-router';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
@@ -15,6 +17,33 @@ let chatError: Error | null = null;
 let messages: MessageView[] = [];
 const send = vi.fn();
 const markRead = vi.fn();
+const edit = vi.fn();
+const removeMessages = vi.fn();
+const removeChat = vi.fn();
+
+// Як у Convex: нове значення запиту одразу перемальовує підписані компоненти
+const chatListeners = new Set<() => void>();
+const setChat = (next: ChatView | null) => {
+    chat = next;
+    chatListeners.forEach(listener => {
+        listener();
+    });
+};
+const subscribeChat = (listener: () => void) => {
+    chatListeners.add(listener);
+
+    return () => {
+        chatListeners.delete(listener);
+    };
+};
+
+const mutations: Record<string, typeof send> = {
+    'messages:send': send,
+    'messages:edit': edit,
+    'messages:remove': removeMessages,
+    'chats:markRead': markRead,
+    'chats:remove': removeChat
+};
 
 vi.mock('convex/react', () => ({
     useQuery: (ref: FunctionReference<'query'>) => {
@@ -22,15 +51,29 @@ vi.mock('convex/react', () => ({
             return { id: 'me', name: 'Alice', email: 'alice@example.com', avatar: null, sound: 'classic' };
         }
 
+        // eslint-disable-next-line react-hooks/rules-of-hooks -- мок useQuery: гілка стала для кожного виклику
+        const current = useSyncExternalStore(subscribeChat, () => chat);
+
         if (chatError) {
             throw chatError;
         }
 
-        return chat;
+        return current;
     },
-    usePaginatedQuery: () => ({ results: messages, status: 'Exhausted', isLoading: false, loadMore: vi.fn() }),
-    useMutation: (ref: FunctionReference<'mutation'>) => getFunctionName(ref) === 'messages:send' ? send : markRead
+    usePaginatedQuery: () => ({ results: [ ...messages ].reverse(), status: 'Exhausted', isLoading: false, loadMore: vi.fn() }),
+    useMutation: (ref: FunctionReference<'mutation'>) => mutations[ getFunctionName(ref) ] ?? vi.fn()
 }));
+
+const message = (id: string, body: string, authorIsMe = false, minutesAgo = 60): MessageView => ({
+    id: id as MessageView[ 'id' ],
+    body,
+    createdAt: Date.now() - minutesAgo * 60_000,
+    authorIsMe,
+    editedAt: null,
+    forwardedFrom: null,
+    replyTo: null,
+    read: true
+});
 
 const makeChat = (patch: Partial<ChatView> = {}): ChatView => ({
     chatId: 'c1' as ChatView[ 'chatId' ],
@@ -63,8 +106,9 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-    send.mockReset();
-    markRead.mockReset();
+    Object.values(mutations).forEach(mock => {
+        mock.mockReset();
+    });
     vi.restoreAllMocks();
 });
 
@@ -127,16 +171,7 @@ test('ConversationPage offers to add a stranger to contacts', () => {
 
 test('ConversationPage cancels a reply on Escape and then closes the chat', async () => {
     chat = makeChat();
-    messages = [ {
-        id: 'm1' as MessageView[ 'id' ],
-        body: 'Lunch?',
-        createdAt: Date.now() - 60_000,
-        authorIsMe: false,
-        editedAt: null,
-        forwardedFrom: null,
-        replyTo: null,
-        read: true
-    } ];
+    messages = [ message('m1', 'Lunch?') ];
     renderPage();
 
     const user = userEvent.setup();
@@ -153,4 +188,201 @@ test('ConversationPage cancels a reply on Escape and then closes the chat', asyn
     await user.keyboard('{Escape}');
 
     expect(screen.getByText('home page')).toBeTruthy();
+});
+
+test('ConversationPage shows a generic error instead of Chat not found for other failures', () => {
+    const show = vi.spyOn(notifications, 'show');
+
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    chatError = new Error('Something exploded');
+    renderPage();
+
+    expect(screen.getByText('Something went wrong')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Back to chats' })).toBeTruthy();
+    expect(screen.queryByText('home page')).toBeNull();
+    expect(show).not.toHaveBeenCalled();
+});
+
+test('ConversationPage treats a Chat not found error as a missing chat', () => {
+    const show = vi.spyOn(notifications, 'show');
+
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    chatError = new ConvexError('Chat not found');
+    renderPage();
+
+    expect(screen.getByText('home page')).toBeTruthy();
+    expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Chat not found' }));
+});
+
+test('right click opens the menu and Reply fills the composer bar', async () => {
+    chat = makeChat();
+    messages = [ message('m1', 'Lunch?') ];
+    renderPage();
+
+    fireEvent.contextMenu(screen.getByText('Lunch?'));
+
+    // Чуже повідомлення не редагується
+    expect(screen.queryByRole('button', { name: 'Edit' })).toBeNull();
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Reply' }));
+
+    expect(screen.getByText('Reply to Bob')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Reply' })).toBeNull();
+});
+
+test('Edit saves through messages.edit and gives the draft back', async () => {
+    chat = makeChat();
+    messages = [ message('m1', 'Old text', true) ];
+    edit.mockResolvedValue(null);
+    renderPage();
+
+    const user = userEvent.setup();
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Message' });
+
+    await user.type(field, 'My draft');
+    fireEvent.contextMenu(screen.getByText('Old text'));
+    await user.click(screen.getByRole('button', { name: 'Edit' }));
+
+    expect(screen.getByText('Edit message')).toBeTruthy();
+    expect(field.value).toBe('Old text');
+
+    await user.clear(field);
+    await user.type(field, 'New text{Enter}');
+
+    expect(edit).toHaveBeenCalledWith({ messageId: 'm1', body: 'New text' });
+    expect(send).not.toHaveBeenCalled();
+    expect(screen.queryByText('Edit message')).toBeNull();
+    expect(field.value).toBe('My draft');
+
+    // Скасоване редагування теж повертає чернетку
+    fireEvent.contextMenu(screen.getByText('Old text'));
+    await user.click(screen.getByRole('button', { name: 'Edit' }));
+    await user.click(screen.getByRole('button', { name: 'Cancel editing' }));
+
+    expect(field.value).toBe('My draft');
+});
+
+test('Copy text puts the message on the clipboard', async () => {
+    const show = vi.spyOn(notifications, 'show');
+
+    chat = makeChat();
+    messages = [ message('m1', 'Lunch?') ];
+    renderPage();
+
+    const user = userEvent.setup();
+
+    fireEvent.contextMenu(screen.getByText('Lunch?'));
+    await user.click(screen.getByRole('button', { name: 'Copy text' }));
+
+    expect(await navigator.clipboard.readText()).toBe('Lunch?');
+    expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Copied' }));
+});
+
+test('Select mode toggles messages and Delete removes them for me', async () => {
+    chat = makeChat();
+    messages = [ message('a', 'First', true, 30), message('b', 'Second', false, 20), message('c', 'Third', false, 10) ];
+    removeMessages.mockResolvedValue(null);
+    renderPage();
+
+    const user = userEvent.setup();
+
+    fireEvent.contextMenu(screen.getByText('First'));
+    await user.click(screen.getByRole('button', { name: 'Select' }));
+
+    expect(screen.getByText('1 selected')).toBeTruthy();
+    // Шапку чату заміняє панель вибору
+    expect(screen.queryByRole('button', { name: 'Chat settings' })).toBeNull();
+
+    await user.click(screen.getByText('Third'));
+    await user.click(screen.getByText('Second'));
+
+    expect(screen.getByText('3 selected')).toBeTruthy();
+
+    // Подвійний клік у режимі вибору не відкриває відповідь
+    await user.dblClick(screen.getByText('Third'));
+
+    expect(screen.queryByText('Reply to Bob')).toBeNull();
+    expect(screen.getByText('3 selected')).toBeTruthy();
+
+    await user.click(screen.getByText('Third'));
+
+    expect(screen.getByText('2 selected')).toBeTruthy();
+
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    const dialog = screen.getByRole('dialog', { name: 'Delete 2 messages?' });
+
+    // Друге повідомлення — Боба, тож видалити можна лише для себе
+    expect(within(dialog).queryByRole('checkbox')).toBeNull();
+
+    await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
+
+    expect(removeMessages).toHaveBeenCalledWith({ messageIds: [ 'a', 'b' ], forEveryone: false });
+    expect(screen.queryByText(/selected/)).toBeNull();
+    expect(screen.getByRole('button', { name: 'Chat settings' })).toBeTruthy();
+});
+
+test('Copy in select mode joins the texts in chronological order', async () => {
+    chat = makeChat();
+    messages = [ message('a', 'First', true, 30), message('b', 'Second', false, 20), message('c', 'Third', false, 10) ];
+    renderPage();
+
+    const user = userEvent.setup();
+
+    fireEvent.contextMenu(screen.getByText('Third'));
+    await user.click(screen.getByRole('button', { name: 'Select' }));
+    await user.click(screen.getByText('First'));
+    await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+    expect(await navigator.clipboard.readText()).toBe('First\n\nThird');
+    // Після копіювання вибір знято
+    expect(screen.queryByText(/selected/)).toBeNull();
+});
+
+test('Escape cancels the selection before the reply', async () => {
+    chat = makeChat();
+    messages = [ message('a', 'First'), message('b', 'Second', false, 10) ];
+    renderPage();
+
+    const user = userEvent.setup();
+
+    await user.dblClick(screen.getByText('First'));
+    fireEvent.contextMenu(screen.getByText('Second'));
+    await user.click(screen.getByRole('button', { name: 'Select' }));
+
+    expect(screen.getByText('1 selected')).toBeTruthy();
+    expect(screen.getByText('Reply to Bob')).toBeTruthy();
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByText('1 selected')).toBeNull();
+    expect(screen.getByText('Reply to Bob')).toBeTruthy();
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByText('Reply to Bob')).toBeNull();
+    expect(screen.queryByText('home page')).toBeNull();
+});
+
+test('Delete chat goes home without the Chat not found toast', async () => {
+    const show = vi.spyOn(notifications, 'show');
+
+    chat = makeChat();
+    // Сервер ховає чат ще до того, як мутація повернулась
+    removeChat.mockImplementation(() => {
+        setChat(null);
+
+        return Promise.resolve(null);
+    });
+
+    renderPage();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Chat settings' }));
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete chat' }));
+    await user.click(within(screen.getByRole('dialog', { name: 'Delete chat?' })).getByRole('button', { name: 'Delete' }));
+
+    expect(removeChat).toHaveBeenCalledWith({ chatId: 'c1', forEveryone: false });
+    expect(await screen.findByText('home page')).toBeTruthy();
+    expect(show).not.toHaveBeenCalledWith(expect.objectContaining({ message: 'Chat not found' }));
 });
