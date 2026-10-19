@@ -19,5 +19,12 @@ export default defineSchema({
         sound: v.optional(soundValidator)
     })
         .index('email', [ 'email' ])
-        .index('phone', [ 'phone' ])
+        .index('phone', [ 'phone' ]),
+    presence: defineTable({
+        userId: v.id('users'),
+        lastSeenAt: v.number(),
+        online: v.boolean(),
+        expireJobId: v.optional(v.id('_scheduled_functions'))
+    })
+        .index('by_user', [ 'userId' ])
 });
