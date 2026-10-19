@@ -1,11 +1,12 @@
 import { ConvexError, v } from 'convex/values';
 
+import { internal } from './_generated/api';
 import type { Doc, Id } from './_generated/dataModel';
-import { mutation, query } from './_generated/server';
+import { internalMutation, mutation, query } from './_generated/server';
 import type { QueryCtx } from './_generated/server';
 import { findMember, partnerIdOf, partnerOf, readMark, requireMember, requireUserId, userView } from './access';
 import type { UserView } from './access';
-import { CANNOT_ADD_SELF, USER_NOT_FOUND, pairKey } from './chatRules';
+import { CANNOT_ADD_SELF, DELETE_BATCH, USER_NOT_FOUND, pairKey } from './chatRules';
 
 const newMember = { lastReadAt: 0, clearedAt: 0, muted: false };
 
@@ -173,6 +174,105 @@ export const markRead = mutation({
         const mine = await requireMember(ctx, chatId, myId);
 
         await ctx.db.patch('chatMembers', mine._id, { lastReadAt: await readMark(ctx, chatId) });
+
+        return null;
+    }
+});
+
+export const setMuted = mutation({
+    args: { chatId: v.id('chats'), muted: v.boolean() },
+    handler: async (ctx, { chatId, muted }) => {
+        const mine = await requireMember(ctx, chatId, await requireUserId(ctx));
+
+        await ctx.db.patch('chatMembers', mine._id, { muted });
+
+        return null;
+    }
+});
+
+export const clearHistory = mutation({
+    args: { chatId: v.id('chats'), forEveryone: v.boolean() },
+    handler: async (ctx, { chatId, forEveryone }) => {
+        const mine = await requireMember(ctx, chatId, await requireUserId(ctx));
+        const before = await readMark(ctx, chatId);
+
+        if (forEveryone) {
+            await ctx.scheduler.runAfter(0, internal.chats.deleteMessagesBatch, { chatId, deleteChat: false, before });
+        } else {
+            await ctx.db.patch('chatMembers', mine._id, { clearedAt: before });
+        }
+
+        return null;
+    }
+});
+
+export const remove = mutation({
+    args: { chatId: v.id('chats'), forEveryone: v.boolean() },
+    handler: async (ctx, { chatId, forEveryone }) => {
+        const mine = await requireMember(ctx, chatId, await requireUserId(ctx));
+        const before = await readMark(ctx, chatId);
+
+        if (!forEveryone) {
+            await ctx.db.patch('chatMembers', mine._id, { hidden: true, clearedAt: before });
+
+            return null;
+        }
+
+        const theirs = await partnerOf(ctx, chatId, mine.userId);
+
+        await ctx.db.patch('chatMembers', mine._id, { hidden: true });
+
+        if (theirs) {
+            await ctx.db.patch('chatMembers', theirs._id, { hidden: true });
+        }
+
+        await ctx.scheduler.runAfter(0, internal.chats.deleteMessagesBatch, { chatId, deleteChat: true, before });
+
+        return null;
+    }
+});
+
+// Видаляє повідомлення не новіші за before порціями по DELETE_BATCH. Нові, надіслані під час видалення, лишаються;
+// виняток — видалення чату, де зникає все. Викликається й з каскаду видалення акаунта
+export const deleteMessagesBatch = internalMutation({
+    args: { chatId: v.id('chats'), deleteChat: v.boolean(), before: v.number() },
+    handler: async (ctx, { chatId, deleteChat, before }) => {
+        const batch = await ctx.db
+            .query('messages')
+            .withIndex('by_chat', q => q.eq('chatId', chatId).lte('_creationTime', before))
+            .take(DELETE_BATCH);
+
+        for (const message of batch) {
+            await ctx.db.delete('messages', message._id);
+        }
+
+        if (batch.length === DELETE_BATCH) {
+            await ctx.scheduler.runAfter(0, internal.chats.deleteMessagesBatch, { chatId, deleteChat, before });
+
+            return null;
+        }
+
+        if (!deleteChat) {
+            return null;
+        }
+
+        // Усе, що надійшло після before, теж іде разом із чатом
+        for await (const message of ctx.db.query('messages').withIndex('by_chat', q => q.eq('chatId', chatId))) {
+            await ctx.db.delete('messages', message._id);
+        }
+
+        const members = await ctx.db
+            .query('chatMembers')
+            .withIndex('by_chat', q => q.eq('chatId', chatId))
+            .collect();
+
+        for (const member of members) {
+            await ctx.db.delete('chatMembers', member._id);
+        }
+
+        if (await ctx.db.get('chats', chatId)) {
+            await ctx.db.delete('chats', chatId);
+        }
 
         return null;
     }

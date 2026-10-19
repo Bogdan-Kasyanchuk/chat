@@ -1,7 +1,8 @@
-import { expect, test } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 
 import { api } from './_generated/api';
-import { CANNOT_ADD_SELF, USER_NOT_FOUND } from './chatRules';
+import type { Id } from './_generated/dataModel';
+import { CANNOT_ADD_SELF, CHAT_NOT_FOUND, USER_NOT_FOUND } from './chatRules';
 import { asUser, setup } from './test.setup';
 
 test('chats.open returns the same chat for both directions', async () => {
@@ -193,4 +194,144 @@ test('unread and lastMessage ignore messages before clearedAt and hidden for me'
 
     expect(summary.unread).toBe(1);
     expect(summary.lastMessage?.body).toBe('kept');
+});
+
+afterEach(() => {
+    vi.useRealTimers();
+});
+
+const startChat = async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const chatId = await alice.client.mutation(api.chats.open, { userId: bob.userId });
+
+    await bob.client.mutation(api.chats.open, { userId: alice.userId });
+
+    return { t, alice, bob, chatId };
+};
+
+const seed = async (t: ReturnType<typeof setup>, chatId: Id<'chats'>, authorId: Id<'users'>, count: number) => {
+    await t.run(async ctx => {
+        for (let i = 0; i < count; i++) {
+            await ctx.db.insert('messages', { chatId, authorId, body: `m${ i }`, hiddenFor: [] });
+        }
+    });
+};
+
+const bodies = async (t: ReturnType<typeof setup>, chatId: Id<'chats'>) => t.run(async ctx => (await ctx.db
+    .query('messages')
+    .withIndex('by_chat', q => q.eq('chatId', chatId))
+    .collect()).map(message => message.body));
+
+test('a muted chat reports muted in the list', async () => {
+    const { alice, bob, chatId } = await startChat();
+
+    await bob.client.mutation(api.messages.send, { chatId, body: 'hi' });
+
+    expect(await alice.client.mutation(api.chats.setMuted, { chatId, muted: true })).toBeNull();
+    expect((await alice.client.query(api.chats.list, {}))[ 0 ].muted).toBe(true);
+    expect((await bob.client.query(api.chats.list, {}))[ 0 ].muted).toBe(false);
+
+    await alice.client.mutation(api.chats.setMuted, { chatId, muted: false });
+
+    expect((await alice.client.query(api.chats.list, {}))[ 0 ].muted).toBe(false);
+});
+
+test('setMuted, clearHistory and remove reject a non-member', async () => {
+    const { t, chatId } = await startChat();
+    const carol = await asUser(t, 'Carol');
+
+    await expect(carol.client.mutation(api.chats.setMuted, { chatId, muted: true })).rejects.toThrow(CHAT_NOT_FOUND);
+    await expect(carol.client.mutation(api.chats.clearHistory, { chatId, forEveryone: true })).rejects.toThrow(CHAT_NOT_FOUND);
+    await expect(carol.client.mutation(api.chats.remove, { chatId, forEveryone: true })).rejects.toThrow(CHAT_NOT_FOUND);
+});
+
+test('clear history for me keeps the partner\'s history', async () => {
+    const { alice, bob, chatId } = await startChat();
+
+    await bob.client.mutation(api.messages.send, { chatId, body: 'one' });
+    await alice.client.mutation(api.messages.send, { chatId, body: 'two' });
+
+    expect(await alice.client.mutation(api.chats.clearHistory, { chatId, forEveryone: false })).toBeNull();
+
+    const mine = await alice.client.query(api.messages.list, { chatId, paginationOpts: { numItems: 50, cursor: null } });
+    const theirs = await bob.client.query(api.messages.list, { chatId, paginationOpts: { numItems: 50, cursor: null } });
+
+    expect(mine.page).toHaveLength(0);
+    expect(theirs.page.map(message => message.body).sort()).toEqual([ 'one', 'two' ]);
+
+    await bob.client.mutation(api.messages.send, { chatId, body: 'three' });
+
+    const after = await alice.client.query(api.messages.list, { chatId, paginationOpts: { numItems: 50, cursor: null } });
+
+    expect(after.page.map(message => message.body)).toEqual([ 'three' ]);
+});
+
+test('clear history for everyone empties the chat for both', async () => {
+    vi.useFakeTimers();
+
+    const { t, alice, bob, chatId } = await startChat();
+
+    await seed(t, chatId, alice.userId, 450);
+    await alice.client.mutation(api.chats.clearHistory, { chatId, forEveryone: true });
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+
+    expect(await bodies(t, chatId)).toHaveLength(0);
+    expect(await t.run(async ctx => ctx.db.query('chats').collect())).toHaveLength(1);
+    expect(await t.run(async ctx => ctx.db.query('chatMembers').collect())).toHaveLength(2);
+    expect(await bob.client.query(api.chats.get, { chatId })).not.toBeNull();
+});
+
+test('clear history for everyone keeps messages sent while the batches run', async () => {
+    vi.useFakeTimers();
+
+    const { t, alice, bob, chatId } = await startChat();
+
+    await seed(t, chatId, alice.userId, 450);
+    await alice.client.mutation(api.chats.clearHistory, { chatId, forEveryone: true });
+    vi.advanceTimersByTime(1);
+    await bob.client.mutation(api.messages.send, { chatId, body: 'after' });
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+
+    expect(await bodies(t, chatId)).toEqual([ 'after' ]);
+});
+
+test('delete chat for everyone removes the chat and members', async () => {
+    vi.useFakeTimers();
+
+    const { t, alice, bob, chatId } = await startChat();
+
+    await seed(t, chatId, bob.userId, 450);
+    await alice.client.mutation(api.chats.remove, { chatId, forEveryone: true });
+
+    expect(await alice.client.query(api.chats.list, {})).toHaveLength(0);
+    expect(await bob.client.query(api.chats.list, {})).toHaveLength(0);
+
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+
+    expect(await t.run(async ctx => ctx.db.query('messages').collect())).toHaveLength(0);
+    expect(await t.run(async ctx => ctx.db.query('chatMembers').collect())).toHaveLength(0);
+    expect(await t.run(async ctx => ctx.db.query('chats').collect())).toHaveLength(0);
+});
+
+// Review Focus 5
+test('a chat deleted for me comes back with only the new messages', async () => {
+    const { alice, bob, chatId } = await startChat();
+
+    await bob.client.mutation(api.messages.send, { chatId, body: 'old 1' });
+    await bob.client.mutation(api.messages.send, { chatId, body: 'old 2' });
+    await alice.client.mutation(api.chats.remove, { chatId, forEveryone: false });
+
+    expect(await alice.client.query(api.chats.list, {})).toHaveLength(0);
+    expect(await alice.client.query(api.chats.get, { chatId })).toBeNull();
+
+    await bob.client.mutation(api.messages.send, { chatId, body: 'new' });
+
+    const [ summary ] = await alice.client.query(api.chats.list, {});
+    const messages = await alice.client.query(api.messages.list, { chatId, paginationOpts: { numItems: 50, cursor: null } });
+
+    expect(summary.lastMessage?.body).toBe('new');
+    expect(summary.unread).toBe(1);
+    expect(messages.page.map(message => message.body)).toEqual([ 'new' ]);
 });
