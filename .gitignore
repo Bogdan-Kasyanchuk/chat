@@ -105,3 +105,11 @@ dist
 
 # Local Netlify folder
 .netlify
+
+# Local env and tooling
+*.local
+.env.local
+.superpowers
+.playwright-mcp
+playwright-report/
+test-results/
