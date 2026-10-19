@@ -19,7 +19,8 @@ export default defineSchema({
         sound: v.optional(soundValidator)
     })
         .index('email', [ 'email' ])
-        .index('phone', [ 'phone' ]),
+        .index('phone', [ 'phone' ])
+        .index('by_avatar', [ 'avatarId' ]),
     presence: defineTable({
         userId: v.id('users'),
         lastSeenAt: v.number(),

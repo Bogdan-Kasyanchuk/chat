@@ -13,6 +13,11 @@ export const requireUserId = async (ctx: QueryCtx): Promise<Id<'users'>> => {
         throw new ConvexError(NOT_SIGNED_IN);
     }
 
+    // JWT живе до закінчення терміну, а акаунт могли видалити: токен видаленого користувача нічого не дає
+    if (!await ctx.db.get('users', userId)) {
+        throw new ConvexError(NOT_SIGNED_IN);
+    }
+
     return userId;
 };
 

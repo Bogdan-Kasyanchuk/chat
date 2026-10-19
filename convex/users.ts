@@ -2,7 +2,9 @@ import { getAuthUserId } from '@convex-dev/auth/server';
 import { ConvexError, v } from 'convex/values';
 
 import { internal } from './_generated/api';
+import type { Id } from './_generated/dataModel';
 import { action, internalMutation, internalQuery, mutation, query } from './_generated/server';
+import type { QueryCtx } from './_generated/server';
 import { avatarUrl, requireUserId } from './access';
 import { normalizeEmail, validateName } from './authRules';
 import type { EmailStatus } from './authRules';
@@ -108,9 +110,19 @@ export const generateAvatarUploadUrl = mutation({
     }
 });
 
+// Власник файлу: URL аватара розкриває storage id, тож чужий файл не можна присвоїти собі
+const avatarOwner = async (ctx: QueryCtx, storageId: Id<'_storage'>) => {
+    const owner = await ctx.db.query('users').withIndex('by_avatar', q => q.eq('avatarId', storageId)).first();
+
+    return owner?._id ?? null;
+};
+
 export const avatarMeta = internalQuery({
     args: { storageId: v.id('_storage') },
-    handler: async (ctx, { storageId }) => ctx.db.system.get('_storage', storageId)
+    handler: async (ctx, { storageId }) => ({
+        meta: await ctx.db.system.get('_storage', storageId),
+        ownerId: await avatarOwner(ctx, storageId)
+    })
 });
 
 export const applyAvatar = internalMutation({
@@ -120,6 +132,14 @@ export const applyAvatar = internalMutation({
 
         if (!user) {
             throw new ConvexError(NOT_SIGNED_IN);
+        }
+
+        if (storageId) {
+            const ownerId = await avatarOwner(ctx, storageId);
+
+            if (ownerId && ownerId !== userId) {
+                throw new ConvexError(AVATAR_NOT_FOUND);
+            }
         }
 
         if (user.avatarId && user.avatarId !== storageId) {
@@ -145,9 +165,10 @@ export const setAvatar = action({
         }
 
         if (storageId !== null) {
-            const meta = await ctx.runQuery(internal.users.avatarMeta, { storageId });
+            const { meta, ownerId } = await ctx.runQuery(internal.users.avatarMeta, { storageId });
 
-            if (!meta) {
+            // Чужий файл не чіпаємо й не видаляємо
+            if (!meta || (ownerId && ownerId !== userId)) {
                 throw new ConvexError(AVATAR_NOT_FOUND);
             }
 
@@ -164,7 +185,20 @@ export const setAvatar = action({
             }
         }
 
-        return ctx.runMutation(internal.users.applyAvatar, { userId, storageId });
+        try {
+            return await ctx.runMutation(internal.users.applyAvatar, { userId, storageId });
+        } catch (error) {
+            // Завантажений файл, який ніхто не посилає, не лишаємо в сховищі
+            if (storageId !== null) {
+                const { meta, ownerId } = await ctx.runQuery(internal.users.avatarMeta, { storageId });
+
+                if (meta && !ownerId) {
+                    await ctx.storage.delete(storageId);
+                }
+            }
+
+            throw error;
+        }
     }
 });
 
