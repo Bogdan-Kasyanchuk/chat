@@ -283,7 +283,7 @@ npm i -D vitest@^5.0.5 convex-test@^0.0.62 @edge-runtime/vm@^5 jsdom@^30 @testin
 - поліфіли з документації Mantine «Testing with Vitest» (`window.matchMedia`, `ResizeObserver`, `getComputedStyle`, `scrollIntoView`);
 - `HTMLMediaElement.prototype.play = () => Promise.resolve()`.
 
-- [ ] **Step 2: 👤 Проєкт Convex і Convex Auth** (поки що замість нього анонімний локальний деплоймент, див. CLAUDE.md)
+- [x] **Step 2: 👤 Проєкт Convex і Convex Auth** (виконано 2026-10-19: dev-деплоймент `academic-cormorant-489`)
 
 ```bash
 npx convex dev
@@ -292,7 +292,7 @@ npx @convex-dev/auth
 
 Створити проєкт `chat`. `npx convex dev` лишити працювати в окремому терміналі. На запит `SITE_URL` відповісти `http://localhost:5173`.
 
-- [ ] **Step 3: 👤 Google OAuth**
+- [x] **Step 3: 👤 Google OAuth**
 
 Окремий від `tic-tac-toe` клієнт «Web application» у Google Auth Platform:
 - origins `http://localhost:5173`;

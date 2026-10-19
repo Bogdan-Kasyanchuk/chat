@@ -32,17 +32,16 @@
 - Ціль після кроку 4 (👤, ще не виконаний): Netlify підключений до GitHub (production branch `main`), збірка `npx convex deploy --cmd 'npm run build'` (`netlify.toml`) оновлює функції Convex на prod і фронт. У Netlify потрібен лише `CONVEX_DEPLOY_KEY` (контекст Production), deploy previews вимкнені.
 - Google OAuth: змінні `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` задаються через `npx convex env set` (dev) і `… --prod`.
 
-## Поточна робота (стан на 2026-10-19)
+## Поточна робота (стан на 2026-10-20)
 
-**Міграція виконана** на гілці `migrate/vite-convex` (не запушена): власник пушить її й відкриває PR у `main`. План — `docs/superpowers/plans/2026-10-18-vite-convex-migration.md`, усі 17 задач.
+**Міграція виконана** на гілці `migrate/vite-convex` (запушена): власник відкриває PR у `main`. План — `docs/superpowers/plans/2026-10-18-vite-convex-migration.md`, усі 17 задач.
 
 Ще чекає на власника (👤):
-- хмарний проєкт Convex `chat`, ключі Convex Auth і Google OAuth (задача 2, кроки 2–3 міграції);
-- продакшн (задача 17, крок 4): у Netlify підключити сайт `075f926c-…` до `Bogdan-Kasyanchuk/chat` (production branch `main`), додати `CONVEX_DEPLOY_KEY` лише для Production, вимкнути deploy previews, видалити старі `VITE_API_KEY`, `VITE_AUTH_DOMAIN`, `VITE_PROJECT_ID`, `VITE_STORAGE_BUCKET`, `VITE_MESSAGING_SENDER_ID`, `VITE_APP_ID`, `VITE_UPLOAD_PRESET`, `VITE_CLOUD_NAME`; виконати `npx @convex-dev/auth --prod` з `SITE_URL=https://<site>.netlify.app`, потім `npx convex env set --prod AUTH_GOOGLE_ID …` і `AUTH_GOOGLE_SECRET …`; у Google OAuth client додати origin `https://<site>.netlify.app` і redirect URI `https://<prod-deployment>.convex.site/api/auth/callback/google`; після деплою перевірити на prod вхід через Google, реєстрацію поштою й повідомлення між двома акаунтами. Локальний `.env` з ключами Firebase і Cloudinary після цього не потрібен; Firebase і Cloudinary вимикає власник, коли вирішить.
+- продакшн (задача 17, крок 4): у Netlify підключити сайт `075f926c-…` до `Bogdan-Kasyanchuk/chat` (production branch `main`), додати `CONVEX_DEPLOY_KEY` лише для Production, вимкнути deploy previews, видалити старі `VITE_API_KEY`, `VITE_AUTH_DOMAIN`, `VITE_PROJECT_ID`, `VITE_STORAGE_BUCKET`, `VITE_MESSAGING_SENDER_ID`, `VITE_APP_ID`, `VITE_UPLOAD_PRESET`, `VITE_CLOUD_NAME`; виконати `npx @convex-dev/auth --prod` з `SITE_URL=https://<site>.netlify.app`, потім `npx convex env set --prod AUTH_GOOGLE_ID …` і `AUTH_GOOGLE_SECRET …`; у Google OAuth client додати origin `https://<site>.netlify.app` і redirect URI `https://<prod-deployment>.convex.site/api/auth/callback/google`; після деплою перевірити на prod вхід через Google, реєстрацію поштою, повідомлення між двома акаунтами й «Copy text» на телефоні (буфер обміну працює лише на https або localhost, тож у dev за LAN-адресою він дає помилку). Локальний `.env` з ключами Firebase і Cloudinary після цього не потрібен; Firebase і Cloudinary вимикає власник, коли вирішить.
 
-Відкладене після фінального рев'ю (не блокує злиття): heartbeat кожні 25 с перераховує запити співрозмовників через `userView` (для імен у `toView` вистачить легшого хелпера); попередження `InvalidCursor` від `usePaginatedQuery` після масових видалень; довге натискання варто перевірити на справжньому телефоні.
+Відкладене після фінального рев'ю (не блокує злиття): heartbeat кожні 25 с перераховує запити співрозмовників через `userView` (для імен у `toView` вистачить легшого хелпера); попередження `InvalidCursor` від `usePaginatedQuery` після масових видалень; «last seen» рахується від годинника браузера, тож у людини з неточним годинником він зсувається.
 
-Доти розробка йде на **анонімному локальному деплойменті** Convex (`.env.local`, бекенд на порту 3210, без логіну). Для e2e бекенд має бути запущений.
+Розробка йде на **хмарному dev-деплойменті** Convex `academic-cormorant-489` (`.env.local`, вхід через Google і поштою працюють на http://localhost:5173). Для e2e бекенд має бути запущений, а годинник ПК — синхронізований, інакше тест «last seen just now» падає. Довге натискання перевірено на Android (2026-10-19).
 
 Наступний план — **редизайн**, `docs/superpowers/plans/2026-10-18-redesign.md`, 9 задач:
 - канвас «Chat redesign» уже намальовано: https://claude.ai/artifact/XLx5GvCkUuVC57mLRdFhid (приватний, 26 артбордів). Задача 1, кроки 1–3 виконані;
