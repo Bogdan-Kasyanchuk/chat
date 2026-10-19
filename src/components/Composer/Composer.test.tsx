@@ -1,11 +1,18 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { expect, test, vi } from 'vitest';
+import { afterEach, expect, test, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
+import { mockViewport } from '@/test/viewport';
 import type { MessageView } from '@/types/chat';
 
 import Composer from './Composer';
+
+vi.mock('frimousse', async () => (await import('@/test/frimousseMock')).frimousseMock);
+
+afterEach(() => {
+    localStorage.clear();
+});
 
 const renderComposer = (onSubmit = vi.fn().mockResolvedValue(undefined)) => {
     renderWithProviders(
@@ -151,4 +158,76 @@ test('Composer keeps the draft while a message is being edited', async () => {
     );
 
     expect(field.value).toBe('Half a thought');
+});
+
+test('picking an emoji inserts it at the caret and keeps the picker open', async () => {
+    mockViewport(true);
+    renderComposer();
+    const user = userEvent.setup();
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Message' });
+
+    await user.type(field, 'Hi there');
+    field.setSelectionRange(2, 2);
+    await user.click(screen.getByRole('button', { name: 'Emoji' }));
+    await user.click(screen.getByRole('button', { name: '😀' }));
+
+    expect(field.value).toBe('Hi😀 there');
+    expect(field.selectionStart).toBe(4);
+    expect(document.activeElement).toBe(field);
+    expect(screen.getByRole('button', { name: 'Emoji' }).getAttribute('aria-expanded')).toBe('true');
+});
+
+test('a picked emoji goes to Recently used', async () => {
+    mockViewport(true);
+    renderComposer();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Emoji' }));
+
+    expect(screen.queryByText('Recently used')).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: '😀' }));
+
+    expect(screen.getByText('Recently used')).toBeTruthy();
+});
+
+test('on a phone the emoji button swaps for Show keyboard and back', async () => {
+    mockViewport(false);
+    renderComposer();
+    const user = userEvent.setup();
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Message' });
+
+    await user.click(field);
+    await user.click(screen.getByRole('button', { name: 'Emoji' }));
+
+    expect(document.activeElement).not.toBe(field);
+    expect(screen.queryByRole('button', { name: 'Emoji' })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: '😀' }));
+
+    expect(field.value).toBe('😀');
+    expect(document.activeElement).not.toBe(field);
+
+    await user.click(screen.getByRole('button', { name: 'Show keyboard' }));
+
+    expect(document.activeElement).toBe(field);
+    expect(screen.queryByRole('button', { name: '😀' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Emoji' })).toBeTruthy();
+});
+
+test('Escape closes the picker without clearing the draft', async () => {
+    mockViewport(true);
+    renderComposer();
+    const user = userEvent.setup();
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Message' });
+
+    await user.type(field, 'Draft');
+    await user.click(screen.getByRole('button', { name: 'Emoji' }));
+
+    expect(screen.getByRole('button', { name: 'Emoji' }).getAttribute('aria-expanded')).toBe('true');
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.getByRole('button', { name: 'Emoji' }).getAttribute('aria-expanded')).toBe('false');
+    expect(field.value).toBe('Draft');
 });

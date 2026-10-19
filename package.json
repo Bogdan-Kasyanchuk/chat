@@ -7,8 +7,10 @@
         "node": ">=22.12"
     },
     "scripts": {
+        "predev": "node scripts/copy-emojibase.mjs",
         "dev": "vite",
         "dev:convex": "convex dev",
+        "prebuild": "node scripts/copy-emojibase.mjs",
         "build": "npm run typecheck && vite build",
         "preview": "vite preview",
         "typecheck": "tsc -p . && tsc -p tsconfig.node.json && tsc -p convex",
@@ -32,6 +34,7 @@
         "@tabler/icons-react": "^3.49.0",
         "clsx": "^2.1.1",
         "convex": "^1.47.0",
+        "frimousse": "^0.4.0",
         "lucia": "^3.2.2",
         "mantine-contextmenu": "^9.4.0",
         "react": "^19.3.1",
@@ -50,6 +53,7 @@
         "@types/react-dom": "^19.3.0",
         "@vitejs/plugin-react": "^6.1.2",
         "convex-test": "^0.0.62",
+        "emojibase-data": "^16.0.3",
         "eslint": "^9.39.5",
         "eslint-plugin-import": "^2.32.0",
         "eslint-plugin-perfectionist": "^5.12.1",

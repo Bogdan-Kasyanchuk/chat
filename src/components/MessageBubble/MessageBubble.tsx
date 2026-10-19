@@ -2,6 +2,7 @@ import { Text, UnstyledButton } from '@mantine/core';
 import { IconCheck, IconChecks } from '@tabler/icons-react';
 import type { FC } from 'react';
 
+import { emojiOnlyCount } from '@/lib/emoji';
 import { formatClock } from '@/lib/formatTime';
 import type { MessageView } from '@/types/chat';
 
@@ -21,6 +22,9 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
     const { authorIsMe, replyTo } = message;
     // id === null — оригінал видалено: цитата лишається, але нікуди не веде
     const quoteId = replyTo?.id ?? null;
+    // Від 1 до 3 емодзі без тексту, цитати й пересилання — велика «наліпка» без бульбашки
+    const emojiCount = emojiOnlyCount(message.body);
+    const emojiOnly = emojiCount >= 1 && emojiCount <= 3 && !replyTo && !message.forwardedFrom;
     const quoteClick = onClick ? undefined : onQuoteClick;
     // span, а не p: цитата буває кнопкою, а в <button> блочним елементам не місце
     const quoteContent = replyTo && (
@@ -61,6 +65,7 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
                 role="article"
                 aria-label={ authorIsMe ? 'You' : partnerName }
                 data-mine={ authorIsMe || undefined }
+                data-emoji-only={ emojiOnly || undefined }
                 onDoubleClick={ onDoubleClick }
             >
                 { message.forwardedFrom && (

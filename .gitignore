@@ -113,3 +113,6 @@ dist
 .playwright-mcp
 playwright-report/
 test-results/
+
+# Дані емодзі копіюються скриптом predev/prebuild
+public/emojibase/

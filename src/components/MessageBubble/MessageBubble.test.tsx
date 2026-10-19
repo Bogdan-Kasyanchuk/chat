@@ -128,3 +128,43 @@ test('MessageBubble in select mode toggles on click and leaves the quote inert',
     expect(onQuoteClick).not.toHaveBeenCalled();
     expect(screen.getByRole('article').closest('[data-selected]')).toBeTruthy();
 });
+
+test('a message of two emoji renders large without a bubble', () => {
+    renderWithProviders(
+        <MessageBubble
+            message={ makeMessage({ body: '🎉🙌' }) }
+            partnerName="Bob"
+        />
+    );
+
+    expect(screen.getByRole('article').hasAttribute('data-emoji-only')).toBe(true);
+});
+
+test('text, long emoji runs and quoted emoji keep the bubble', () => {
+    const { rerender } = renderWithProviders(
+        <MessageBubble
+            message={ makeMessage({ body: 'ok 👍' }) }
+            partnerName="Bob"
+        />
+    );
+
+    expect(screen.getByRole('article').hasAttribute('data-emoji-only')).toBe(false);
+
+    rerender(
+        <MessageBubble
+            message={ makeMessage({ body: '🎉🙌👍🔥' }) }
+            partnerName="Bob"
+        />
+    );
+
+    expect(screen.getByRole('article').hasAttribute('data-emoji-only')).toBe(false);
+
+    rerender(
+        <MessageBubble
+            message={ makeMessage({ body: '🎉', replyTo: { id: 'm0' as MessageView[ 'id' ], authorName: 'Bob', body: 'Hi' } }) }
+            partnerName="Bob"
+        />
+    );
+
+    expect(screen.getByRole('article').hasAttribute('data-emoji-only')).toBe(false);
+});

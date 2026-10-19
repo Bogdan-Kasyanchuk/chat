@@ -37,3 +37,10 @@
     padding-block: var(--mantine-spacing-xs);
     text-align: center;
 }
+
+.panel {
+    height: 300px;
+    margin-inline: calc(-1 * var(--mantine-spacing-xs));
+    margin-top: var(--mantine-spacing-xs);
+    border-top: 1px solid var(--mantine-color-gray-3);
+}
