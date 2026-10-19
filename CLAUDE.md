@@ -2,13 +2,16 @@
 
 Онлайн-чат 1:1. Репозиторій: https://github.com/Bogdan-Kasyanchuk/chat, сайт на Netlify (деплой поки вручну через `netlify deploy -p`).
 
-## Поточна робота (стан на 2026-10-18)
+## Поточна робота (стан на 2026-10-19)
 
-Проєкт переписується за двома планами. Код ще старий — жодна задача не виконана.
+Проєкт переписується за двома планами.
 
 1. **Міграція й новий функціонал** — `docs/superpowers/plans/2026-10-18-vite-convex-migration.md`, 17 задач.
-   - Наступний крок: задача 1, нова гілка `migrate/vite-convex` від `feature/temp` (вона на один коміт попереду `main`).
-   - Перед стартом спитай власника, як виконувати: subagent-driven (рекомендовано для цього плану) чи native.
+   - Гілка `migrate/vite-convex` (від `feature/temp`, не запушена). Задачі 1–14 виконані й пройшли рев'ю: увесь бекенд Convex і фронт до налаштувань включно. Старий код лежить у `legacy/` до задачі 17.
+   - **Пауза на прохання власника.** Наступна — задача 15 (емодзі), лише коли власник скаже продовжити. Режим — subagent-driven (обрав власник).
+   - Ledger виконання: `.superpowers/sdd/2026-10-18-vite-convex-migration/progress.md` (git-ignored, лише на цій машині). Там рішення контролера (`Ruling:`) і відкладені дрібні зауваження для фінального рев'ю. Без нього — `git log` і галочки в плані.
+   - Convex поки працює на **анонімному локальному деплойменті** (`.env.local`, бекенд на порту 3210, без логіну). 👤 Кроки 2–3 задачі 2 (хмарний проєкт `chat`, Google OAuth) власник ще не зробив; вони потрібні для входу через Google і для задачі 17.
+   - Зразок `tic-tac-toe` на цій машині лежить у `~/Documents/Projects/tic-tac-toe`.
    - Позначай виконані кроки `- [x]` у плані й онови цей розділ наприкінці сесії.
 2. **Редизайн** — `docs/superpowers/plans/2026-10-18-redesign.md`, 9 задач, виконується після міграції.
    - Канвас «Chat redesign» уже намальовано: https://claude.ai/artifact/XLx5GvCkUuVC57mLRdFhid (приватний, 26 артбордів). Задача 1, кроки 1–3 виконані.
@@ -24,7 +27,7 @@
 
 ## Зразок
 
-`D:\WebDev\Projects\tic-tac-toe` — та сама міграція й редизайн, уже виконані. Звідти копіюються тулінг (`eslint.config.mjs`, `tsconfig*.json`, `vitest.config.ts`, `playwright.config.ts`), Convex Auth (`convex/auth.ts`, `authRules.ts`, `emailPassword.ts`, `test.setup.ts`, `testing.ts`) і підхід до тестів. Його `CLAUDE.md` і плани в `docs/superpowers/plans/` пояснюють рішення.
+`tic-tac-toe` (`~/Documents/Projects/tic-tac-toe`) — та сама міграція й редизайн, уже виконані. Звідти копіюються тулінг (`eslint.config.mjs`, `tsconfig*.json`, `vitest.config.ts`, `playwright.config.ts`), Convex Auth (`convex/auth.ts`, `authRules.ts`, `emailPassword.ts`, `test.setup.ts`, `testing.ts`) і підхід до тестів. Його `CLAUDE.md` і плани в `docs/superpowers/plans/` пояснюють рішення.
 
 ## Старий стек (до міграції)
 

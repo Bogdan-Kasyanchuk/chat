@@ -11,7 +11,7 @@
 
 **Tech Stack:** Vite 8.3, React 19.3, TypeScript ~6.0.3, React Router 8.4, Mantine 9.7 (`@mantine/core`, `hooks`, `form`, `modals`, `notifications`), `mantine-contextmenu` 9.4, `frimousse` 0.4 + `emojibase-data` 16 (пікер емодзі), `@tabler/icons-react` 3, `postcss-preset-mantine` + `postcss-simple-vars`, Convex 1.47 + `@convex-dev/auth` 0.0.96 + `@auth/core` 0.41.3, `lucia` 3 (Scrypt), Vitest 5 + Testing Library + `convex-test`, Playwright, ESLint 9 + `@stylistic` + `perfectionist`, husky + lint-staged, Netlify.
 
-**Виконання:** стан на 2026-10-18 — план готовий, жодна задача не почата. Виконується в новій сесії. Спосіб (subagent-driven чи native) обирає власник на її початку; рекомендовано subagent-driven. Галочки `- [x]` у кроках показують, що вже зроблено.
+**Виконання:** стан на 2026-10-19 — задачі 1–14 виконані (subagent-driven), крім 👤-кроків 2–3 задачі 2. Наступна — задача 15. Галочки `- [x]` у кроках показують, що вже зроблено.
 
 **Spec:** окремого документа немає. Специфікація — запит власника від 2026-10-18 і відповіді на уточнення, зведені в розділ «Рішення». Зразок рішень і тулінгу — `D:\WebDev\Projects\tic-tac-toe` (`CLAUDE.md`, `docs/superpowers/plans/2026-10-12-vite-convex-migration.md`, `docs/superpowers/plans/2026-10-15-redesign-email-auth.md`).
 
@@ -196,7 +196,7 @@ chat/
   - `theme` (default export `src/theme.ts`, `createTheme`): `primaryColor: 'dark'`, `defaultRadius: 0`, брейкпоінти з Global Constraints;
   - скрипти `dev`, `build`, `preview`, `typecheck`, `lint`, `lint:fix`, `prepare`.
 
-- [ ] **Step 1: Гілка й прибирання старого**
+- [x] **Step 1: Гілка й прибирання старого**
 
 ```bash
 git switch -c migrate/vite-convex
@@ -210,7 +210,7 @@ rm -rf node_modules
 
 Скопіюй цей план і `2026-10-18-redesign.md` у `docs/superpowers/plans/`, якщо їх там ще немає.
 
-- [ ] **Step 2: `package.json`**
+- [x] **Step 2: `package.json`**
 
 Як у `tic-tac-toe`: `name: "chat"`, `version: "1.0.0"`, `private`, `type: "module"`, `engines.node: ">=22.12"`, `lint-staged` для `*.{ts,tsx,mjs}`. Скрипти: `dev` (`vite`), `build` (`npm run typecheck && vite build`), `preview`, `typecheck` (`tsc -p . && tsc -p tsconfig.node.json`), `lint`, `lint:fix`, `prepare` (`husky`).
 
@@ -219,7 +219,7 @@ npm i react@^19.3.0 react-dom@^19.3.0 react-router@^8.4.0 @mantine/core@^9.7.3 @
 npm i -D vite@^8.3.4 @vitejs/plugin-react@^6.1.2 typescript@~6.0.3 @types/react@^19.3.0 @types/react-dom@^19.3.0 @types/node@^24 postcss@^8 postcss-preset-mantine@^1.18.0 postcss-simple-vars@^7 eslint@^9 @eslint/js@^9 typescript-eslint@^8.71.1 eslint-plugin-react-hooks@^7.1.1 eslint-plugin-react-refresh@^0.5.7 @stylistic/eslint-plugin@^5.10.0 eslint-plugin-import@^2.32.0 eslint-plugin-perfectionist@^5.12.1 globals@^17 husky@^9.1.7 lint-staged@^17.6.0
 ```
 
-- [ ] **Step 3: Конфіги**
+- [x] **Step 3: Конфіги**
 
 - `vite.config.ts`: як у `tic-tac-toe` (плагін `react()`, `server.host: true`, аліаси `@` і `@convex`), без `tailwindcss()`.
 - `tsconfig.json` і `tsconfig.node.json`: копії з `tic-tac-toe`.
@@ -229,13 +229,13 @@ npm i -D vite@^8.3.4 @vitejs/plugin-react@^6.1.2 typescript@~6.0.3 @types/react@
 - `.husky/pre-commit`: `npx lint-staged`. `.claude/launch.json`: копія з `tic-tac-toe`.
 - `index.html`: `description` → `Online chat`, `theme-color` лишається.
 
-- [ ] **Step 4: Тема й тимчасовий `main.tsx`**
+- [x] **Step 4: Тема й тимчасовий `main.tsx`**
 
 `src/theme.ts`: `createTheme` з `primaryColor: 'dark'`, `defaultRadius: 0`, `breakpoints` з Global Constraints, `components.Container.defaultProps = { size: 1440 }`. `src/global.css`: `html, body, #root { height: 100%; }` і фон `body` — `var(--mantine-color-gray-2)`. Фонова текстура з `transparenttextures.com` прибирається: це зовнішній хост.
 
 `src/main.tsx` імпортує `@mantine/core/styles.css`, `@mantine/notifications/styles.css`, `mantine-contextmenu/styles.css` (у порядку з документації `mantine-contextmenu`) і `@/global.css`. Рендерить `<MantineProvider theme={ theme }><Title>Chat</Title></MantineProvider>`. `src/vite-env.d.ts` оголошує `VITE_CONVEX_URL: string`.
 
-- [ ] **Step 5: Перевірка**
+- [x] **Step 5: Перевірка**
 
 ```bash
 npm run lint:fix && npm run lint && npm run typecheck && npm run build
@@ -243,7 +243,7 @@ npm run lint:fix && npm run lint && npm run typecheck && npm run build
 
 Очікується: усе зелене, на `npm run dev` видно заголовок «Chat» шрифтом Mantine.
 
-- [ ] **Step 6: Коміт**
+- [x] **Step 6: Коміт**
 
 ```bash
 git add -A
@@ -272,7 +272,7 @@ git commit -m "chore: replace Vite 4, Tailwind and Mantine 6 with Vite 8, TS 6 a
   - `mockViewport(desktop: boolean): void` у `src/test/viewport.ts` (підміняє `matchMedia` для `(min-width: 48em)`; `setup.ts` викликає `mockViewport(false)` перед кожним тестом);
   - скрипти `dev:convex`, `test`, `test:once`; `typecheck` додає `tsc -p convex`.
 
-- [ ] **Step 1: Залежності, скрипти, Vitest**
+- [x] **Step 1: Залежності, скрипти, Vitest**
 
 ```bash
 npm i convex@^1.47.0 @convex-dev/auth@^0.0.96 @auth/core@^0.41.3 lucia@^3.2.2
@@ -283,7 +283,7 @@ npm i -D vitest@^5.0.5 convex-test@^0.0.62 @edge-runtime/vm@^5 jsdom@^30 @testin
 - поліфіли з документації Mantine «Testing with Vitest» (`window.matchMedia`, `ResizeObserver`, `getComputedStyle`, `scrollIntoView`);
 - `HTMLMediaElement.prototype.play = () => Promise.resolve()`.
 
-- [ ] **Step 2: 👤 Проєкт Convex і Convex Auth**
+- [ ] **Step 2: 👤 Проєкт Convex і Convex Auth** (поки що замість нього анонімний локальний деплоймент, див. CLAUDE.md)
 
 ```bash
 npx convex dev
@@ -303,11 +303,11 @@ npx convex env set AUTH_GOOGLE_ID <client id>
 npx convex env set AUTH_GOOGLE_SECRET <client secret>
 ```
 
-- [ ] **Step 4: Схема**
+- [x] **Step 4: Схема**
 
 `convex/schema.ts`: `...authTables`, а таблиця `users` перевизначена за документацією Convex Auth «Customizing schema». Поля `authTables.users` (`name`, `image`, `email`, `emailVerificationTime`, `phone`, `phoneVerificationTime`, `isAnonymous`) плюс `avatarId: v.optional(v.id('_storage'))` і `sound: v.optional(soundValidator)`. Індекси `email` і `phone`. Решту таблиць додають задачі 3–5.
 
-- [ ] **Step 5: Правила входу й провайдер пошти**
+- [x] **Step 5: Правила входу й провайдер пошти**
 
 `convex/authRules.ts` і `convex/emailPassword.ts` копіюються з `tic-tac-toe` разом із `authRules.test.ts`. Зміни:
 - у `authRules.ts` додати `validateName(value: unknown): string`. Вона обрізає рядок і кидає `ConvexError('Name is required')`, якщо він порожній, або `ConvexError('Name is too long')`, якщо довший за 64;
@@ -328,7 +328,7 @@ createOrUpdateUser: async (ctx, { existingUserId, profile }) => {
 
 Поля `profile` типізуються як `string | undefined`: Convex Auth віддає `Record<string, unknown>`, тож значення приводяться через `typeof … === 'string'`.
 
-- [ ] **Step 6: Тести `users`**
+- [x] **Step 6: Тести `users`**
 
 ```ts
 test('me returns null for an anonymous visitor', …)       // null
@@ -344,11 +344,11 @@ test('signing in again through Google keeps the edited name and avatar', async (
 
 Callback тестується напряму: експортувати `createOrUpdateUser` з `convex/auth.ts` окремою іменованою функцією й передати її в `convexAuth`.
 
-- [ ] **Step 7: Реалізація `users.me` і `access.ts`**
+- [x] **Step 7: Реалізація `users.me` і `access.ts`**
 
 `me` повертає `sound: user.sound ?? 'classic'` і `avatar: await avatarUrl(ctx, user)`.
 
-- [ ] **Step 8: Перевірка й коміт**
+- [x] **Step 8: Перевірка й коміт**
 
 Run: `npm run lint:fix && npm run typecheck && npm run test:once`. Очікується: усе зелене.
 
@@ -379,7 +379,7 @@ git commit -m "feat(convex): Google and email sign-in that keeps edited profiles
     - `normalizeBody(value: string): string` — обрізає й кидає `MESSAGE_EMPTY` / `MESSAGE_TOO_LONG`;
     - `pairKey(a: string, b: string): string` — відсортовані id через `|`.
 
-- [ ] **Step 1: Тести `chatRules`**
+- [x] **Step 1: Тести `chatRules`**
 
 ```ts
 test('normalizeBody trims and rejects blank text', () => {
@@ -393,7 +393,7 @@ test('pairKey does not depend on the order', () => {
 });
 ```
 
-- [ ] **Step 2: Тести `presence`** (фейкові таймери, як у `tic-tac-toe/convex/games.test.ts`)
+- [x] **Step 2: Тести `presence`** (фейкові таймери, як у `tic-tac-toe/convex/games.test.ts`)
 
 ```ts
 test('heartbeat marks the user online', …)                // presenceOf → { online: true, lastSeenAt: Date.now() }
@@ -406,11 +406,11 @@ test('a user who never connected has no last seen', …)   // { online: false, l
 test('heartbeat requires sign-in', …)                     // rejects NOT_SIGNED_IN
 ```
 
-- [ ] **Step 3: Реалізація**
+- [x] **Step 3: Реалізація**
 
 `heartbeat` робить upsert рядка: `lastSeenAt = Date.now()`, `online = true`. Попереднє завдання скасовується (`ctx.scheduler.cancel(expireJobId)`), нове ставиться `ctx.scheduler.runAfter(ONLINE_TIMEOUT_MS, internal.presence.expire, { userId })`, його id зберігається. `expire` ставить `online = false`. `disconnect` ставить `online = false` і `lastSeenAt = now`, а також скасовує завдання.
 
-- [ ] **Step 4: Перевірка й коміт**
+- [x] **Step 4: Перевірка й коміт**
 
 ```bash
 npm run lint:fix && npm run typecheck && npm run test:once
@@ -442,7 +442,7 @@ git add -A && git commit -m "feat(convex): presence with heartbeat and scheduled
     - мій `chatMembers` створюється з `hidden: false`, співрозмовника — з `hidden: true`;
     - якщо мій рядок був `hidden`, відкриває його.
 
-- [ ] **Step 1: Тести**
+- [x] **Step 1: Тести**
 
 ```ts
 test('findByEmail finds a user by exact email, case-insensitive', …)  // ' Bob@Example.com ' → { name: 'Bob', isContact: false }
@@ -455,11 +455,11 @@ test('a new chat is hidden for the partner until the first message', …) // у 
 test('contacts.list links an existing chat', …)                         // chatId не null після open
 ```
 
-- [ ] **Step 2: Реалізація й перевірка**
+- [x] **Step 2: Реалізація й перевірка**
 
 Run: `npm run test:once`. Очікується: PASS.
 
-- [ ] **Step 3: Коміт**
+- [x] **Step 3: Коміт**
 
 ```bash
 git add -A && git commit -m "feat(convex): contacts, email lookup and opening a chat"
@@ -495,7 +495,7 @@ git add -A && git commit -m "feat(convex): contacts, email lookup and opening a 
   - `api.chats.get({ chatId })` → `{ chatId, partner: UserView & { isContact }, muted, lastReadAt, canSend: boolean } | null`. `null` — не учасник або `hidden`;
   - `api.chats.markRead({ chatId })` → `null`, `lastReadAt = Date.now()`.
 
-- [ ] **Step 1: Тести**
+- [x] **Step 1: Тести**
 
 ```ts
 test('send trims the text and the partner sees the chat after the first message', …)
@@ -513,11 +513,11 @@ test('a reply to a message from another chat is rejected', …)            // ME
 test('sending marks the chat read for the sender', …)
 ```
 
-- [ ] **Step 2: Реалізація й перевірка**
+- [x] **Step 2: Реалізація й перевірка**
 
 Пагінація — `paginationOptsValidator` і `.order('desc').paginate(...)` по індексу `by_chat` з `.gt('_creationTime', clearedAt)`. Run: `npm run test:once` → PASS.
 
-- [ ] **Step 3: Коміт**
+- [x] **Step 3: Коміт**
 
 ```bash
 git add -A && git commit -m "feat(convex): paginated messages, chat list with unread counts and read receipts"
@@ -543,7 +543,7 @@ git add -A && git commit -m "feat(convex): paginated messages, chat list with un
     - `forwardedFromId = original.forwardedFromId ?? original.authorId`;
     - ті самі побічні ефекти, що й у `send`.
 
-- [ ] **Step 1: Тести**
+- [x] **Step 1: Тести**
 
 ```ts
 test('the author edits a message and it is marked edited', …)
@@ -558,7 +558,7 @@ test('forward to a chat I am not in is rejected', …)             // CHAT_NOT_F
 test('remove rejects messages from different chats', …)          // MESSAGE_NOT_FOUND
 ```
 
-- [ ] **Step 2: Реалізація, перевірка, коміт**
+- [x] **Step 2: Реалізація, перевірка, коміт**
 
 ```bash
 npm run test:once
@@ -579,7 +579,7 @@ git add -A && git commit -m "feat(convex): edit, delete for me or everyone, and 
   - `api.chats.remove({ chatId, forEveryone })` → `null`. Для себе — `hidden: true`, `clearedAt = now`. Для обох — обидва `hidden: true`, потім `deleteMessagesBatch({ chatId, deleteChat: true })`, яка в кінці видаляє `chatMembers` і `chats`;
   - `internal.chats.deleteMessagesBatch({ chatId, deleteChat })` видаляє до `DELETE_BATCH` повідомлень. Якщо лишились ще, ставить себе знову `runAfter(0)`.
 
-- [ ] **Step 1: Тести**
+- [x] **Step 1: Тести**
 
 ```ts
 test('a muted chat reports muted in the list', …)
@@ -593,7 +593,7 @@ test('a chat deleted for me comes back with only the new messages', async () => 
 });
 ```
 
-- [ ] **Step 2: Реалізація, перевірка, коміт**
+- [x] **Step 2: Реалізація, перевірка, коміт**
 
 ```bash
 npm run test:once
@@ -629,7 +629,7 @@ git add -A && git commit -m "feat(convex): mute, clear history and delete chat"
     - сам `users`;
   - `internal.testing.deleteE2eUsers({})` → `number` — `deleteUserCascade` для кожного `@e2e.test`.
 
-- [ ] **Step 1: Тести**
+- [x] **Step 1: Тести**
 
 ```ts
 test('updateName trims and validates', …)                        // '  Al  ' → 'Al'; '' → 'Name is required'
@@ -648,7 +648,7 @@ test('deleteAccount removes sessions so the old token is useless', …) // authS
 test('deleteE2eUsers deletes only @e2e.test users', …)
 ```
 
-- [ ] **Step 2: Реалізація, перевірка, коміт**
+- [x] **Step 2: Реалізація, перевірка, коміт**
 
 ```bash
 npm run test:once
@@ -688,7 +688,7 @@ git add -A && git commit -m "feat(convex): profile name, avatar upload, sound an
   - `initials(name: string): string` — до двох перших літер слів, верхній регістр, `'?'` для порожнього;
   - у `src/types/chat.ts`: `ChatSummary`, `ChatView`, `MessageView`, `ContactView`, `UserView` як `FunctionReturnType<typeof api.…>`.
 
-- [ ] **Step 1: Тести сторінок і маршрутів**
+- [x] **Step 1: Тести сторінок і маршрутів**
 
 Тести `SignInPage` і `PrivateRoute` / `PublicRoute` переносяться з `tic-tac-toe` з `/chat/c1` замість `/game/g1`. Нові:
 
@@ -701,7 +701,7 @@ test('signs up with a trimmed name and lowercased email', …)
 test('keeps the fields after a server error', …)  // ConvexError(EMAIL_TAKEN) → текст видно, Email не очищено
 ```
 
-- [ ] **Step 2: Реалізація**
+- [x] **Step 2: Реалізація**
 
 - Форми — `@mantine/form` з валідаторами `isEmail('Enter a valid email')`, `hasLength({ min: 8 }, 'Password must be at least 8 characters')`, `matchesField('password', 'Passwords do not match')`.
 - `AuthCard` — центрована `Paper` шириною 360px у старій палітрі: заголовок, Google-кнопка, `Divider label="or"`, форма, посилання між входом і реєстрацією.
@@ -711,7 +711,7 @@ test('keeps the fields after a server error', …)  // ConvexError(EMAIL_TAKEN) 
   - посилання — «No account? Sign up» і «Have an account? Sign in»;
   - `NotFoundPage` — тексти старого `Error_404`.
 
-- [ ] **Step 3: Перевірка й коміт**
+- [x] **Step 3: Перевірка й коміт**
 
 Run: `npm run lint:fix && npm run typecheck && npm run test:once` → PASS. Перевірка в браузері: реєстрація `e2e-…@e2e.test` веде на `/`, а `/chat/x` без входу — на `/login` і назад.
 
@@ -764,7 +764,7 @@ git add -A && git commit -m "feat: app shell with Convex auth, sign-in and sign-
     - результат — картка з «Add to contacts» (або «In contacts») і «Message»;
     - нічого не знайдено — «No user with this email».
 
-- [ ] **Step 1: Тести чистих функцій**
+- [x] **Step 1: Тести чистих функцій**
 
 ```ts
 const now = new Date(2026, 9, 18, 15, 0).getTime();
@@ -786,7 +786,7 @@ test('lastSeenText', () => {
 });
 ```
 
-- [ ] **Step 2: Тести компонентів** (`vi.mock('convex/react')`, як у `tic-tac-toe`)
+- [x] **Step 2: Тести компонентів** (`vi.mock('convex/react')`, як у `tic-tac-toe`)
 
 ```ts
 test('ChatListItem shows You: prefix, read ticks and a capped unread badge', …) // unread 120 → '99+'
@@ -795,7 +795,7 @@ test('AddContactModal finds a user and adds them', …)                         
 test('AddContactModal says when nobody has the email', …)
 ```
 
-- [ ] **Step 3: Реалізація, перевірка в браузері (1280px і 390px), коміт**
+- [x] **Step 3: Реалізація, перевірка в браузері (1280px і 390px), коміт**
 
 ```bash
 npm run lint:fix && npm run typecheck && npm run test:once
@@ -846,7 +846,7 @@ git add -A && git commit -m "feat: sidebar with chats, contacts, email lookup an
     - якщо `disabled` — замість поля текст «You can't message a deleted account»;
   - `useMarkRead(chatId, { atBottom: boolean, hasUnread: boolean }): void` — `markRead`, коли `atBottom && hasUnread && document.visibilityState === 'visible'`, і повторно при поверненні у вкладку.
 
-- [ ] **Step 1: Тести**
+- [x] **Step 1: Тести**
 
 ```ts
 test('Composer sends on Enter and adds a newline on Shift+Enter', …)
@@ -858,7 +858,7 @@ test('ConversationPage disables the composer for a deleted account', …) // cha
 test('ConversationPage redirects home when the chat is gone', …)     // chats.get → null → '/'
 ```
 
-- [ ] **Step 2: Реалізація й перевірка в браузері**
+- [x] **Step 2: Реалізація й перевірка в браузері**
 
 Два контексти Playwright MCP, `e2e-…@e2e.test`:
 - повідомлення доходить без перезавантаження;
@@ -866,7 +866,7 @@ test('ConversationPage redirects home when the chat is gone', …)     // chats.
 - розділювач «Unread messages» на місці;
 - 60+ повідомлень підвантажуються вгору без стрибка.
 
-- [ ] **Step 3: Коміт**
+- [x] **Step 3: Коміт**
 
 ```bash
 npm run lint:fix && npm run typecheck && npm run test:once
@@ -908,7 +908,7 @@ git add -A && git commit -m "feat: conversation with paginated history, unread d
     - чекбокс «Also for <name>» (для «Deleted account» його немає);
     - після «Delete chat» — перехід на `/`.
 
-- [ ] **Step 1: Тести**
+- [x] **Step 1: Тести**
 
 ```ts
 test('messageActions offers edit only for my own non-forwarded messages', …)
@@ -920,7 +920,7 @@ test('Delete chat for everyone calls remove and goes home', …)                
 test('Mute toggles the label', …)
 ```
 
-- [ ] **Step 2: Реалізація, перевірка в браузері (ПКМ на 1280px, довге натискання на 390px з `hasTouch`), коміт**
+- [x] **Step 2: Реалізація, перевірка в браузері (ПКМ на 1280px, довге натискання на 390px з `hasTouch`), коміт**
 
 ```bash
 npm run lint:fix && npm run typecheck && npm run test:once
@@ -958,7 +958,7 @@ git add -A && git commit -m "feat: message context menu, selection, forward, del
     - для кожного з `findIncoming` грає `me.sound` (один раз на оновлення) і показує `notifications.show` з аватаром, іменем і текстом;
     - клік по сповіщенню веде на `/chat/:chatId`.
 
-- [ ] **Step 1: Тести** (Review Focus 3)
+- [x] **Step 1: Тести** (Review Focus 3)
 
 ```ts
 test('the first load never notifies', …)                            // prev undefined → []
@@ -970,7 +970,7 @@ test('an unchanged last message does not notify again', …)
 test('playSound none plays nothing and classic reuses one audio element', …)
 ```
 
-- [ ] **Step 2: Реалізація, перевірка (два контексти: toast і звук у фоновому чаті, тиша в замʼюченому), коміт**
+- [x] **Step 2: Реалізація, перевірка (два контексти: toast і звук у фоновому чаті, тиша в замʼюченому), коміт**
 
 ```bash
 npm run lint:fix && npm run typecheck && npm run test:once
@@ -1002,7 +1002,7 @@ git add -A && git commit -m "feat: new message notifications with selectable sou
     - «Delete account» відкриває `ConfirmModal` «Delete account?» з текстом «Your profile, contacts and chats will be deleted. Your messages stay visible to other people as Deleted account. This cannot be undone.» і червоною кнопкою «Delete account»;
     - підтвердження: `deleteAccount` → `signOut()` (помилку ігнорувати: сесії вже немає) → `/login`.
 
-- [ ] **Step 1: Тести**
+- [x] **Step 1: Тести**
 
 ```ts
 test('ProfileSettings saves a trimmed name', …)
@@ -1012,7 +1012,7 @@ test('choosing a sound saves and previews it', …)                  // setSound
 test('Delete account asks first, then deletes and signs out', …)
 ```
 
-- [ ] **Step 2: Реалізація, перевірка в браузері (аватар з `e2e/fixtures/avatar.png` видно в другого користувача без перезавантаження), коміт**
+- [x] **Step 2: Реалізація, перевірка в браузері (аватар з `e2e/fixtures/avatar.png` видно в другого користувача без перезавантаження), коміт**
 
 ```bash
 npm run lint:fix && npm run typecheck && npm run test:once
