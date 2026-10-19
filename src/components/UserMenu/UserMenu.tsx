@@ -1,10 +1,11 @@
 import { Group, Menu, Skeleton, Text, UnstyledButton } from '@mantine/core';
-import { IconLogout } from '@tabler/icons-react';
+import { IconLogout, IconSettings } from '@tabler/icons-react';
 import { useQuery } from 'convex/react';
 import { type FC, useState } from 'react';
 
 import ConfirmModal from '@/components/ConfirmModal';
 import PresenceAvatar from '@/components/PresenceAvatar';
+import SettingsModal from '@/components/SettingsModal';
 import useLogout from '@/hooks/useLogout';
 import { api } from '@convex/_generated/api';
 
@@ -12,6 +13,7 @@ const UserMenu: FC = () => {
     const me = useQuery(api.users.me);
     const { logout, loading } = useLogout();
     const [ confirming, setConfirming ] = useState(false);
+    const [ settingsOpened, setSettingsOpened ] = useState(false);
 
     if (!me) {
         return (
@@ -50,6 +52,14 @@ const UserMenu: FC = () => {
                 </Menu.Target>
                 <Menu.Dropdown>
                     <Menu.Item
+                        leftSection={ <IconSettings size={ 16 } /> }
+                        onClick={ () => {
+                            setSettingsOpened(true);
+                        } }
+                    >
+                        Settings
+                    </Menu.Item>
+                    <Menu.Item
                         leftSection={ <IconLogout size={ 16 } /> }
                         onClick={ () => {
                             setConfirming(true);
@@ -59,6 +69,12 @@ const UserMenu: FC = () => {
                     </Menu.Item>
                 </Menu.Dropdown>
             </Menu>
+            <SettingsModal
+                opened={ settingsOpened }
+                onClose={ () => {
+                    setSettingsOpened(false);
+                } }
+            />
             <ConfirmModal
                 opened={ confirming }
                 title="Log out?"
