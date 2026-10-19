@@ -79,3 +79,28 @@ test('AvatarUpload removes the photo', async () => {
         expect(setAvatar).toHaveBeenCalledWith({ storageId: null });
     });
 });
+
+test('AvatarUpload lets the same file be picked twice', async () => {
+    generateUrl.mockResolvedValue('https://upload.test/u');
+    fetchMock.mockResolvedValue({ ok: true, json: () => Promise.resolve({ storageId: 's1' }) });
+    setAvatar.mockResolvedValue(null);
+
+    const file = new File([ 'x' ], 'a.png', { type: 'image/png' });
+    const { container } = renderWithProviders(
+        <AvatarUpload
+            name="Alice"
+            avatar={ null }
+        />
+    );
+    const input = container.querySelector<HTMLInputElement>('input[type="file"]') as HTMLInputElement;
+    const user = userEvent.setup();
+
+    await user.upload(input, file);
+    await waitFor(() => {
+        expect(setAvatar).toHaveBeenCalledTimes(1);
+    });
+    await user.upload(input, file);
+    await waitFor(() => {
+        expect(setAvatar).toHaveBeenCalledTimes(2);
+    });
+});

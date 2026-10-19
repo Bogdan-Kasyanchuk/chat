@@ -326,15 +326,22 @@ test('delete chat for everyone removes the chat and members', async () => {
 
 // Review Focus 5
 test('a chat deleted for me comes back with only the new messages', async () => {
+    // Дата заморожена, щоб прогін не залежав від швидкості: convex-test дає _creationTime = Date.now() (ціле число),
+    // коли той випереджає попередні вставки, тож нове повідомлення в ту саму мілісекунду, що й clearedAt, збігалося б
+    // з міткою й було б приховане. У справжньому Convex _creationTime дробовий, там збіг неможливий; у тесті розводимо мілісекунди
+    vi.useFakeTimers({ toFake: [ 'Date' ] });
+
     const { alice, bob, chatId } = await startChat();
 
     await bob.client.mutation(api.messages.send, { chatId, body: 'old 1' });
     await bob.client.mutation(api.messages.send, { chatId, body: 'old 2' });
+    vi.advanceTimersByTime(1);
     await alice.client.mutation(api.chats.remove, { chatId, forEveryone: false });
 
     expect(await alice.client.query(api.chats.list, {})).toHaveLength(0);
     expect(await alice.client.query(api.chats.get, { chatId })).toBeNull();
 
+    vi.advanceTimersByTime(1);
     await bob.client.mutation(api.messages.send, { chatId, body: 'new' });
 
     const [ summary ] = await alice.client.query(api.chats.list, {});

@@ -1,7 +1,7 @@
 import { Button, FileButton, Group, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useAction, useMutation } from 'convex/react';
-import { type FC, useEffect, useState } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 
 import PresenceAvatar from '@/components/PresenceAvatar';
 import errorMessage from '@/lib/errorMessage';
@@ -17,6 +17,7 @@ type AvatarUploadProps = {
 const AvatarUpload: FC<AvatarUploadProps> = ({ name, avatar }) => {
     const generateUrl = useMutation(api.users.generateAvatarUploadUrl);
     const setAvatar = useAction(api.users.setAvatar);
+    const resetRef = useRef<() => void>(null);
     const [ preview, setPreview ] = useState<string | null>(null);
     const [ error, setError ] = useState<string | null>(null);
     const [ loading, setLoading ] = useState(false);
@@ -35,6 +36,8 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, avatar }) => {
             return;
         }
 
+        // FileButton не чистить прихований input: без скидання той самий файл вдруге не спрацює
+        resetRef.current?.();
         setError(null);
 
         if (!AVATAR_TYPES.includes(file.type)) {
@@ -95,6 +98,7 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ name, avatar }) => {
                 />
                 <Group gap="xs">
                     <FileButton
+                        resetRef={ resetRef }
                         accept={ AVATAR_TYPES.join(',') }
                         onChange={ file => {
                             void upload(file);
