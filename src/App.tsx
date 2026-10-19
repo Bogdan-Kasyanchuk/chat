@@ -1,21 +1,14 @@
 import { LoadingOverlay } from '@mantine/core';
 import { useConvexAuth } from 'convex/react';
 import type { FC } from 'react';
-import { Outlet, Route, Routes } from 'react-router';
+import { Route, Routes } from 'react-router';
 
-import usePresenceHeartbeat from '@/hooks/usePresenceHeartbeat';
+import ChatLayout from '@/components/ChatLayout';
 import NotFoundPage from '@/pages/NotFoundPage';
 import SignInPage from '@/pages/SignInPage';
 import SignUpPage from '@/pages/SignUpPage';
 import PrivateRoute from '@/routes/PrivateRoute';
 import PublicRoute from '@/routes/PublicRoute';
-
-// Заглушка: задача 10 замінює її на ChatLayout, але лишає usePresenceHeartbeat
-const ChatLayout: FC = () => {
-    usePresenceHeartbeat();
-
-    return <Outlet />;
-};
 
 const App: FC = () => {
     const { isLoading } = useConvexAuth();

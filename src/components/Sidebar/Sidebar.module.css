@@ -1,0 +1,19 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--mantine-color-white);
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mantine-spacing-sm);
+    padding: var(--mantine-spacing-md);
+    border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+.list {
+    flex: 1;
+    overflow-y: auto;
+}

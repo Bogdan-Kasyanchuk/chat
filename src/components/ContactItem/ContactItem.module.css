@@ -1,0 +1,18 @@
+.item {
+    display: flex;
+    align-items: center;
+    gap: var(--mantine-spacing-sm);
+    width: 100%;
+    padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+    border-bottom: 1px solid var(--mantine-color-gray-2);
+
+    &:hover {
+        background-color: var(--mantine-color-gray-0);
+    }
+}
+
+.body {
+    flex: 1;
+    min-width: 0;
+    text-align: left;
+}

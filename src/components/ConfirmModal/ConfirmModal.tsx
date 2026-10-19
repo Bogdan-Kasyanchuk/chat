@@ -16,6 +16,9 @@ const ConfirmModal: FC<ConfirmModalProps> = ({ opened, title, children, confirmL
     <Modal
         opened={ opened }
         title={ title }
+        closeOnClickOutside={ !loading }
+        closeOnEscape={ !loading }
+        withCloseButton={ !loading }
         centered
         onClose={ onClose }
     >
@@ -26,6 +29,7 @@ const ConfirmModal: FC<ConfirmModalProps> = ({ opened, title, children, confirmL
         >
             <Button
                 variant="default"
+                disabled={ loading }
                 onClick={ onClose }
             >
                 Cancel
