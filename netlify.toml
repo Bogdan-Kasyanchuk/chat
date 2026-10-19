@@ -2,9 +2,9 @@
   command = "npx convex deploy --cmd 'npm run build'"
   publish = "dist"
 
-# Vite 8 потребує Node >= 22.12; сайт створено ще під CRA, тож версію за замовчуванням не беремо на віру
+# Збираємо на тій самій Node, що й локально; сайт створено ще під CRA, тож версію за замовчуванням не беремо на віру
 [build.environment]
-  NODE_VERSION = "22"
+  NODE_VERSION = "24.19.0"
 
 [[redirects]]
   from = "/*"

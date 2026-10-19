@@ -12,7 +12,7 @@
 
 ## Команди
 
-- Node `>=22.12` (вимога Vite 8). Перший запуск: `npm install`, `npx convex dev`, `npx @convex-dev/auth` (ключі Convex Auth і `SITE_URL`), Google OAuth через `npx convex env set AUTH_GOOGLE_ID …` / `AUTH_GOOGLE_SECRET …`.
+- Node `>=24.19.0` (локально через nvm, на Netlify — `NODE_VERSION` у `netlify.toml`). Перший запуск: `npm install`, `npx convex dev`, `npx @convex-dev/auth` (ключі Convex Auth і `SITE_URL`), Google OAuth через `npx convex env set AUTH_GOOGLE_ID …` / `AUTH_GOOGLE_SECRET …`.
 - Pre-commit: husky запускає `lint-staged` (`eslint --fix` для `*.{ts,tsx,mjs}`).
 - `npx convex dev` — бекенд у режимі розробки; `npm run dev` — фронт на http://localhost:5173.
 - `npm run test:once` — Vitest: функції Convex через `convex-test` (edge-runtime) і фронт (jsdom).
