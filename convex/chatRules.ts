@@ -36,6 +36,8 @@ export const FORWARDED_NOT_EDITABLE = 'Forwarded messages can\'t be edited';
 
 export const DELETE_FOR_EVERYONE_OWN_ONLY = 'You can only delete your own messages for everyone';
 
+export const BATCH_SIZE_INVALID = 'Select from 1 to 100 messages';
+
 export const ACCOUNT_DELETED = 'This account was deleted';
 
 export const USER_NOT_FOUND = 'User not found';
