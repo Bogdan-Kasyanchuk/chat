@@ -141,13 +141,15 @@ export const list = query({
     }
 });
 
+// chatId приходить з адреси сторінки: рядок, а не v.id, щоб зіпсована адреса давала null, а не помилку валідатора
 export const get = query({
-    args: { chatId: v.id('chats') },
-    handler: async (ctx, { chatId }) => {
+    args: { chatId: v.string() },
+    handler: async (ctx, args) => {
         const myId = await requireUserId(ctx);
-        const chat = await ctx.db.get('chats', chatId);
+        const chatId = ctx.db.normalizeId('chats', args.chatId);
+        const chat = chatId && await ctx.db.get('chats', chatId);
 
-        if (!chat) {
+        if (!chatId || !chat) {
             return null;
         }
 

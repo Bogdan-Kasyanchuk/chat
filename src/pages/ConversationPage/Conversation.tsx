@@ -33,6 +33,10 @@ type ConversationProps = {
 // Escape не чіпає розмову, поки відкрите модальне вікно чи меню: воно закривається само
 const overlayOpen = () => document.querySelector('[role="dialog"], [role="menu"], .mantine-contextmenu') !== null;
 
+const NONE: ReadonlySet<Id<'messages'>> = new Set();
+
+const pick = (messages: MessageView[], ids: ReadonlySet<Id<'messages'>>) => messages.filter(message => ids.has(message.id));
+
 const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
     const { chatId, partner } = chat;
     const now = useNow();
@@ -44,33 +48,45 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
     const copyText = useCopyText();
     // Знімок на момент відкриття: розділювач «Unread messages» не стрибає, коли спрацьовує markRead
     const [ lastReadAtOnOpen ] = useState(chat.lastReadAt);
-    const [ replyTo, setReplyTo ] = useState<MessageView | null>(null);
-    const [ editing, setEditing ] = useState<MessageView | null>(null);
-    const [ selected, setSelected ] = useState<ReadonlySet<Id<'messages'>>>(new Set());
-    const [ forwarding, setForwarding ] = useState<Id<'messages'>[] | null>(null);
-    const [ deleting, setDeleting ] = useState<MessageView[] | null>(null);
+    // У стані лише id; самі повідомлення беруться з завантаженої історії. Те, що зникло (видалене співрозмовником
+    // чи в іншій вкладці, очищена історія), випадає саме: відповідь і редагування закриваються, діалоги
+    // працюють із тим, що лишилось, а порожній діалог закривається
+    const [ replyToId, setReplyToId ] = useState<Id<'messages'> | null>(null);
+    const [ editingId, setEditingId ] = useState<Id<'messages'> | null>(null);
+    const [ selected, setSelected ] = useState<ReadonlySet<Id<'messages'>>>(NONE);
+    const [ forwarding, setForwarding ] = useState<ReadonlySet<Id<'messages'>>>(NONE);
+    const [ deleting, setDeleting ] = useState<ReadonlySet<Id<'messages'>>>(NONE);
 
-    // Вибрані, що досі в стрічці, у хронологічному порядку: видалене співрозмовником випадає саме
-    const selectedMessages = useMemo(
-        () => history.messages.filter(message => selected.has(message.id)),
-        [ history.messages, selected ]
-    );
+    // У хронологічному порядку стрічки
+    const selectedMessages = useMemo(() => pick(history.messages, selected), [ history.messages, selected ]);
+    const forwardMessages = useMemo(() => pick(history.messages, forwarding), [ history.messages, forwarding ]);
+    const deleteMessages = useMemo(() => pick(history.messages, deleting), [ history.messages, deleting ]);
     const visibleSelection = useMemo(() => new Set(selectedMessages.map(message => message.id)), [ selectedMessages ]);
     const selecting = selectedMessages.length > 0;
+    const replyTo = history.messages.find(message => message.id === replyToId) ?? null;
+    const editingMessage = history.messages.find(message => message.id === editingId) ?? null;
 
-    // Стабільний об'єкт: композер фокусує поле лише коли відповідь справді змінилась
-    const replyDraft = useMemo(() => replyTo && {
-        authorName: replyTo.authorIsMe ? me?.name ?? 'You' : partner.name,
-        body: replyTo.body
-    }, [ replyTo, me?.name, partner.name ]);
+    // Стабільні об'єкти з примітивів: Convex віддає нові об'єкти з кожним оновленням історії,
+    // а композер фокусує поле, коли відповідь чи редагування змінились
+    const replyAuthor = replyTo && (replyTo.authorIsMe ? me?.name ?? 'You' : partner.name);
+    const replyBody = replyTo?.body;
+    const replyDraft = useMemo(
+        () => replyAuthor === null || replyBody === undefined ? null : { authorName: replyAuthor, body: replyBody },
+        [ replyAuthor, replyBody ]
+    );
+    const editingBody = editingMessage?.body;
+    const editing = useMemo(
+        () => editingId === null || editingBody === undefined ? null : { id: editingId, body: editingBody },
+        [ editingId, editingBody ]
+    );
 
     const cancel = () => {
-        setReplyTo(null);
-        setEditing(null);
+        setReplyToId(null);
+        setEditingId(null);
     };
 
     const clearSelection = () => {
-        setSelected(new Set());
+        setSelected(NONE);
     };
 
     const toggle = (id: Id<'messages'>) => {
@@ -107,29 +123,29 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
     const onAction = (action: MessageAction, message: MessageView) => {
         switch (action) {
             case 'reply':
-                setEditing(null);
-                setReplyTo(message);
+                setEditingId(null);
+                setReplyToId(message.id);
                 break;
             case 'edit':
-                setReplyTo(null);
-                setEditing(message);
+                setReplyToId(null);
+                setEditingId(message.id);
                 break;
             case 'copy':
                 copyText(message.body);
                 break;
             case 'forward':
-                setForwarding([ message.id ]);
+                setForwarding(new Set([ message.id ]));
                 break;
             case 'select':
                 toggle(message.id);
                 break;
             case 'delete':
-                setDeleting([ message ]);
+                setDeleting(new Set([ message.id ]));
                 break;
         }
     };
 
-    const saveEdit = async (target: MessageView, body: string) => {
+    const saveEdit = async (target: Pick<MessageView, 'id' | 'body'>, body: string) => {
         // Текст не змінився — нічого не зберігаємо, щоб не з'явилась позначка «edited»
         if (body.trim() !== target.body) {
             try {
@@ -141,7 +157,7 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
         }
 
         // Редагування закривається лише після збереження: при помилці текст лишається в полі
-        setEditing(current => current?.id === target.id ? null : current);
+        setEditingId(current => current === target.id ? null : current);
     };
 
     const submit = async (body: string) => {
@@ -149,14 +165,15 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
             return saveEdit(editing, body);
         }
 
-        const target = replyTo;
+        const target = replyTo?.id ?? null;
 
-        setReplyTo(null);
+        setReplyToId(null);
 
         try {
-            await send({ chatId, body, ...target && { replyToId: target.id } });
+            await send({ chatId, body, ...target && { replyToId: target } });
         } catch (error) {
-            setReplyTo(current => current ?? target);
+            // Повертаємо відповідь; якщо оригінал тим часом зник, вона сама не покажеться
+            setReplyToId(current => current ?? target);
             notifications.show({ color: 'red', message: errorMessage(error) });
             throw error;
         }
@@ -169,14 +186,14 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
                     <SelectionBar
                         count={ selectedMessages.length }
                         onForward={ () => {
-                            setForwarding(selectedMessages.map(message => message.id));
+                            setForwarding(visibleSelection);
                         } }
                         onCopy={ () => {
                             copyText(selectedMessages.map(message => message.body).join('\n\n'));
                             clearSelection();
                         } }
                         onDelete={ () => {
-                            setDeleting(selectedMessages);
+                            setDeleting(visibleSelection);
                         } }
                         onCancel={ clearSelection }
                     />
@@ -211,11 +228,11 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
                 onCancel={ cancel }
                 onSubmit={ submit }
             />
-            { forwarding && (
+            { forwardMessages.length > 0 && (
                 <ForwardModal
-                    messageIds={ forwarding }
+                    messageIds={ forwardMessages.map(message => message.id) }
                     onDone={ forwarded => {
-                        setForwarding(null);
+                        setForwarding(NONE);
 
                         if (forwarded) {
                             clearSelection();
@@ -223,21 +240,15 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
                     } }
                 />
             ) }
-            { deleting && (
+            { deleteMessages.length > 0 && (
                 <DeleteMessagesModal
-                    messages={ deleting }
+                    messages={ deleteMessages }
                     partnerName={ partner.userId === null ? null : partner.name }
                     onDone={ deleted => {
-                        const gone = new Set(deleting.map(message => message.id));
-                        const keep = (current: MessageView | null) => current && gone.has(current.id) ? null : current;
-
-                        setDeleting(null);
+                        setDeleting(NONE);
 
                         if (deleted) {
                             clearSelection();
-                            // Відповідати чи редагувати вже нічого
-                            setReplyTo(keep);
-                            setEditing(keep);
                         }
                     } }
                 />

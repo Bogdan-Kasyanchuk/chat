@@ -4,7 +4,7 @@ import { Component, type ReactNode } from 'react';
 import { CHAT_NOT_FOUND } from '@convex/chatRules';
 
 type ChatErrorBoundaryProps = {
-    // Чату немає: зіпсований id в адресі чи CHAT_NOT_FOUND від сервера
+    // Чату немає: CHAT_NOT_FOUND від сервера
     notFound: ReactNode,
     // Будь-яка інша помилка рендеру
     fallback: ReactNode,
@@ -15,11 +15,11 @@ type ChatErrorBoundaryState = {
     error: { notFound: boolean } | null
 };
 
-// Валідатор v.id відхиляє зіпсований id ще до обробника: на клієнт приходить звичайна Error з ArgumentValidationError
-const isChatNotFound = (error: unknown): boolean => (error instanceof ConvexError && error.data === CHAT_NOT_FOUND)
-    || (error instanceof Error && error.message.includes('ArgumentValidationError'));
+// Зіпсований id сервер сам перетворює на null чи CHAT_NOT_FOUND; тут лишається гонка, коли messages.list
+// дізнається про зниклий чат раніше за chats.get
+const isChatNotFound = (error: unknown): boolean => error instanceof ConvexError && error.data === CHAT_NOT_FOUND;
 
-// Запити чату кидають, якщо id в адресі зіпсований або чат зник: замість білого екрана — «Chat not found».
+// Замість білого екрана: CHAT_NOT_FOUND — «Chat not found», будь-яка інша помилка — загальний fallback.
 // Інші помилки не видаємо за відсутній чат
 class ChatErrorBoundary extends Component<ChatErrorBoundaryProps, ChatErrorBoundaryState> {
     state: ChatErrorBoundaryState = { error: null };

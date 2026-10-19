@@ -1,7 +1,7 @@
 import { useLongPress } from '@mantine/hooks';
 import { IconArrowBackUp, IconArrowForwardUp, IconCircleCheck, IconCopy, IconPencil, IconTrash } from '@tabler/icons-react';
 import { type ContextMenuItemOptions, useContextMenu } from 'mantine-contextmenu';
-import type { FC, ReactNode } from 'react';
+import type { FC, MouseEvent, ReactNode } from 'react';
 
 import type { MessageView } from '@/types/chat';
 
@@ -42,6 +42,11 @@ const swallowNextContextMenu = () => {
     }, 1000);
 };
 
+// У режимі вибору правий клік не відкриває ні наше меню, ні браузерне
+const preventNativeMenu = (event: MouseEvent) => {
+    event.preventDefault();
+};
+
 // Меню повідомлення: правий клік на десктопі, довге натискання на телефоні
 const MessageMenu: FC<MessageMenuProps> = ({ message, canSend, disabled = false, onAction, children }) => {
     const { showContextMenu } = useContextMenu();
@@ -74,7 +79,7 @@ const MessageMenu: FC<MessageMenuProps> = ({ message, canSend, disabled = false,
     return (
         <div
             className={ classes.trigger }
-            onContextMenu={ disabled ? undefined : open }
+            onContextMenu={ disabled ? preventNativeMenu : open }
             { ...!disabled && longPress }
         >
             { children }

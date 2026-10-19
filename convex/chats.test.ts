@@ -165,6 +165,15 @@ test('chats.get returns the partner with isContact, or null for a hidden chat', 
     expect(await bob.client.query(api.chats.get, { chatId })).toBeNull();
 });
 
+test('chats.get returns null for an address that is not a chat id', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+
+    expect(await alice.client.query(api.chats.get, { chatId: 'not-a-chat' })).toBeNull();
+    // Справжній id, але іншої таблиці
+    expect(await alice.client.query(api.chats.get, { chatId: alice.userId })).toBeNull();
+});
+
 test('unread and lastMessage ignore messages before clearedAt and hidden for me', async () => {
     const t = setup();
     const alice = await asUser(t, 'Alice');

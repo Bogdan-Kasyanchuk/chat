@@ -54,17 +54,18 @@ test('MessageMenu opens on right click with every action for my message', async 
     expect(onAction).toHaveBeenCalledWith('forward');
 });
 
-test('MessageMenu hides Reply and Edit when the chat is read-only and opens nothing when disabled', () => {
+test('MessageMenu hides Reply and Edit when the chat is read-only', () => {
     renderMenu({ canSend: false });
     fireEvent.contextMenu(screen.getByText('Hello'));
 
     expect(titles()).toEqual([ 'Copy text', 'Forward', 'Select', 'Delete' ]);
 });
 
-test('MessageMenu stays closed while disabled', () => {
+test('MessageMenu stays closed while disabled and keeps the browser menu away too', () => {
     renderMenu({ disabled: true });
-    fireEvent.contextMenu(screen.getByText('Hello'));
 
+    // fireEvent повертає false, якщо обробник викликав preventDefault
+    expect(fireEvent.contextMenu(screen.getByText('Hello'))).toBe(false);
     expect(titles()).toEqual([]);
 });
 

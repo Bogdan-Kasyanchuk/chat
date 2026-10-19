@@ -8,6 +8,7 @@ import { findMember, partnerOf, requireMember, requireUserId, userView } from '.
 import {
     ACCOUNT_DELETED,
     BATCH_SIZE_INVALID,
+    CHAT_NOT_FOUND,
     DELETED_MESSAGE,
     DELETE_FOR_EVERYONE_OWN_ONLY,
     FORWARDED_NOT_EDITABLE,
@@ -90,10 +91,17 @@ const toView = async (
     };
 };
 
+// chatId з адреси сторінки: зіпсований id — той самий CHAT_NOT_FOUND, що й чужий чат
 export const list = query({
-    args: { chatId: v.id('chats'), paginationOpts: paginationOptsValidator },
-    handler: async (ctx, { chatId, paginationOpts }) => {
+    args: { chatId: v.string(), paginationOpts: paginationOptsValidator },
+    handler: async (ctx, { paginationOpts, ...args }) => {
         const myId = await requireUserId(ctx);
+        const chatId = ctx.db.normalizeId('chats', args.chatId);
+
+        if (!chatId) {
+            throw new ConvexError(CHAT_NOT_FOUND);
+        }
+
         const mine = await requireMember(ctx, chatId, myId);
         const partner = await partnerOf(ctx, chatId, myId);
         const result = await ctx.db

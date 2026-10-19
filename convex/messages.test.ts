@@ -48,6 +48,13 @@ test('a blank message is rejected', async () => {
     await expect(alice.client.mutation(api.messages.send, { chatId, body: '   ' })).rejects.toThrow(MESSAGE_EMPTY);
 });
 
+test('messages.list says Chat not found for an address that is not a chat id', async () => {
+    const { alice } = await pair();
+
+    await expect(alice.client.query(api.messages.list, { chatId: 'not-a-chat', paginationOpts: page })).rejects.toThrow(CHAT_NOT_FOUND);
+    await expect(alice.client.query(api.messages.list, { chatId: alice.userId, paginationOpts: page })).rejects.toThrow(CHAT_NOT_FOUND);
+});
+
 test('an outsider cannot read, send to or see a chat', async () => {
     const { t, alice, chatId } = await pair();
     const carol = await asUser(t, 'Carol');

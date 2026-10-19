@@ -1,5 +1,5 @@
 import { notifications } from '@mantine/notifications';
-import { fireEvent, screen, within } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
 import { ConvexError } from 'convex/values';
@@ -14,6 +14,7 @@ import ConversationPage from './ConversationPage';
 
 let chat: ChatView | null | undefined;
 let chatError: Error | null = null;
+let messagesError: Error | null = null;
 let messages: MessageView[] = [];
 const send = vi.fn();
 const markRead = vi.fn();
@@ -22,18 +23,25 @@ const removeMessages = vi.fn();
 const removeChat = vi.fn();
 
 // Як у Convex: нове значення запиту одразу перемальовує підписані компоненти
-const chatListeners = new Set<() => void>();
-const setChat = (next: ChatView | null) => {
-    chat = next;
-    chatListeners.forEach(listener => {
+const listeners = new Set<() => void>();
+const notify = () => {
+    listeners.forEach(listener => {
         listener();
     });
 };
-const subscribeChat = (listener: () => void) => {
-    chatListeners.add(listener);
+const setChat = (next: ChatView | null) => {
+    chat = next;
+    notify();
+};
+const setMessages = (next: MessageView[]) => {
+    messages = next;
+    notify();
+};
+const subscribe = (listener: () => void) => {
+    listeners.add(listener);
 
     return () => {
-        chatListeners.delete(listener);
+        listeners.delete(listener);
     };
 };
 
@@ -47,12 +55,16 @@ const mutations: Record<string, typeof send> = {
 
 vi.mock('convex/react', () => ({
     useQuery: (ref: FunctionReference<'query'>) => {
+        if ([ 'chats:list', 'contacts:list' ].includes(getFunctionName(ref))) {
+            return [];
+        }
+
         if (getFunctionName(ref) !== 'chats:get') {
             return { id: 'me', name: 'Alice', email: 'alice@example.com', avatar: null, sound: 'classic' };
         }
 
         // eslint-disable-next-line react-hooks/rules-of-hooks -- мок useQuery: гілка стала для кожного виклику
-        const current = useSyncExternalStore(subscribeChat, () => chat);
+        const current = useSyncExternalStore(subscribe, () => chat);
 
         if (chatError) {
             throw chatError;
@@ -60,7 +72,15 @@ vi.mock('convex/react', () => ({
 
         return current;
     },
-    usePaginatedQuery: () => ({ results: [ ...messages ].reverse(), status: 'Exhausted', isLoading: false, loadMore: vi.fn() }),
+    usePaginatedQuery: () => {
+        const current = useSyncExternalStore(subscribe, () => messages);
+
+        if (messagesError) {
+            throw messagesError;
+        }
+
+        return { results: [ ...current ].reverse(), status: 'Exhausted', isLoading: false, loadMore: vi.fn() };
+    },
     useMutation: (ref: FunctionReference<'mutation'>) => mutations[ getFunctionName(ref) ] ?? vi.fn()
 }));
 
@@ -101,6 +121,7 @@ const renderPage = () => renderWithProviders(
 beforeEach(() => {
     messages = [];
     chatError = null;
+    messagesError = null;
     send.mockResolvedValue('m9');
     markRead.mockResolvedValue(null);
 });
@@ -149,18 +170,6 @@ test('ConversationPage redirects home when the chat is gone', () => {
     expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Chat not found' }));
 });
 
-test('ConversationPage redirects home when the chat id in the address is malformed', () => {
-    const show = vi.spyOn(notifications, 'show');
-
-    // React пише перехоплену помилку в консоль — у виводі тестів вона не потрібна
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    chatError = new Error('ArgumentValidationError: Value does not match validator');
-    renderPage();
-
-    expect(screen.getByText('home page')).toBeTruthy();
-    expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Chat not found' }));
-});
-
 test('ConversationPage offers to add a stranger to contacts', () => {
     chat = makeChat({ partner: { ...makeChat().partner, isContact: false } });
     renderPage();
@@ -203,11 +212,13 @@ test('ConversationPage shows a generic error instead of Chat not found for other
     expect(show).not.toHaveBeenCalled();
 });
 
-test('ConversationPage treats a Chat not found error as a missing chat', () => {
+test('ConversationPage treats Chat not found from the message list as a missing chat', () => {
     const show = vi.spyOn(notifications, 'show');
 
+    // Гонка: messages.list дізнався, що чату немає, раніше за chats.get
     vi.spyOn(console, 'error').mockImplementation(() => {});
-    chatError = new ConvexError('Chat not found');
+    chat = makeChat();
+    messagesError = new ConvexError('Chat not found');
     renderPage();
 
     expect(screen.getByText('home page')).toBeTruthy();
@@ -385,4 +396,105 @@ test('Delete chat goes home without the Chat not found toast', async () => {
     expect(removeChat).toHaveBeenCalledWith({ chatId: 'c1', forEveryone: false });
     expect(await screen.findByText('home page')).toBeTruthy();
     expect(show).not.toHaveBeenCalledWith(expect.objectContaining({ message: 'Chat not found' }));
+});
+
+test('Delete in select mode sends only the messages that are still there', async () => {
+    chat = makeChat();
+    messages = [ message('a', 'First', true, 30), message('b', 'Second', true, 20) ];
+    removeMessages.mockResolvedValue(null);
+    renderPage();
+
+    const user = userEvent.setup();
+
+    fireEvent.contextMenu(screen.getByText('First'));
+    await user.click(screen.getByRole('button', { name: 'Select' }));
+    await user.click(screen.getByText('Second'));
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(screen.getByRole('dialog', { name: 'Delete 2 messages?' })).toBeTruthy();
+
+    // Поки діалог відкритий, повідомлення зникає (видалене в іншій вкладці)
+    act(() => {
+        setMessages([ messages[ 1 ] ]);
+    });
+
+    const dialog = screen.getByRole('dialog', { name: 'Delete message?' });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Delete' }));
+
+    expect(removeMessages).toHaveBeenCalledWith({ messageIds: [ 'b' ], forEveryone: false });
+});
+
+test('Delete and Forward dialogs close when their only message disappears', async () => {
+    chat = makeChat();
+    messages = [ message('a', 'First', true, 30), message('b', 'Second', false, 20) ];
+    renderPage();
+
+    const user = userEvent.setup();
+
+    fireEvent.contextMenu(screen.getByText('First'));
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
+
+    expect(screen.getByRole('dialog', { name: 'Delete message?' })).toBeTruthy();
+
+    act(() => {
+        setMessages([ messages[ 1 ] ]);
+    });
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    fireEvent.contextMenu(screen.getByText('Second'));
+    await user.click(screen.getByRole('button', { name: 'Forward' }));
+
+    expect(screen.getByRole('dialog', { name: 'Forward to' })).toBeTruthy();
+
+    act(() => {
+        setMessages([]);
+    });
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+test('A reply to a message that disappeared is dropped and the next send goes without it', async () => {
+    chat = makeChat();
+    messages = [ message('a', 'First', false, 30), message('b', 'Second', false, 20) ];
+    renderPage();
+
+    const user = userEvent.setup();
+
+    await user.dblClick(screen.getByText('First'));
+
+    expect(screen.getByText('Reply to Bob')).toBeTruthy();
+
+    act(() => {
+        setMessages([ messages[ 1 ] ]);
+    });
+
+    expect(screen.queryByText('Reply to Bob')).toBeNull();
+
+    await user.type(screen.getByRole('textbox', { name: 'Message' }), 'Hello{Enter}');
+
+    expect(send).toHaveBeenCalledWith({ chatId: 'c1', body: 'Hello' });
+});
+
+test('Editing a message that disappeared ends and gives the draft back', async () => {
+    chat = makeChat();
+    messages = [ message('a', 'Mine', true, 30), message('b', 'Second', false, 20) ];
+    renderPage();
+
+    const user = userEvent.setup();
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Message' });
+
+    await user.type(field, 'Draft');
+    fireEvent.contextMenu(screen.getByText('Mine'));
+    await user.click(screen.getByRole('button', { name: 'Edit' }));
+
+    expect(field.value).toBe('Mine');
+
+    act(() => {
+        setMessages([ messages[ 1 ] ]);
+    });
+
+    expect(screen.queryByText('Edit message')).toBeNull();
+    expect(field.value).toBe('Draft');
 });
