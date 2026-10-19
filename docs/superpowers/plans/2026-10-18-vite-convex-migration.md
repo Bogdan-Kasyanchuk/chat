@@ -11,7 +11,7 @@
 
 **Tech Stack:** Vite 8.3, React 19.3, TypeScript ~6.0.3, React Router 8.4, Mantine 9.7 (`@mantine/core`, `hooks`, `form`, `modals`, `notifications`), `mantine-contextmenu` 9.4, `frimousse` 0.4 + `emojibase-data` 16 (пікер емодзі), `@tabler/icons-react` 3, `postcss-preset-mantine` + `postcss-simple-vars`, Convex 1.47 + `@convex-dev/auth` 0.0.96 + `@auth/core` 0.41.3, `lucia` 3 (Scrypt), Vitest 5 + Testing Library + `convex-test`, Playwright, ESLint 9 + `@stylistic` + `perfectionist`, husky + lint-staged, Netlify.
 
-**Виконання:** стан на 2026-10-19 — задачі 1–14 виконані (subagent-driven), крім 👤-кроків 2–3 задачі 2. Наступна — задача 15. Галочки `- [x]` у кроках показують, що вже зроблено.
+**Виконання:** стан на 2026-10-19 — усі 17 задач виконані (subagent-driven) і пройшли фінальне рев'ю гілки, крім 👤-кроків: задача 2 кроки 2–3 і задача 17 крок 4. Галочки `- [x]` у кроках показують, що вже зроблено.
 
 **Spec:** окремого документа немає. Специфікація — запит власника від 2026-10-18 і відповіді на уточнення, зведені в розділ «Рішення». Зразок рішень і тулінгу — `D:\WebDev\Projects\tic-tac-toe` (`CLAUDE.md`, `docs/superpowers/plans/2026-10-12-vite-convex-migration.md`, `docs/superpowers/plans/2026-10-15-redesign-email-auth.md`).
 
@@ -1052,7 +1052,7 @@ git add -A && git commit -m "feat: settings with profile, avatar upload, notific
     - вибір емодзі — `insertAtCursor` з поточним `selectionStart` / `selectionEnd` поля, потім курсор у нову позицію;
   - `MessageBubble` — при `emojiOnlyCount(body)` від 1 до 3 текст 44px без фону бульбашки й тіні, час на плашці (`data-emoji-only`).
 
-- [ ] **Step 1: Залежності й дані**
+- [x] **Step 1: Залежності й дані**
 
 ```bash
 npm i frimousse@^0.4.0
@@ -1061,7 +1061,7 @@ npm i -D emojibase-data@^16.0.2
 
 `scripts/copy-emojibase.mjs` копіює `node_modules/emojibase-data/en/data.json` і `messages.json` у `public/emojibase/en/` (створює теку, перезаписує). У `package.json`: `"predev": "node scripts/copy-emojibase.mjs"`, `"prebuild": "node scripts/copy-emojibase.mjs"`. У `.gitignore`: `public/emojibase/`.
 
-- [ ] **Step 2: Тести чистих функцій**
+- [x] **Step 2: Тести чистих функцій**
 
 ```ts
 test('insertAtCursor replaces the selection and moves the caret after the emoji', () => {
@@ -1085,7 +1085,7 @@ test('pushRecent moves a repeat to the front and keeps 18', …)
 test('readRecent survives a throwing localStorage', …)        // vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => { throw … }) → []
 ```
 
-- [ ] **Step 3: Тести компонентів** (`frimousse` мокається: `Root` рендерить кнопку «😀», що викликає `onEmojiSelect({ emoji: '😀' })`)
+- [x] **Step 3: Тести компонентів** (`frimousse` мокається: `Root` рендерить кнопку «😀», що викликає `onEmojiSelect({ emoji: '😀' })`)
 
 ```ts
 test('picking an emoji inserts it at the caret and keeps the picker open', …)  // поле 'Hi there', курсор 2 → 'Hi😀 there'
@@ -1095,14 +1095,14 @@ test('Escape closes the picker without clearing the draft', …)
 test('a message of two emoji renders large without a bubble', …)               // data-emoji-only
 ```
 
-- [ ] **Step 4: Реалізація й перевірка в браузері**
+- [x] **Step 4: Реалізація й перевірка в браузері**
 
 Run: `npm run lint:fix && npm run typecheck && npm run test:once` → PASS. У Playwright MCP перевірити:
 - поповер на 1280px і панель на 390px;
 - запит іде на `/emojibase/en/data.json` нашого сайту, а не на `cdn.jsdelivr.net` (`browser_network_requests`);
 - надіслане «🎉🙌» у співрозмовника велике й без бульбашки.
 
-- [ ] **Step 5: Коміт**
+- [x] **Step 5: Коміт**
 
 ```bash
 git add -A && git commit -m "feat: emoji picker in the composer and large emoji-only messages"
@@ -1120,9 +1120,9 @@ git add -A && git commit -m "feat: emoji picker in the composer and large emoji-
 - Consumes: усі екрани; `internal.testing.deleteE2eUsers`.
 - Produces: у `e2e/helpers.ts` — `PASSWORD`, `testEmail(label)`, `isPhone()`, `newUserPage(browser)`, `signUp(page, name, email?)`, `addContact(page, email)`, `openChat(page, name)`, `messageMenu(page, text, item)` (ПКМ на десктопі, довге натискання на телефоні).
 
-- [ ] **Step 1: `npm i -D @playwright/test@^1.64.1 && npx playwright install chromium`**
+- [x] **Step 1: `npm i -D @playwright/test@^1.64.1 && npx playwright install chromium`**
 
-- [ ] **Step 2: `e2e/chat.spec.ts`**
+- [x] **Step 2: `e2e/chat.spec.ts`**
 
 ```ts
 test('two people add each other, talk, reply, edit, forward and delete', …)
@@ -1138,7 +1138,7 @@ test('mute silences a chat and clear history empties it for me only', …)
 test('status shows online and switches to last seen after logout', …)
 ```
 
-- [ ] **Step 3: `e2e/account.spec.ts`**
+- [x] **Step 3: `e2e/account.spec.ts`**
 
 ```ts
 test('renaming and a new avatar reach the other person live', …)
@@ -1146,7 +1146,7 @@ test('deleting an account leaves the partner a read-only Deleted account chat', 
 test('a direct chat link survives sign-in', …)   // /chat/<id> → /login → вхід → той самий чат
 ```
 
-- [ ] **Step 4: Прогін і коміт**
+- [x] **Step 4: Прогін і коміт**
 
 Run: `npm run test:e2e` (з запущеним `npx convex dev`). Очікується: усі тести зелені в проєктах `desktop` і `phone`, після прогону `@e2e.test`-користувачів немає.
 
@@ -1163,15 +1163,15 @@ git add -A && git commit -m "test: end-to-end chat and account flows with Playwr
 - Modify: `CLAUDE.md` (переписати за зразком `tic-tac-toe/CLAUDE.md`; зараз там стан робіт перед міграцією)
 - Modify: `netlify.toml`, `README.md`, `eslint.config.mjs` (без `legacy/**`)
 
-- [ ] **Step 1: Прибрати старий код**
+- [x] **Step 1: Прибрати старий код**
 
 `git rm -r legacy`. Перевірити, що в коді немає `firebase`, `cloudinary`, `joi`, `@emotion`, `tailwind`: `grep -rniE "firebase|cloudinary|joi|emotion|tailwind" src convex package.json` нічого не знаходить.
 
-- [ ] **Step 2: `netlify.toml`**
+- [x] **Step 2: `netlify.toml`**
 
 Як у `tic-tac-toe`: `command = "npx convex deploy --cmd 'npm run build'"`, `publish = "dist"`, `NODE_VERSION = "22"`, SPA-редирект.
 
-- [ ] **Step 3: README і CLAUDE.md**
+- [x] **Step 3: README і CLAUDE.md**
 
 - README: стек, запуск (`npm install`, `npx convex dev`, Google OAuth, `npm run dev`), скрипти, деплой.
 - CLAUDE.md:
@@ -1193,7 +1193,7 @@ git add -A && git commit -m "test: end-to-end chat and account flows with Playwr
 3. У Google OAuth client додати origin `https://<site>.netlify.app` і redirect URI `https://<prod-deployment>.convex.site/api/auth/callback/google`.
 4. Після деплою — локальний `.env` з ключами Firebase і Cloudinary більше не потрібен; Firebase і Cloudinary вимикає власник, коли вирішить.
 
-- [ ] **Step 5: Фінальна перевірка**
+- [x] **Step 5: Фінальна перевірка**
 
 ```bash
 npm run lint && npm run typecheck && npm run test:once && npm run build && npm run test:e2e
@@ -1201,7 +1201,7 @@ npm run lint && npm run typecheck && npm run test:once && npm run build && npm r
 
 Очікується: усе зелене. Перевірити на prod: вхід через Google 👤, реєстрацію поштою, повідомлення між двома акаунтами.
 
-- [ ] **Step 6: Коміт і PR**
+- [x] **Step 6: Коміт і PR**
 
 ```bash
 git add -A && git commit -m "chore: remove legacy code, document the project and deploy via Convex on Netlify"
