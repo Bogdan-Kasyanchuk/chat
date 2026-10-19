@@ -60,17 +60,25 @@ export const emailStatus = internalQuery({
     }
 });
 
+const hasGoogleAccount = async (ctx: QueryCtx, userId: Id<'users'>) => await ctx.db
+    .query('authAccounts')
+    .withIndex('userIdAndProvider', q => q.eq('userId', userId).eq('provider', 'google'))
+    .first() !== null;
+
 // Пошук за точною поштою (як у Telegram): інших користувачів не видно.
-// Пошта не унікальна, тому беремо найстаріший акаунт
+// Пошта не унікальна (пароль і Google — окремі акаунти). Пошту з паролем ніхто не підтверджує, а Google — підтверджує,
+// тож перевага в акаунта з входом через Google; серед рівних — найстаріший (індекс упорядкований за _creationTime)
 export const findByEmail = query({
     args: { email: v.string() },
     handler: async (ctx, { email }) => {
         const myId = await requireUserId(ctx);
         const normalized = normalizeEmail(email);
-        const user = await ctx.db
+        const matches = await ctx.db
             .query('users')
             .withIndex('email', q => q.eq('email', normalized))
-            .first();
+            .collect();
+        const withGoogle = await Promise.all(matches.map(async match => hasGoogleAccount(ctx, match._id)));
+        const user = matches.find((_, index) => withGoogle[ index ]) ?? matches.at(0);
 
         if (!user || user._id === myId) {
             return null;

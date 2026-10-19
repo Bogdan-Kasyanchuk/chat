@@ -154,6 +154,34 @@ test('a reply to a message from another chat is rejected', async () => {
         .rejects.toThrow(MESSAGE_NOT_FOUND);
 });
 
+test('a reply to a message hidden for me or cleared by me is rejected', async () => {
+    const { t, alice, bob, chatId } = await pair();
+
+    await bob.client.mutation(api.chats.open, { userId: alice.userId });
+
+    const cleared = await bob.client.mutation(api.messages.send, { chatId, body: 'old' });
+
+    await t.run(async ctx => {
+        const mine = await ctx.db
+            .query('chatMembers')
+            .withIndex('by_chat', q => q.eq('chatId', chatId).eq('userId', alice.userId))
+            .unique();
+        const message = await ctx.db.get('messages', cleared);
+
+        await ctx.db.patch('chatMembers', mine!._id, { clearedAt: message!._creationTime });
+    });
+
+    const hidden = await bob.client.mutation(api.messages.send, { chatId, body: 'hidden' });
+
+    await alice.client.mutation(api.messages.remove, { messageIds: [ hidden ], forEveryone: false });
+
+    await expect(alice.client.mutation(api.messages.send, { chatId, body: 'y', replyToId: cleared }))
+        .rejects.toThrow(MESSAGE_NOT_FOUND);
+    await expect(alice.client.mutation(api.messages.send, { chatId, body: 'y', replyToId: hidden }))
+        .rejects.toThrow(MESSAGE_NOT_FOUND);
+    await expect(bob.client.mutation(api.messages.send, { chatId, body: 'y', replyToId: hidden })).resolves.toBeTruthy();
+});
+
 test('sending marks the chat read for the sender', async () => {
     const { t, alice, chatId } = await pair();
 

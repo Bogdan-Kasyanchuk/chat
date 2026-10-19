@@ -3,7 +3,7 @@ import { ConvexError, v } from 'convex/values';
 import type { Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import type { QueryCtx } from './_generated/server';
-import { requireUserId, userView } from './access';
+import { findMember, requireUserId, userView } from './access';
 import { CANNOT_ADD_SELF, USER_NOT_FOUND, pairKey } from './chatRules';
 
 const findContact = async (ctx: QueryCtx, ownerId: Id<'users'>, contactId: Id<'users'>) => ctx.db
@@ -30,8 +30,10 @@ export const list = query({
                 .query('chats')
                 .withIndex('by_pair', q => q.eq('pairKey', pairKey(myId, row.contactId)))
                 .unique();
+            // Чат, прихований для мене (співрозмовник лише відкрив його, або я його видалив), — ніби його немає
+            const mine = chat && await findMember(ctx, chat._id, myId);
 
-            return { ...view, userId: row.contactId, chatId: chat?._id ?? null };
+            return { ...view, userId: row.contactId, chatId: mine && !mine.hidden ? mine.chatId : null };
         }))).filter(item => item !== null);
 
         return items.sort((a, b) => a.name.localeCompare(b.name));

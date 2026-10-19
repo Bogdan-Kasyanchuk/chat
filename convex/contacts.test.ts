@@ -104,3 +104,27 @@ test('contacts.list skips a contact whose user no longer exists', async () => {
 
     expect(await alice.client.query(api.contacts.list, {})).toEqual([]);
 });
+
+test('contacts.list gives no chatId while the chat is hidden for me', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+
+    await alice.client.mutation(api.contacts.add, { userId: bob.userId });
+    await bob.client.mutation(api.contacts.add, { userId: alice.userId });
+
+    // Bob відкрив чат, але нічого не написав: рядок Alice прихований
+    const chatId = await bob.client.mutation(api.chats.open, { userId: alice.userId });
+
+    expect((await alice.client.query(api.contacts.list, {}))[ 0 ].chatId).toBeNull();
+    expect((await bob.client.query(api.contacts.list, {}))[ 0 ].chatId).toBe(chatId);
+
+    await alice.client.mutation(api.chats.open, { userId: bob.userId });
+
+    expect((await alice.client.query(api.contacts.list, {}))[ 0 ].chatId).toBe(chatId);
+
+    // «Видалити чат» для себе знову ховає його
+    await alice.client.mutation(api.chats.remove, { chatId, forEveryone: false });
+
+    expect((await alice.client.query(api.contacts.list, {}))[ 0 ].chatId).toBeNull();
+});

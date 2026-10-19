@@ -72,6 +72,13 @@ export const openChat = async (page: Page, name: string) => {
     await expect(page).toHaveURL(/\/chat\//);
 };
 
+// Клік по людині на вкладці контактів відкриває чат з нею
+export const openContact = async (page: Page, name: string) => {
+    await sidebarTab(page, 'Contacts');
+    await page.getByRole('button', { name: new RegExp(escapeRegExp(name)) }).click();
+    await expect(page).toHaveURL(/\/chat\//);
+};
+
 // Назад до списку: на телефоні — стрілка, на десктопі — Escape (закриває розмову)
 export const leaveChat = async (page: Page) => {
     if (isPhone()) {

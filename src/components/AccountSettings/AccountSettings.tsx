@@ -19,6 +19,7 @@ const AccountSettings: FC<AccountSettingsProps> = ({ onDeleted }) => {
     const deleteAccount = useMutation(api.users.deleteAccount);
     const navigate = useNavigate();
     const { logout, loading: loggingOut } = useLogout();
+    const [ confirmingLogout, setConfirmingLogout ] = useState(false);
     const [ confirming, setConfirming ] = useState(false);
     const [ deleting, setDeleting ] = useState(false);
 
@@ -44,9 +45,8 @@ const AccountSettings: FC<AccountSettingsProps> = ({ onDeleted }) => {
         <Stack>
             <Button
                 variant="default"
-                loading={ loggingOut }
                 onClick={ () => {
-                    void logout();
+                    setConfirmingLogout(true);
                 } }
             >
                 Log out
@@ -60,6 +60,20 @@ const AccountSettings: FC<AccountSettingsProps> = ({ onDeleted }) => {
             >
                 Delete account
             </Button>
+            <ConfirmModal
+                opened={ confirmingLogout }
+                title="Log out?"
+                confirmLabel="Log out"
+                loading={ loggingOut }
+                onConfirm={ () => {
+                    void logout();
+                } }
+                onClose={ () => {
+                    setConfirmingLogout(false);
+                } }
+            >
+                You will need to sign in again to read your messages.
+            </ConfirmModal>
             <ConfirmModal
                 opened={ confirming }
                 title="Delete account?"

@@ -324,6 +324,33 @@ test('delete chat for everyone removes the chat and members', async () => {
     expect(await t.run(async ctx => ctx.db.query('chats').collect())).toHaveLength(0);
 });
 
+test('a chat reopened while it is being deleted for everyone keeps only the new messages', async () => {
+    vi.useFakeTimers();
+
+    const { t, alice, bob, chatId } = await startChat();
+
+    await seed(t, chatId, bob.userId, 450);
+    await alice.client.mutation(api.chats.remove, { chatId, forEveryone: true });
+    vi.advanceTimersByTime(1);
+
+    // Порції ще видаляються, а Alice знову пише Bob: той самий чат, старі повідомлення не повертаються
+    expect(await alice.client.mutation(api.chats.open, { userId: bob.userId })).toBe(chatId);
+    expect((await alice.client.query(api.messages.list, { chatId, paginationOpts: { numItems: 50, cursor: null } })).page
+        .map(message => message.body)).toEqual([]);
+
+    await alice.client.mutation(api.messages.send, { chatId, body: 'again' });
+
+    expect((await bob.client.query(api.messages.list, { chatId, paginationOpts: { numItems: 50, cursor: null } })).page
+        .map(message => message.body)).toEqual([ 'again' ]);
+
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+
+    expect(await bodies(t, chatId)).toEqual([ 'again' ]);
+    expect(await t.run(async ctx => ctx.db.query('chatMembers').collect())).toHaveLength(2);
+    expect((await alice.client.query(api.chats.list, {})).map(chat => chat.lastMessage?.body)).toEqual([ 'again' ]);
+    expect((await bob.client.query(api.chats.list, {})).map(chat => chat.lastMessage?.body)).toEqual([ 'again' ]);
+});
+
 // Review Focus 5
 test('a chat deleted for me comes back with only the new messages', async () => {
     // Дата заморожена, щоб прогін не залежав від швидкості: convex-test дає _creationTime = Date.now() (ціле число),

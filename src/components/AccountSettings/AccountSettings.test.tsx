@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Route, Routes } from 'react-router';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -63,9 +63,17 @@ test('Delete account asks first, then deletes and signs out', async () => {
     expect(signOut).toHaveBeenCalled();
 });
 
-test('Log out uses the shared logout flow', async () => {
+test('Log out asks first, then uses the shared logout flow', async () => {
     renderWithProviders(<AccountSettings onDeleted={ vi.fn() } />);
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Log out' }));
+
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Log out' }));
+    expect(logout).not.toHaveBeenCalled();
+
+    const dialog = screen.getByRole('dialog', { name: 'Log out?' });
+
+    await user.click(within(dialog).getByRole('button', { name: 'Log out' }));
 
     expect(logout).toHaveBeenCalled();
 });

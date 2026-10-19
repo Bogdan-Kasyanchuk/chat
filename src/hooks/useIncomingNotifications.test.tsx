@@ -90,3 +90,34 @@ test('the open chat notifies when the tab is hidden', () => {
 
     expect(notifications.show).toHaveBeenCalledTimes(1);
 });
+
+test('a long message is cut in the toast', () => {
+    const long = (id: string) => {
+        const item = chat('a', id);
+
+        return { ...item, lastMessage: { ...item.lastMessage!, body: 'x'.repeat(500) } };
+    };
+    const { rerender } = renderHook(({ chats }) => {
+        useIncomingNotifications(chats, null);
+    }, {
+        initialProps: { chats: [ long('1') ] }
+    });
+
+    rerender({ chats: [ long('2') ] });
+
+    const { message } = vi.mocked(notifications.show).mock.calls[ 0 ][ 0 ];
+
+    expect(message).toBe(`${ 'x'.repeat(120) }…`);
+});
+
+test('a short message stays whole in the toast', () => {
+    const { rerender } = renderHook(({ chats }) => {
+        useIncomingNotifications(chats, null);
+    }, {
+        initialProps: { chats: [ chat('a', '1') ] }
+    });
+
+    rerender({ chats: [ chat('a', '2') ] });
+
+    expect(vi.mocked(notifications.show).mock.calls[ 0 ][ 0 ].message).toBe('text 2');
+});

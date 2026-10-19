@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { addContact, chatItem, leaveChat, message, messageMenu, newUserPage, openChat, sendMessage, signUp } from './helpers';
+import { addContact, chatItem, leaveChat, message, messageMenu, newUserPage, openChat, openContact, sendMessage, signUp } from './helpers';
 
 test('two people add each other, talk, reply, edit, forward and delete', async ({ page, browser }) => {
     const bob = await newUserPage(browser);
@@ -119,6 +119,38 @@ test('mute silences a chat and clear history empties it for me only', async ({ p
     await openChat(bob, 'Alice');
     await expect(message(bob, 'First')).toBeVisible();
     await expect(message(bob, 'Second')).toBeVisible();
+
+    await bob.context().close();
+});
+
+test('a chat deleted for me opens again from contacts, empty', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+    await sendMessage(page, 'Before');
+
+    const chatUrl = page.url();
+
+    await page.getByRole('button', { name: 'Chat settings' }).click();
+    await page.getByRole('menuitem', { name: 'Delete chat' }).click();
+    await page.getByRole('dialog', { name: 'Delete chat?' }).getByRole('button', { name: 'Delete' }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(chatItem(page, 'Bob')).toHaveCount(0);
+
+    // Той самий чат повертається з контактів, без старих повідомлень і без «Chat not found»
+    await openContact(page, 'Bob');
+    await expect(page).toHaveURL(chatUrl);
+    await expect(page.getByText('No messages here yet')).toBeVisible();
+    await expect(page.getByText('Chat not found')).toHaveCount(0);
+
+    await sendMessage(page, 'After');
+    await openChat(bob, 'Alice');
+    await expect(message(bob, 'Before')).toBeVisible();
+    await expect(message(bob, 'After')).toBeVisible();
 
     await bob.context().close();
 });

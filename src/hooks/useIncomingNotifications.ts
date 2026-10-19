@@ -10,6 +10,15 @@ import { playSound } from '@/lib/sounds';
 import type { ChatSummary } from '@/types/chat';
 import { api } from '@convex/_generated/api';
 
+const TOAST_LIMIT = 120;
+
+// Довге повідомлення в toast обрізаємо; за кодовими точками, щоб не розрізати емодзі навпіл
+const clip = (text: string): string => {
+    const chars = Array.from(text);
+
+    return chars.length > TOAST_LIMIT ? `${ chars.slice(0, TOAST_LIMIT).join('') }…` : text;
+};
+
 const useIncomingNotifications = (chats: ChatSummary[] | undefined, activeChatId: string | null): void => {
     const me = useQuery(api.users.me);
     const navigate = useNavigate();
@@ -47,7 +56,7 @@ const useIncomingNotifications = (chats: ChatSummary[] | undefined, activeChatId
             notifications.show({
                 id,
                 title: chat.partner.name,
-                message: chat.lastMessage?.body,
+                message: clip(chat.lastMessage?.body ?? ''),
                 icon: createElement(PresenceAvatar, { name: chat.partner.name, avatar: chat.partner.avatar, size: 32 }),
                 style: { cursor: 'pointer' },
                 onClick: () => {

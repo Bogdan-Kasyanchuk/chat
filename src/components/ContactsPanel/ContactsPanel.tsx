@@ -25,7 +25,8 @@ const ContactsPanel: FC<ContactsPanelProps> = ({ search }) => {
 
     const open = async (contact: ContactView) => {
         try {
-            const chatId = contact.chatId ?? await openChat({ userId: contact.userId });
+            // Завжди через open: чат може бути прихований для мене, і лише open повертає його в мій список
+            const chatId = await openChat({ userId: contact.userId });
 
             await navigate(`/chat/${ chatId }`);
         } catch (error) {

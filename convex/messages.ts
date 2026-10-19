@@ -117,26 +117,6 @@ export const list = query({
     }
 });
 
-export const send = mutation({
-    args: { chatId: v.id('chats'), body: v.string(), replyToId: v.optional(v.id('messages')) },
-    handler: async (ctx, { chatId, body, replyToId }) => {
-        const myId = await requireUserId(ctx);
-        await requireMember(ctx, chatId, myId);
-
-        const text = normalizeBody(body);
-
-        if (replyToId) {
-            const original = await ctx.db.get('messages', replyToId);
-
-            if (original?.chatId !== chatId) {
-                throw new ConvexError(MESSAGE_NOT_FOUND);
-            }
-        }
-
-        return insertMessage(ctx, { chatId, authorId: myId, body: text, replyToId });
-    }
-});
-
 // Повідомлення, яке я бачу: існує, чат мій і не прихований, не приховане для мене, не раніше за clearedAt
 const requireVisibleMessage = async (ctx: QueryCtx, messageId: Id<'messages'>, myId: Id<'users'>): Promise<Doc<'messages'>> => {
     const message = await ctx.db.get('messages', messageId);
@@ -153,6 +133,23 @@ const requireVisibleMessage = async (ctx: QueryCtx, messageId: Id<'messages'>, m
 
     return message;
 };
+
+export const send = mutation({
+    args: { chatId: v.id('chats'), body: v.string(), replyToId: v.optional(v.id('messages')) },
+    handler: async (ctx, { chatId, body, replyToId }) => {
+        const myId = await requireUserId(ctx);
+        await requireMember(ctx, chatId, myId);
+
+        const text = normalizeBody(body);
+
+        // Відповісти можна лише на те, що я бачу в цьому чаті
+        if (replyToId && (await requireVisibleMessage(ctx, replyToId, myId)).chatId !== chatId) {
+            throw new ConvexError(MESSAGE_NOT_FOUND);
+        }
+
+        return insertMessage(ctx, { chatId, authorId: myId, body: text, replyToId });
+    }
+});
 
 // Перевіряє розмір вибірки, прибирає дублі й віддає видимі повідомлення в порядку створення
 const requireSelection = async (ctx: QueryCtx, ids: Id<'messages'>[], myId: Id<'users'>): Promise<Doc<'messages'>[]> => {

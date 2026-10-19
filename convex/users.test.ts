@@ -161,6 +161,58 @@ test('findByEmail takes the oldest account when emails repeat and reports isCont
     });
 });
 
+// Пошта не перевіряється при реєстрації з паролем, тож акаунт, чию адресу підтвердив Google, надійніший
+const googleAccount = async (t: ReturnType<typeof setup>, userId: Id<'users'>) => {
+    await t.run(async ctx => {
+        await ctx.db.insert('authAccounts', { userId, provider: 'google', providerAccountId: `google-${ userId }` });
+    });
+};
+
+const passwordAccount = async (t: ReturnType<typeof setup>, userId: Id<'users'>, email: string) => {
+    await t.run(async ctx => {
+        await ctx.db.insert('authAccounts', { userId, provider: 'password', providerAccountId: email, secret: 'hash' });
+    });
+};
+
+test('findByEmail prefers the Google account over an older password account', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const google = await t.run(async ctx => ctx.db.insert('users', { name: 'Bob Google', email: 'bob@example.com' }));
+
+    await passwordAccount(t, bob.userId, 'bob@example.com');
+    await googleAccount(t, google);
+
+    expect(await alice.client.query(api.users.findByEmail, { email: 'bob@example.com' })).toMatchObject({
+        userId: google,
+        name: 'Bob Google'
+    });
+});
+
+test('findByEmail keeps the Google account when a password account comes later', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const password = await t.run(async ctx => ctx.db.insert('users', { name: 'Bob Password', email: 'bob@example.com' }));
+
+    await googleAccount(t, bob.userId);
+    await passwordAccount(t, password, 'bob@example.com');
+
+    expect(await alice.client.query(api.users.findByEmail, { email: 'bob@example.com' })).toMatchObject({ userId: bob.userId });
+});
+
+test('findByEmail takes the oldest of two Google accounts', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const second = await t.run(async ctx => ctx.db.insert('users', { name: 'Bob 2', email: 'bob@example.com' }));
+
+    await googleAccount(t, second);
+    await googleAccount(t, bob.userId);
+
+    expect(await alice.client.query(api.users.findByEmail, { email: 'bob@example.com' })).toMatchObject({ userId: bob.userId });
+});
+
 test('updateName trims and validates', async () => {
     const t = setup();
     const alice = await asUser(t, 'Alice');

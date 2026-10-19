@@ -222,10 +222,11 @@ export const remove = mutation({
 
         const theirs = await partnerOf(ctx, chatId, mine.userId);
 
-        await ctx.db.patch('chatMembers', mine._id, { hidden: true });
+        // clearedAt — на випадок, якщо чат знову відкриють до кінця видалення: старі повідомлення вже не видно
+        await ctx.db.patch('chatMembers', mine._id, { hidden: true, clearedAt: before });
 
         if (theirs) {
-            await ctx.db.patch('chatMembers', theirs._id, { hidden: true });
+            await ctx.db.patch('chatMembers', theirs._id, { hidden: true, clearedAt: before });
         }
 
         await ctx.scheduler.runAfter(0, internal.chats.deleteMessagesBatch, { chatId, deleteChat: true, before });
@@ -234,8 +235,10 @@ export const remove = mutation({
     }
 });
 
-// Видаляє повідомлення не новіші за before порціями по DELETE_BATCH. Нові, надіслані під час видалення, лишаються;
-// виняток — видалення чату, де зникає все. Викликається й з каскаду видалення акаунта
+// Видаляє повідомлення не новіші за before порціями по DELETE_BATCH. Нові, надіслані під час видалення, лишаються.
+// Видалення чату наприкінці прибирає й чат: якщо його ніхто не відкрив знову — разом з усім, що лишилось;
+// якщо хтось відкрив (рядок учасника вже не прихований) — чат живий і лишається з новими повідомленнями.
+// Викликається й з каскаду видалення акаунта
 export const deleteMessagesBatch = internalMutation({
     args: { chatId: v.id('chats'), deleteChat: v.boolean(), before: v.number() },
     handler: async (ctx, { chatId, deleteChat, before }) => {
@@ -258,15 +261,19 @@ export const deleteMessagesBatch = internalMutation({
             return null;
         }
 
-        // Усе, що надійшло після before, теж іде разом із чатом
-        for await (const message of ctx.db.query('messages').withIndex('by_chat', q => q.eq('chatId', chatId))) {
-            await ctx.db.delete('messages', message._id);
-        }
-
         const members = await ctx.db
             .query('chatMembers')
             .withIndex('by_chat', q => q.eq('chatId', chatId))
             .collect();
+
+        if (members.some(member => !member.hidden)) {
+            return null;
+        }
+
+        // Ніхто не повернувся: усе, що надійшло після before, теж іде разом із чатом
+        for await (const message of ctx.db.query('messages').withIndex('by_chat', q => q.eq('chatId', chatId))) {
+            await ctx.db.delete('messages', message._id);
+        }
 
         for (const member of members) {
             await ctx.db.delete('chatMembers', member._id);
