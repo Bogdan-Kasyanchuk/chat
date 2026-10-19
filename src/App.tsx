@@ -4,6 +4,7 @@ import type { FC } from 'react';
 import { Route, Routes } from 'react-router';
 
 import ChatLayout from '@/components/ChatLayout';
+import ConversationPage from '@/pages/ConversationPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import SignInPage from '@/pages/SignInPage';
 import SignUpPage from '@/pages/SignUpPage';
@@ -32,14 +33,15 @@ const App: FC = () => {
                 path="/signup"
                 element={ <PublicRoute restricted><SignUpPage /></PublicRoute> }
             />
+            { /* ChatLayout сам вирішує, що показати на «/»: список (телефон) чи EmptyChat (десктоп) */ }
             <Route element={ <PrivateRoute><ChatLayout /></PrivateRoute> }>
                 <Route
                     path="/"
-                    element={ <p>Chat</p> }
+                    element={ null }
                 />
                 <Route
                     path="/chat/:chatId"
-                    element={ <p>Chat</p> }
+                    element={ <ConversationPage /> }
                 />
             </Route>
             <Route

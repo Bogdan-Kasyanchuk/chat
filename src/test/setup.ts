@@ -16,6 +16,11 @@ globalThis.ResizeObserver = class {
     disconnect() {}
 };
 HTMLMediaElement.prototype.play = () => Promise.resolve();
+// Textarea autosize Mantine слухає завантаження шрифтів
+Object.defineProperty(document, 'fonts', {
+    value: { addEventListener: () => {}, removeEventListener: () => {} },
+    configurable: true
+});
 
 beforeEach(() => {
     mockViewport(false);

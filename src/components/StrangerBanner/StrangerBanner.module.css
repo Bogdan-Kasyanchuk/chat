@@ -1,0 +1,10 @@
+.banner {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--mantine-spacing-sm);
+    padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+    border-bottom: 1px solid var(--mantine-color-gray-3);
+    background-color: var(--mantine-color-gray-1);
+}

@@ -1,0 +1,7 @@
+.divider {
+    margin-block: var(--mantine-spacing-xs);
+    padding: 4px 0;
+    text-align: center;
+    color: var(--mantine-color-gray-7);
+    background-color: var(--mantine-color-gray-2);
+}
