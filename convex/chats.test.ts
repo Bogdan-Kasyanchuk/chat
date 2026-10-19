@@ -163,3 +163,34 @@ test('chats.get returns the partner with isContact, or null for a hidden chat', 
     expect((await alice.client.query(api.chats.get, { chatId }))?.partner.isContact).toBe(true);
     expect(await bob.client.query(api.chats.get, { chatId })).toBeNull();
 });
+
+test('unread and lastMessage ignore messages before clearedAt and hidden for me', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const chatId = await alice.client.mutation(api.chats.open, { userId: bob.userId });
+
+    await bob.client.mutation(api.chats.open, { userId: alice.userId });
+
+    const old = await bob.client.mutation(api.messages.send, { chatId, body: 'old' });
+
+    await bob.client.mutation(api.messages.send, { chatId, body: 'kept' });
+
+    const hidden = await bob.client.mutation(api.messages.send, { chatId, body: 'hidden' });
+
+    await t.run(async ctx => {
+        const oldMessage = await ctx.db.get('messages', old);
+        const member = await ctx.db
+            .query('chatMembers')
+            .withIndex('by_chat', q => q.eq('chatId', chatId).eq('userId', alice.userId))
+            .unique();
+
+        await ctx.db.patch('messages', hidden, { hiddenFor: [ alice.userId ] });
+        await ctx.db.patch('chatMembers', member!._id, { clearedAt: oldMessage!._creationTime, lastReadAt: 0 });
+    });
+
+    const [ summary ] = await alice.client.query(api.chats.list, {});
+
+    expect(summary.unread).toBe(1);
+    expect(summary.lastMessage?.body).toBe('kept');
+});

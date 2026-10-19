@@ -56,7 +56,7 @@ export const partnerIdOf = (chat: Doc<'chats'>, userId: Id<'users'>): Id<'users'
     return partnerId as Id<'users'>;
 };
 
-const findMember = async (ctx: QueryCtx, chatId: Id<'chats'>, userId: Id<'users'>) => ctx.db
+export const findMember = async (ctx: QueryCtx, chatId: Id<'chats'>, userId: Id<'users'>) => ctx.db
     .query('chatMembers')
     .withIndex('by_chat', q => q.eq('chatId', chatId).eq('userId', userId))
     .unique();
@@ -81,4 +81,16 @@ export const partnerOf = async (ctx: QueryCtx, chatId: Id<'chats'>, userId: Id<'
     }
 
     return findMember(ctx, chatId, partnerIdOf(chat, userId));
+};
+
+// Мітка «прочитано/очищено до цього моменту». _creationTime має дробову частину, тож без max
+// повідомлення з тієї самої мілісекунди, що й Date.now(), лишилось би по інший бік мітки
+export const readMark = async (ctx: QueryCtx, chatId: Id<'chats'>): Promise<number> => {
+    const latest = await ctx.db
+        .query('messages')
+        .withIndex('by_chat', q => q.eq('chatId', chatId))
+        .order('desc')
+        .first();
+
+    return Math.max(Date.now(), latest?._creationTime ?? 0);
 };

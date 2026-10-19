@@ -1,3 +1,4 @@
+import { getAuthUserId } from '@convex-dev/auth/server';
 import { v } from 'convex/values';
 
 import { internalQuery, query } from './_generated/server';
@@ -9,7 +10,7 @@ import { DEFAULT_SOUND } from './chatRules';
 export const me = query({
     args: {},
     handler: async ctx => {
-        const userId = await requireUserId(ctx).catch(() => null);
+        const userId = await getAuthUserId(ctx);
 
         if (userId === null) {
             return null;

@@ -3,7 +3,7 @@ import { ConvexError, v } from 'convex/values';
 import type { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import type { QueryCtx } from './_generated/server';
-import { partnerIdOf, partnerOf, requireMember, requireUserId, userView } from './access';
+import { findMember, partnerIdOf, partnerOf, readMark, requireMember, requireUserId, userView } from './access';
 import type { UserView } from './access';
 import { CANNOT_ADD_SELF, USER_NOT_FOUND, pairKey } from './chatRules';
 
@@ -150,9 +150,9 @@ export const get = query({
             return null;
         }
 
-        const mine = await requireMember(ctx, chatId, myId).catch(() => null);
+        const mine = await findMember(ctx, chatId, myId);
 
-        if (!mine) {
+        if (!mine || mine.hidden) {
             return null;
         }
 
@@ -172,14 +172,7 @@ export const markRead = mutation({
         const myId = await requireUserId(ctx);
         const mine = await requireMember(ctx, chatId, myId);
 
-        // _creationTime має дробову частину: без max повідомлення з цієї ж мілісекунди лишилось би непрочитаним
-        const latest = await ctx.db
-            .query('messages')
-            .withIndex('by_chat', q => q.eq('chatId', chatId))
-            .order('desc')
-            .first();
-
-        await ctx.db.patch('chatMembers', mine._id, { lastReadAt: Math.max(Date.now(), latest?._creationTime ?? 0) });
+        await ctx.db.patch('chatMembers', mine._id, { lastReadAt: await readMark(ctx, chatId) });
 
         return null;
     }
