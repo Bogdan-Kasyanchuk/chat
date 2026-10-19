@@ -18,7 +18,8 @@
         "lint:fix": "eslint . --fix",
         "prepare": "husky",
         "test": "vitest",
-        "test:once": "vitest run"
+        "test:once": "vitest run",
+        "test:e2e": "playwright test"
     },
     "lint-staged": {
         "*.{ts,tsx,mjs}": "eslint --fix"
@@ -44,6 +45,7 @@
     "devDependencies": {
         "@edge-runtime/vm": "^5.0.0",
         "@eslint/js": "^9.39.5",
+        "@playwright/test": "^1.64.1",
         "@stylistic/eslint-plugin": "^5.10.0",
         "@testing-library/dom": "^10.4.2",
         "@testing-library/react": "^16.3.3",
