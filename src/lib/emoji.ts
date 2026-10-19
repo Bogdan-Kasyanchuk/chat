@@ -3,7 +3,15 @@ export const SKIN_TONE_KEY = 'chat-emoji-skin-tone';
 export const MAX_RECENT_EMOJI = 18;
 
 const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' });
-const EMOJI_START = /^(?:\p{Extended_Pictographic}|\p{Regional_Indicator})/u;
+const FLAG = /^\p{Regional_Indicator}{2}$/u;
+const REGIONAL = /^\p{Regional_Indicator}+$/u;
+const EMOJI_PRESENTATION = /\p{Emoji_Presentation}/u;
+// ©, ®, ™ мають Extended_Pictographic, але стають емодзі лише з селектором U+FE0F
+const PICTOGRAPHIC_VS16 = /\p{Extended_Pictographic}\uFE0F/u;
+
+const isEmoji = (grapheme: string): boolean => REGIONAL.test(grapheme)
+    ? FLAG.test(grapheme)
+    : EMOJI_PRESENTATION.test(grapheme) || PICTOGRAPHIC_VS16.test(grapheme);
 
 export const insertAtCursor = (value: string, start: number, end: number, insert: string, maxLength: number): { value: string, caret: number } => {
     const next = value.slice(0, start) + insert + value.slice(end);
@@ -19,7 +27,7 @@ export const insertAtCursor = (value: string, start: number, end: number, insert
 export const emojiOnlyCount = (text: string): number => {
     const graphemes = Array.from(segmenter.segment(text.replace(/\s+/gu, '')), part => part.segment);
 
-    return graphemes.length > 0 && graphemes.every(grapheme => EMOJI_START.test(grapheme)) ? graphemes.length : 0;
+    return graphemes.length > 0 && graphemes.every(isEmoji) ? graphemes.length : 0;
 };
 
 export const pushRecent = (list: string[], emoji: string): string[] => [ emoji, ...list.filter(item => item !== emoji) ].slice(0, MAX_RECENT_EMOJI);

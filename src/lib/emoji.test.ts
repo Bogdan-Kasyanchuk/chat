@@ -25,6 +25,10 @@ test('emojiOnlyCount', () => {
     expect(emojiOnlyCount('ok 👍')).toBe(0);
     expect(emojiOnlyCount('123')).toBe(0);
     expect(emojiOnlyCount('')).toBe(0);
+    expect(emojiOnlyCount('©')).toBe(0);
+    expect(emojiOnlyCount('©\uFE0F')).toBe(1);
+    expect(emojiOnlyCount('❤\uFE0F')).toBe(1);
+    expect(emojiOnlyCount('™')).toBe(0);
 });
 
 test('pushRecent moves a repeat to the front and keeps 18', () => {

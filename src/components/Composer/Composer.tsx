@@ -109,8 +109,11 @@ const Composer: FC<ComposerProps> = ({ disabled, replyTo, editing, onCancel, onS
         const end = field?.selectionEnd ?? value.length;
         const result = insertAtCursor(value, start, end, emoji, MAX_MESSAGE_LENGTH);
 
-        caretRef.current = result.caret;
-        setValue(result.value);
+        // Відхилена вставка значення не змінює: застарілий курсор не ставимо
+        if (result.value !== value) {
+            caretRef.current = result.caret;
+            setValue(result.value);
+        }
     };
 
     const togglePhonePicker = () => {
@@ -139,6 +142,9 @@ const Composer: FC<ComposerProps> = ({ disabled, replyTo, editing, onCancel, onS
             className={ classes.composer }
             onKeyDown={ event => {
                 if (event.key === 'Escape' && pickerOpen) {
+                    // Escape тут належить панелі: розмова (відповідь, вихід із чату) його не бачить
+                    event.preventDefault();
+                    event.stopPropagation();
                     setPickerOpen(false);
                 }
             } }
@@ -223,6 +229,12 @@ const Composer: FC<ComposerProps> = ({ disabled, replyTo, editing, onCancel, onS
                         setValue(event.currentTarget.value);
                     } }
                     onKeyDown={ onKeyDown }
+                    onFocus={ () => {
+                        // На телефоні клавіатура й панель разом не показуються
+                        if (!isDesktop) {
+                            setPickerOpen(false);
+                        }
+                    } }
                 />
                 <ActionIcon
                     aria-label="Send"

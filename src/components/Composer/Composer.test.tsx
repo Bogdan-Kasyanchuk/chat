@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, test, vi } from 'vitest';
 
@@ -230,4 +230,39 @@ test('Escape closes the picker without clearing the draft', async () => {
 
     expect(screen.getByRole('button', { name: 'Emoji' }).getAttribute('aria-expanded')).toBe('false');
     expect(field.value).toBe('Draft');
+});
+
+test('a refused emoji at the limit leaves no stale caret for the next typing', async () => {
+    mockViewport(true);
+    renderComposer();
+    const user = userEvent.setup();
+    const field = screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Message' });
+
+    fireEvent.change(field, { target: { value: 'a'.repeat(4096) } });
+    field.setSelectionRange(0, 0);
+    await user.click(screen.getByRole('button', { name: 'Emoji' }));
+    await user.click(screen.getByRole('button', { name: '😀' }));
+
+    expect(field.value).toHaveLength(4096);
+
+    await user.click(field);
+    field.setSelectionRange(4096, 4096);
+    await user.keyboard('{Backspace}b');
+
+    expect(field.value).toBe(`${ 'a'.repeat(4095) }b`);
+});
+
+test('on a phone focusing the field closes the panel', async () => {
+    mockViewport(false);
+    renderComposer();
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Emoji' }));
+
+    expect(screen.getByRole('button', { name: 'Show keyboard' })).toBeTruthy();
+
+    await user.click(screen.getByRole('textbox', { name: 'Message' }));
+
+    expect(screen.getByRole('button', { name: 'Emoji' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: '😀' })).toBeNull();
 });

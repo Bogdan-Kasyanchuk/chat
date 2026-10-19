@@ -53,6 +53,8 @@ const mutations: Record<string, typeof send> = {
     'chats:remove': removeChat
 };
 
+vi.mock('frimousse', async () => (await import('@/test/frimousseMock')).frimousseMock);
+
 vi.mock('convex/react', () => ({
     useQuery: (ref: FunctionReference<'query'>) => {
         if ([ 'chats:list', 'contacts:list' ].includes(getFunctionName(ref))) {
@@ -497,4 +499,28 @@ test('Editing a message that disappeared ends and gives the draft back', async (
 
     expect(screen.queryByText('Edit message')).toBeNull();
     expect(field.value).toBe('Draft');
+});
+
+test('Escape with the emoji panel open closes only the panel; the next one cancels the reply', async () => {
+    chat = makeChat();
+    messages = [ message('m1', 'Lunch?') ];
+    renderPage();
+
+    const user = userEvent.setup();
+
+    await user.dblClick(screen.getByText('Lunch?'));
+    await user.click(screen.getByRole('button', { name: 'Emoji' }));
+
+    expect(screen.getByRole('button', { name: '😀' })).toBeTruthy();
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByRole('button', { name: '😀' })).toBeNull();
+    expect(screen.getByText('Reply to Bob')).toBeTruthy();
+    expect(screen.queryByText('home page')).toBeNull();
+
+    await user.keyboard('{Escape}');
+
+    expect(screen.queryByText('Reply to Bob')).toBeNull();
+    expect(screen.queryByText('home page')).toBeNull();
 });
