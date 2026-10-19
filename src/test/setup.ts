@@ -1,4 +1,5 @@
-import { beforeEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import { afterEach, beforeEach } from 'vitest';
 
 import { mockViewport } from './viewport';
 
@@ -18,4 +19,8 @@ HTMLMediaElement.prototype.play = () => Promise.resolve();
 
 beforeEach(() => {
     mockViewport(false);
+});
+
+afterEach(() => {
+    cleanup();
 });
