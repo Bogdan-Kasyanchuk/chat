@@ -73,6 +73,19 @@ test('ChatListItem greys the badge of a muted chat', () => {
         />
     );
 
-    expect(screen.getByText('3').closest('[data-muted]')).toBeTruthy();
+    expect(screen.getByText('3').closest('.mantine-Badge-root')?.hasAttribute('data-muted')).toBe(true);
     expect(screen.getByLabelText('Muted')).toBeTruthy();
+});
+
+test('ChatListItem keeps the badge of an unmuted chat dark', () => {
+    renderWithProviders(
+        <ChatListItem
+            chat={ makeChat({ unread: 3 }) }
+            active={ false }
+            now={ now }
+        />
+    );
+
+    expect(screen.getByText('3').closest('.mantine-Badge-root')?.hasAttribute('data-muted')).toBe(false);
+    expect(screen.queryByLabelText('Muted')).toBeNull();
 });

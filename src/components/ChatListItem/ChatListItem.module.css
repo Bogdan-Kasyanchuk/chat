@@ -36,3 +36,7 @@
 .preview {
     min-width: 0;
 }
+
+.time {
+    flex-shrink: 0;
+}

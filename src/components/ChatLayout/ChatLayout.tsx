@@ -17,7 +17,7 @@ const ChatLayout: FC = () => {
     // Телефон: або список на «/», або чат; десктоп: список і чат поруч
     if (!isDesktop) {
         return inChat
-            ? <div className={ classes.main }><Outlet /></div>
+            ? <main className={ classes.main }><Outlet /></main>
             : <div className={ classes.sidebar }><Sidebar /></div>;
     }
 

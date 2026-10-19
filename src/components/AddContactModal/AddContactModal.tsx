@@ -26,6 +26,7 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
     const [ searched, setSearched ] = useState(false);
     const [ error, setError ] = useState<string | null>(null);
     const [ busy, setBusy ] = useState(false);
+    const [ acting, setActing ] = useState(false);
 
     const reset = () => {
         setEmail('');
@@ -57,22 +58,28 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
     };
 
     const add = async () => {
-        if (!found) {
+        if (!found || acting) {
             return;
         }
+
+        setActing(true);
 
         try {
             await addContact({ userId: found.userId });
             setFound({ ...found, isContact: true });
         } catch (e) {
             notifications.show({ color: 'red', message: errorMessage(e) });
+        } finally {
+            setActing(false);
         }
     };
 
     const message = async () => {
-        if (!found) {
+        if (!found || acting) {
             return;
         }
+
+        setActing(true);
 
         try {
             const chatId = await openChat({ userId: found.userId });
@@ -81,6 +88,8 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
             await navigate(`/chat/${ chatId }`);
         } catch (e) {
             notifications.show({ color: 'red', message: errorMessage(e) });
+        } finally {
+            setActing(false);
         }
     };
 
@@ -149,7 +158,7 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
                     <Group grow>
                         <Button
                             variant="default"
-                            disabled={ found.isContact }
+                            disabled={ found.isContact || acting }
                             onClick={ () => {
                                 void add();
                             } }
@@ -157,6 +166,7 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
                             { found.isContact ? 'In contacts' : 'Add to contacts' }
                         </Button>
                         <Button
+                            disabled={ acting }
                             onClick={ () => {
                                 void message();
                             } }

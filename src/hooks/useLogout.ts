@@ -1,8 +1,10 @@
 import { useAuthActions } from '@convex-dev/auth/react';
+import { notifications } from '@mantine/notifications';
 import { useMutation } from 'convex/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
+import errorMessage from '@/lib/errorMessage';
 import { api } from '@convex/_generated/api';
 
 // Вихід: позначаємо себе офлайн (не критично), закриваємо сесію, ведемо на /login
@@ -19,6 +21,8 @@ const useLogout = () => {
             await disconnect().catch(() => {});
             await signOut();
             await navigate('/login', { replace: true });
+        } catch (error) {
+            notifications.show({ color: 'red', message: errorMessage(error) });
         } finally {
             setLoading(false);
         }

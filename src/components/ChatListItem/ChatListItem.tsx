@@ -44,8 +44,8 @@ const ChatListItem: FC<ChatListItemProps> = ({ chat, active, now }) => {
                     { lastMessage && (
                         <Text
                             size="xs"
+                            className={ classes.time }
                             c="dimmed"
-                            style={ { flexShrink: 0 } }
                         >
                             { formatListTime(lastMessage.createdAt, now) }
                         </Text>
