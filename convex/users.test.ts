@@ -1,8 +1,9 @@
-import { expect, test } from 'vitest';
+import { expect, test, vi } from 'vitest';
 
 import { api, internal } from './_generated/api';
+import type { Id } from './_generated/dataModel';
 import { createOrUpdateUser } from './auth';
-import { NOT_SIGNED_IN } from './chatRules';
+import { ACCOUNT_DELETED, AVATAR_NOT_FOUND, AVATAR_TOO_BIG, AVATAR_TYPE, MAX_AVATAR_BYTES, NOT_SIGNED_IN } from './chatRules';
 import { asUser, setup } from './test.setup';
 
 test('me returns null for an anonymous visitor', async () => {
@@ -154,4 +155,222 @@ test('findByEmail takes the oldest account when emails repeat and reports isCont
         userId: bob.userId,
         isContact: true
     });
+});
+
+test('updateName trims and validates', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+
+    await alice.client.mutation(api.users.updateName, { name: '  Al  ' });
+
+    expect((await alice.client.query(api.users.me, {}))?.name).toBe('Al');
+    await expect(alice.client.mutation(api.users.updateName, { name: '   ' })).rejects.toThrow('Name is required');
+    await expect(t.mutation(api.users.updateName, { name: 'Al' })).rejects.toThrow(NOT_SIGNED_IN);
+});
+
+// convex-test не записує contentType у метадані _storage, тож дописуємо його вручну
+const storeFile = async (t: ReturnType<typeof setup>, type: string, size = 1) => t.run(async ctx => {
+    const id = await ctx.storage.store(new Blob([ new Uint8Array(size) ], { type }));
+
+    await ctx.db.patch('_storage' as never, id as never, { contentType: type } as never);
+
+    return id;
+});
+
+const fileExists = async (t: ReturnType<typeof setup>, storageId: Id<'_storage'>) => t.run(async ctx => await ctx.db.system.get('_storage', storageId) !== null);
+
+test('generateAvatarUploadUrl returns a URL for a signed-in user only', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+
+    expect(typeof await alice.client.mutation(api.users.generateAvatarUploadUrl, {})).toBe('string');
+    await expect(t.mutation(api.users.generateAvatarUploadUrl, {})).rejects.toThrow(NOT_SIGNED_IN);
+});
+
+test('setAvatar replaces and deletes the previous file', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const first = await storeFile(t, 'image/png');
+    const second = await storeFile(t, 'image/webp');
+
+    await alice.client.action(api.users.setAvatar, { storageId: first });
+    await alice.client.action(api.users.setAvatar, { storageId: second });
+
+    const url = await t.run(async ctx => ctx.storage.getUrl(second));
+
+    expect((await alice.client.query(api.users.me, {}))?.avatar).toBe(url);
+    expect(await fileExists(t, first)).toBe(false);
+    expect(await fileExists(t, second)).toBe(true);
+});
+
+test('setAvatar keeps the file when the same one is set again', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const file = await storeFile(t, 'image/png');
+
+    await alice.client.action(api.users.setAvatar, { storageId: file });
+    await alice.client.action(api.users.setAvatar, { storageId: file });
+
+    expect(await fileExists(t, file)).toBe(true);
+});
+
+test('setAvatar rejects a non-image and deletes the upload', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const file = await storeFile(t, 'text/plain');
+
+    await expect(alice.client.action(api.users.setAvatar, { storageId: file })).rejects.toThrow(AVATAR_TYPE);
+    expect(await fileExists(t, file)).toBe(false);
+});
+
+test('setAvatar rejects files over 5 MB', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const file = await storeFile(t, 'image/png', MAX_AVATAR_BYTES + 1);
+
+    await expect(alice.client.action(api.users.setAvatar, { storageId: file })).rejects.toThrow(AVATAR_TOO_BIG);
+    expect(await fileExists(t, file)).toBe(false);
+});
+
+test('setAvatar rejects an unknown file', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const file = await storeFile(t, 'image/png');
+
+    await t.run(async ctx => ctx.storage.delete(file));
+
+    await expect(alice.client.action(api.users.setAvatar, { storageId: file })).rejects.toThrow(AVATAR_NOT_FOUND);
+});
+
+test('setAvatar(null) falls back to initials', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const file = await storeFile(t, 'image/png');
+
+    await alice.client.action(api.users.setAvatar, { storageId: file });
+    await alice.client.action(api.users.setAvatar, { storageId: null });
+
+    expect((await alice.client.query(api.users.me, {}))?.avatar).toBeNull();
+    expect(await fileExists(t, file)).toBe(false);
+});
+
+test('setSound stores the choice', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+
+    await alice.client.mutation(api.users.setSound, { sound: 'pop' });
+
+    expect((await alice.client.query(api.users.me, {}))?.sound).toBe('pop');
+    await expect(alice.client.mutation(api.users.setSound, { sound: 'bad' as never })).rejects.toThrow();
+});
+
+// Review Focus 4
+test('after deleting an account the partner keeps the chat as Deleted account and cannot send', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+
+    await alice.client.mutation(api.contacts.add, { userId: bob.userId });
+    await bob.client.mutation(api.contacts.add, { userId: alice.userId });
+
+    const chatId = await alice.client.mutation(api.chats.open, { userId: bob.userId });
+
+    await alice.client.mutation(api.messages.send, { chatId, body: 'hi' });
+    await bob.client.mutation(api.messages.send, { chatId, body: 'hello' });
+    await bob.client.mutation(api.users.deleteAccount, {});
+
+    const [ item ] = await alice.client.query(api.chats.list, {});
+
+    expect(item.partner).toMatchObject({ userId: null, name: 'Deleted account', avatar: null });
+    expect(await alice.client.query(api.contacts.list, {})).toEqual([]);
+
+    const page = await alice.client.query(api.messages.list, { chatId, paginationOpts: { numItems: 10, cursor: null } });
+
+    expect(page.page.map(message => message.body)).toContain('hello');
+    await expect(alice.client.mutation(api.messages.send, { chatId, body: 'still there?' })).rejects.toThrow(ACCOUNT_DELETED);
+    expect((await alice.client.query(api.chats.get, { chatId }))?.canSend).toBe(false);
+});
+
+test('deleteAccount removes sessions so the old token is useless', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const other = await asUser(t, 'Bob');
+    const rows = await t.run(async ctx => {
+        const make = async (userId: Id<'users'>) => {
+            const sessionId = await ctx.db.insert('authSessions', { userId, expirationTime: Date.now() + 1000 });
+
+            await ctx.db.insert('authRefreshTokens', { sessionId, expirationTime: Date.now() + 1000 });
+            await ctx.db.insert('authVerifiers', { sessionId });
+
+            return sessionId;
+        };
+        const accountId = await ctx.db.insert('authAccounts', { userId: alice.userId, provider: 'password', providerAccountId: 'alice@example.com' });
+
+        await ctx.db.insert('authVerificationCodes', { accountId, provider: 'password', code: 'c', expirationTime: Date.now() + 1000 });
+
+        return { mine: await make(alice.userId), theirs: await make(other.userId) };
+    });
+
+    await alice.client.mutation(api.users.deleteAccount, {});
+
+    const left = await t.run(async ctx => ({
+        sessions: await ctx.db.query('authSessions').withIndex('userId', q => q.eq('userId', alice.userId)).collect(),
+        tokens: await ctx.db.query('authRefreshTokens').withIndex('sessionId', q => q.eq('sessionId', rows.mine)).collect(),
+        accounts: await ctx.db.query('authAccounts').collect(),
+        codes: await ctx.db.query('authVerificationCodes').collect(),
+        verifiers: await ctx.db.query('authVerifiers').collect(),
+        theirTokens: await ctx.db.query('authRefreshTokens').withIndex('sessionId', q => q.eq('sessionId', rows.theirs)).collect(),
+        user: await ctx.db.get('users', alice.userId)
+    }));
+
+    expect(left.sessions).toEqual([]);
+    expect(left.tokens).toEqual([]);
+    expect(left.accounts).toEqual([]);
+    expect(left.codes).toEqual([]);
+    expect(left.verifiers.map(verifier => verifier.sessionId)).toEqual([ rows.theirs ]);
+    expect(left.theirTokens).toHaveLength(1);
+    expect(left.user).toBeNull();
+});
+
+test('deleteAccount cleans presence, avatar, contacts and a chat nobody is left in', async () => {
+    vi.useFakeTimers();
+
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const file = await storeFile(t, 'image/png');
+
+    await alice.client.action(api.users.setAvatar, { storageId: file });
+    await alice.client.mutation(api.presence.heartbeat, {});
+    await bob.client.mutation(api.contacts.add, { userId: alice.userId });
+
+    const chatId = await alice.client.mutation(api.chats.open, { userId: bob.userId });
+
+    await alice.client.mutation(api.messages.send, { chatId, body: 'hi' });
+    await alice.client.mutation(api.users.deleteAccount, {});
+    await bob.client.mutation(api.users.deleteAccount, {});
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+
+    const left = await t.run(async ctx => ({
+        presence: await ctx.db.query('presence').collect(),
+        contacts: await ctx.db.query('contacts').collect(),
+        members: await ctx.db.query('chatMembers').collect(),
+        messages: await ctx.db.query('messages').collect(),
+        chats: await ctx.db.query('chats').collect()
+    }));
+
+    vi.useRealTimers();
+
+    expect(left).toEqual({ presence: [], contacts: [], members: [], messages: [], chats: [] });
+    expect(await fileExists(t, file)).toBe(false);
+});
+
+test('deleteAccount works for a user with no presence, avatar or chats', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+
+    await alice.client.mutation(api.users.deleteAccount, {});
+
+    expect(await t.run(async ctx => ctx.db.get('users', alice.userId))).toBeNull();
+    await expect(t.mutation(api.users.deleteAccount, {})).rejects.toThrow(NOT_SIGNED_IN);
 });

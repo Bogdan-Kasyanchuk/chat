@@ -1,7 +1,7 @@
 import { afterEach, expect, test, vi } from 'vitest';
 
 import { api } from './_generated/api';
-import { CANNOT_ADD_SELF, DELETED_ACCOUNT, USER_NOT_FOUND } from './chatRules';
+import { CANNOT_ADD_SELF, USER_NOT_FOUND } from './chatRules';
 import { asUser, setup } from './test.setup';
 
 afterEach(() => {
@@ -94,7 +94,7 @@ test('contacts.list links an existing chat', async () => {
     expect(contact.chatId).toBe(chatId);
 });
 
-test('a deleted contact is listed as a deleted account', async () => {
+test('contacts.list skips a contact whose user no longer exists', async () => {
     const t = setup();
     const alice = await asUser(t, 'Alice');
     const bob = await asUser(t, 'Bob');
@@ -102,7 +102,5 @@ test('a deleted contact is listed as a deleted account', async () => {
     await alice.client.mutation(api.contacts.add, { userId: bob.userId });
     await t.run(async ctx => ctx.db.delete('users', bob.userId));
 
-    const [ contact ] = await alice.client.query(api.contacts.list, {});
-
-    expect(contact).toMatchObject({ userId: null, name: DELETED_ACCOUNT, avatar: null, online: false });
+    expect(await alice.client.query(api.contacts.list, {})).toEqual([]);
 });

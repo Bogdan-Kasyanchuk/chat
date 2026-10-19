@@ -48,6 +48,8 @@ export const AVATAR_TYPE = 'Upload a PNG, JPEG, WebP or GIF image';
 
 export const AVATAR_TOO_BIG = 'Image must be 5 MB or smaller';
 
+export const AVATAR_NOT_FOUND = 'Upload failed. Try again';
+
 export const DELETED_ACCOUNT = 'Deleted account';
 
 export const DELETED_MESSAGE = 'Deleted message';

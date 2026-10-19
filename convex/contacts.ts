@@ -19,15 +19,20 @@ export const list = query({
             .query('contacts')
             .withIndex('by_owner', q => q.eq('ownerId', myId))
             .collect();
-        const items = await Promise.all(rows.map(async row => {
+        const items = (await Promise.all(rows.map(async row => {
+            // Після каскаду видалення акаунта контактів на нього не лишається; рядок без користувача пропускаємо
+            if (!await ctx.db.get('users', row.contactId)) {
+                return null;
+            }
+
             const view = await userView(ctx, row.contactId);
             const chat = await ctx.db
                 .query('chats')
                 .withIndex('by_pair', q => q.eq('pairKey', pairKey(myId, row.contactId)))
                 .unique();
 
-            return { ...view, chatId: chat?._id ?? null };
-        }));
+            return { ...view, userId: row.contactId, chatId: chat?._id ?? null };
+        }))).filter(item => item !== null);
 
         return items.sort((a, b) => a.name.localeCompare(b.name));
     }

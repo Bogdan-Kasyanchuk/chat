@@ -11,6 +11,7 @@
 import type * as access from "../access.js";
 import type * as auth from "../auth.js";
 import type * as authRules from "../authRules.js";
+import type * as cascade from "../cascade.js";
 import type * as chatRules from "../chatRules.js";
 import type * as chats from "../chats.js";
 import type * as contacts from "../contacts.js";
@@ -18,6 +19,7 @@ import type * as emailPassword from "../emailPassword.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as presence from "../presence.js";
+import type * as testing from "../testing.js";
 import type * as users from "../users.js";
 import type * as validators from "../validators.js";
 
@@ -31,6 +33,7 @@ declare const fullApi: ApiFromModules<{
   access: typeof access;
   auth: typeof auth;
   authRules: typeof authRules;
+  cascade: typeof cascade;
   chatRules: typeof chatRules;
   chats: typeof chats;
   contacts: typeof contacts;
@@ -38,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   messages: typeof messages;
   presence: typeof presence;
+  testing: typeof testing;
   users: typeof users;
   validators: typeof validators;
 }>;
