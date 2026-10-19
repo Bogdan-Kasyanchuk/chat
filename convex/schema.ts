@@ -26,5 +26,27 @@ export default defineSchema({
         online: v.boolean(),
         expireJobId: v.optional(v.id('_scheduled_functions'))
     })
+        .index('by_user', [ 'userId' ]),
+    contacts: defineTable({
+        ownerId: v.id('users'),
+        contactId: v.id('users')
+    })
+        .index('by_owner', [ 'ownerId', 'contactId' ])
+        .index('by_contact', [ 'contactId' ]),
+    // pairKey — відсортовані id обох учасників (chatRules.pairKey)
+    chats: defineTable({
+        pairKey: v.string(),
+        lastMessageAt: v.number()
+    })
+        .index('by_pair', [ 'pairKey' ]),
+    chatMembers: defineTable({
+        chatId: v.id('chats'),
+        userId: v.id('users'),
+        lastReadAt: v.number(),
+        clearedAt: v.number(),
+        muted: v.boolean(),
+        hidden: v.boolean()
+    })
         .index('by_user', [ 'userId' ])
+        .index('by_chat', [ 'chatId', 'userId' ])
 });

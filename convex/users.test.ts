@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 
 import { api, internal } from './_generated/api';
 import { createOrUpdateUser } from './auth';
+import { NOT_SIGNED_IN } from './chatRules';
 import { asUser, setup } from './test.setup';
 
 test('me returns null for an anonymous visitor', async () => {
@@ -110,4 +111,47 @@ test('duplicate users with one email do not break emailStatus', async () => {
     await t.run(async ctx => ctx.db.insert('users', { name: 'Alice 2', email: 'alice@example.com' }));
 
     expect(await t.query(internal.users.emailStatus, { email: 'alice@example.com' })).toBe('google');
+});
+
+test('findByEmail finds a user by exact email, case-insensitive', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+
+    expect(await alice.client.query(api.users.findByEmail, { email: ' Bob@Example.com ' })).toEqual({
+        userId: bob.userId,
+        name: 'Bob',
+        avatar: 'https://example.com/Bob.png',
+        isContact: false
+    });
+});
+
+test('findByEmail returns null for yourself and for unknown emails', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+
+    expect(await alice.client.query(api.users.findByEmail, { email: 'alice@example.com' })).toBeNull();
+    expect(await alice.client.query(api.users.findByEmail, { email: 'nobody@example.com' })).toBeNull();
+});
+
+test('findByEmail rejects an invalid email and an anonymous visitor', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+
+    await expect(alice.client.query(api.users.findByEmail, { email: 'nope' })).rejects.toThrow('Enter a valid email');
+    await expect(t.query(api.users.findByEmail, { email: 'bob@example.com' })).rejects.toThrow(NOT_SIGNED_IN);
+});
+
+test('findByEmail takes the oldest account when emails repeat and reports isContact', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+
+    await t.run(async ctx => ctx.db.insert('users', { name: 'Bob 2', email: 'bob@example.com' }));
+    await alice.client.mutation(api.contacts.add, { userId: bob.userId });
+
+    expect(await alice.client.query(api.users.findByEmail, { email: 'bob@example.com' })).toMatchObject({
+        userId: bob.userId,
+        isContact: true
+    });
 });

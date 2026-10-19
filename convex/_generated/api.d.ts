@@ -12,6 +12,8 @@ import type * as access from "../access.js";
 import type * as auth from "../auth.js";
 import type * as authRules from "../authRules.js";
 import type * as chatRules from "../chatRules.js";
+import type * as chats from "../chats.js";
+import type * as contacts from "../contacts.js";
 import type * as emailPassword from "../emailPassword.js";
 import type * as http from "../http.js";
 import type * as presence from "../presence.js";
@@ -29,6 +31,8 @@ declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   authRules: typeof authRules;
   chatRules: typeof chatRules;
+  chats: typeof chats;
+  contacts: typeof contacts;
   emailPassword: typeof emailPassword;
   http: typeof http;
   presence: typeof presence;
