@@ -49,4 +49,16 @@ export default defineSchema({
     })
         .index('by_user', [ 'userId' ])
         .index('by_chat', [ 'chatId', 'userId' ])
+    ,
+    // hiddenFor — «видалити для себе»; діапазон по часу іде через _creationTime в індексі
+    messages: defineTable({
+        chatId: v.id('chats'),
+        authorId: v.id('users'),
+        body: v.string(),
+        replyToId: v.optional(v.id('messages')),
+        forwardedFromId: v.optional(v.id('users')),
+        editedAt: v.optional(v.number()),
+        hiddenFor: v.array(v.id('users'))
+    })
+        .index('by_chat', [ 'chatId' ])
 });

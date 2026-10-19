@@ -65,3 +65,101 @@ test('chats.open rejects yourself and unknown users', async () => {
     await expect(alice.client.mutation(api.chats.open, { userId: alice.userId })).rejects.toThrow(CANNOT_ADD_SELF);
     await expect(alice.client.mutation(api.chats.open, { userId: bob.userId })).rejects.toThrow(USER_NOT_FOUND);
 });
+
+test('unread counts only the partner messages after lastReadAt', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const chatId = await alice.client.mutation(api.chats.open, { userId: bob.userId });
+
+    await bob.client.mutation(api.chats.open, { userId: alice.userId });
+
+    for (const body of [ 'a', 'b', 'c' ]) {
+        await bob.client.mutation(api.messages.send, { chatId, body });
+    }
+
+    await alice.client.mutation(api.messages.send, { chatId, body: 'mine' });
+
+    const [ before ] = await alice.client.query(api.chats.list, {});
+
+    expect(before.unread).toBe(0);
+
+    await alice.client.mutation(api.chats.markRead, { chatId });
+    await t.run(async ctx => {
+        const member = await ctx.db
+            .query('chatMembers')
+            .withIndex('by_chat', q => q.eq('chatId', chatId).eq('userId', alice.userId))
+            .unique();
+
+        await ctx.db.patch('chatMembers', member!._id, { lastReadAt: 0 });
+    });
+
+    const [ unread ] = await alice.client.query(api.chats.list, {});
+
+    expect(unread.unread).toBe(3);
+
+    await alice.client.mutation(api.chats.markRead, { chatId });
+
+    const [ after ] = await alice.client.query(api.chats.list, {});
+
+    expect(after.unread).toBe(0);
+});
+
+test('a new partner message after reading counts as unread', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const chatId = await alice.client.mutation(api.chats.open, { userId: bob.userId });
+
+    await bob.client.mutation(api.chats.open, { userId: alice.userId });
+    await bob.client.mutation(api.messages.send, { chatId, body: 'one' });
+    await alice.client.mutation(api.chats.markRead, { chatId });
+    await new Promise(resolve => setTimeout(resolve, 5));
+    await bob.client.mutation(api.messages.send, { chatId, body: 'two' });
+
+    const [ summary ] = await alice.client.query(api.chats.list, {});
+
+    expect(summary.unread).toBe(1);
+    expect(summary.lastMessage?.body).toBe('two');
+});
+
+test('chats.list orders by the last message', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const carol = await asUser(t, 'Carol');
+    const withBob = await alice.client.mutation(api.chats.open, { userId: bob.userId });
+    const withCarol = await alice.client.mutation(api.chats.open, { userId: carol.userId });
+
+    await alice.client.mutation(api.messages.send, { chatId: withBob, body: 'first' });
+    await new Promise(resolve => setTimeout(resolve, 5));
+    await alice.client.mutation(api.messages.send, { chatId: withCarol, body: 'second' });
+
+    const chats = await alice.client.query(api.chats.list, {});
+
+    expect(chats.map(chat => chat.partner.name)).toEqual([ 'Carol', 'Bob' ]);
+
+    await new Promise(resolve => setTimeout(resolve, 5));
+    await alice.client.mutation(api.messages.send, { chatId: withBob, body: 'third' });
+
+    expect((await alice.client.query(api.chats.list, {})).map(chat => chat.partner.name)).toEqual([ 'Bob', 'Carol' ]);
+});
+
+test('chats.get returns the partner with isContact, or null for a hidden chat', async () => {
+    const t = setup();
+    const alice = await asUser(t, 'Alice');
+    const bob = await asUser(t, 'Bob');
+    const chatId = await alice.client.mutation(api.chats.open, { userId: bob.userId });
+
+    expect(await alice.client.query(api.chats.get, { chatId })).toMatchObject({
+        chatId,
+        partner: { name: 'Bob', isContact: false },
+        muted: false,
+        canSend: true
+    });
+
+    await alice.client.mutation(api.contacts.add, { userId: bob.userId });
+
+    expect((await alice.client.query(api.chats.get, { chatId }))?.partner.isContact).toBe(true);
+    expect(await bob.client.query(api.chats.get, { chatId })).toBeNull();
+});

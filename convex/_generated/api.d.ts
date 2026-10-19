@@ -16,6 +16,7 @@ import type * as chats from "../chats.js";
 import type * as contacts from "../contacts.js";
 import type * as emailPassword from "../emailPassword.js";
 import type * as http from "../http.js";
+import type * as messages from "../messages.js";
 import type * as presence from "../presence.js";
 import type * as users from "../users.js";
 import type * as validators from "../validators.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   contacts: typeof contacts;
   emailPassword: typeof emailPassword;
   http: typeof http;
+  messages: typeof messages;
   presence: typeof presence;
   users: typeof users;
   validators: typeof validators;

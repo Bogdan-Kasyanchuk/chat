@@ -3,7 +3,7 @@ import { ConvexError } from 'convex/values';
 
 import type { Doc, Id } from './_generated/dataModel';
 import type { QueryCtx } from './_generated/server';
-import { DELETED_ACCOUNT, NOT_SIGNED_IN } from './chatRules';
+import { CHAT_NOT_FOUND, DELETED_ACCOUNT, NOT_SIGNED_IN } from './chatRules';
 import { presenceOf } from './presence';
 
 export const requireUserId = async (ctx: QueryCtx): Promise<Id<'users'>> => {
@@ -47,4 +47,38 @@ export const userView = async (ctx: QueryCtx, userId: Id<'users'>): Promise<User
         avatar: await avatarUrl(ctx, user),
         ...await presenceOf(ctx, userId)
     };
+};
+
+// Співрозмовник береться з pairKey, а не з chatMembers: після видалення акаунта його рядків уже немає
+export const partnerIdOf = (chat: Doc<'chats'>, userId: Id<'users'>): Id<'users'> => {
+    const partnerId = chat.pairKey.split('|').find(id => id !== userId);
+
+    return partnerId as Id<'users'>;
+};
+
+const findMember = async (ctx: QueryCtx, chatId: Id<'chats'>, userId: Id<'users'>) => ctx.db
+    .query('chatMembers')
+    .withIndex('by_chat', q => q.eq('chatId', chatId).eq('userId', userId))
+    .unique();
+
+// Учасник, чий рядок не прихований. Чужий чат виглядає як неіснуючий
+export const requireMember = async (ctx: QueryCtx, chatId: Id<'chats'>, userId: Id<'users'>): Promise<Doc<'chatMembers'>> => {
+    const member = await findMember(ctx, chatId, userId);
+
+    if (!member || member.hidden) {
+        throw new ConvexError(CHAT_NOT_FOUND);
+    }
+
+    return member;
+};
+
+// Рядок співрозмовника в chatMembers; null, якщо його акаунт видалено
+export const partnerOf = async (ctx: QueryCtx, chatId: Id<'chats'>, userId: Id<'users'>): Promise<Doc<'chatMembers'> | null> => {
+    const chat = await ctx.db.get('chats', chatId);
+
+    if (!chat) {
+        return null;
+    }
+
+    return findMember(ctx, chatId, partnerIdOf(chat, userId));
 };
