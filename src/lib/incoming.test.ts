@@ -9,7 +9,7 @@ const chat = (id: string, messageId: string | null, overrides: Partial<ChatSumma
     muted: false,
     lastMessage: messageId === null
         ? null
-        : { id: messageId, body: 'hi', authorIsMe: false, createdAt: 1, read: true },
+        : { id: messageId, body: 'hi', authorIsMe: false, createdAt: Number(messageId.replace(/\D/g, '')), read: true },
     ...overrides
 }) as unknown as ChatSummary;
 
@@ -54,4 +54,11 @@ test('the open chat notifies only when the tab is hidden', () => {
 
 test('an unchanged last message does not notify again', () => {
     expect(findIncoming([ chat('a', 'm1') ], [ chat('a', 'm1') ], options)).toEqual([]);
+});
+
+test('an older message becoming the last one after a delete does not notify', () => {
+    const older = chat('a', 'm0', { lastMessage: { id: 'm0', body: 'old', authorIsMe: false, createdAt: 1, read: true } } as never);
+    const newer = chat('a', 'm1', { lastMessage: { id: 'm1', body: 'new', authorIsMe: false, createdAt: 5, read: true } } as never);
+
+    expect(findIncoming([ newer ], [ older ], options)).toEqual([]);
 });

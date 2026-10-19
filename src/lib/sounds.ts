@@ -61,7 +61,9 @@ export const playSound = async (sound: Sound): Promise<void> => {
             await context.resume();
         }
 
-        SYNTH[ sound ].forEach(tone => playTone(context!, tone));
+        SYNTH[ sound ].forEach(tone => {
+            playTone(context!, tone);
+        });
     } catch {
         // Браузер може заборонити автоплей до першої взаємодії з сторінкою
     }

@@ -20,7 +20,10 @@ const findIncoming = (prev: ChatSummary[] | undefined, next: ChatSummary[], { ac
             return false;
         }
 
-        if (previous.get(chat.chatId)?.lastMessage?.id === lastMessage.id) {
+        const before = previous.get(chat.chatId)?.lastMessage;
+
+        // Старіше повідомлення стає останнім після видалення новішого — це не нове
+        if (before?.id === lastMessage.id || (before && lastMessage.createdAt <= before.createdAt)) {
             return false;
         }
 

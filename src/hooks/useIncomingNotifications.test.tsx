@@ -23,7 +23,7 @@ const chat = (id: string, messageId: string, muted = false) => ({
     chatId: id,
     muted,
     partner: { name: `Partner ${ id }`, avatar: null },
-    lastMessage: { id: messageId, body: `text ${ messageId }`, authorIsMe: false, createdAt: 1, read: true }
+    lastMessage: { id: messageId, body: `text ${ messageId }`, authorIsMe: false, createdAt: Number(messageId.replace(/\D/g, '')), read: true }
 }) as unknown as ChatSummary;
 
 beforeEach(() => {
@@ -32,7 +32,9 @@ beforeEach(() => {
 });
 
 test('shows one toast per incoming chat and plays the sound once', () => {
-    const { rerender } = renderHook(({ chats }) => useIncomingNotifications(chats, 'open'), {
+    const { rerender } = renderHook(({ chats }) => {
+        useIncomingNotifications(chats, 'open');
+    }, {
         initialProps: { chats: [ chat('a', '1'), chat('b', '1') ] }
     });
 
@@ -46,7 +48,9 @@ test('shows one toast per incoming chat and plays the sound once', () => {
 });
 
 test('toast click hides it and opens the chat', () => {
-    const { rerender } = renderHook(({ chats }) => useIncomingNotifications(chats, null), {
+    const { rerender } = renderHook(({ chats }) => {
+        useIncomingNotifications(chats, null);
+    }, {
         initialProps: { chats: [ chat('a', '1') ] }
     });
 
@@ -61,7 +65,9 @@ test('toast click hides it and opens the chat', () => {
 });
 
 test('muted and open visible chats stay silent', () => {
-    const { rerender } = renderHook(({ chats }) => useIncomingNotifications(chats, 'a'), {
+    const { rerender } = renderHook(({ chats }) => {
+        useIncomingNotifications(chats, 'a');
+    }, {
         initialProps: { chats: [ chat('a', '1'), chat('b', '1', true) ] }
     });
 
@@ -69,4 +75,18 @@ test('muted and open visible chats stay silent', () => {
 
     expect(notifications.show).not.toHaveBeenCalled();
     expect(playSound).not.toHaveBeenCalled();
+});
+
+test('the open chat notifies when the tab is hidden', () => {
+    visibility = 'hidden';
+
+    const { rerender } = renderHook(({ chats }) => {
+        useIncomingNotifications(chats, 'a');
+    }, {
+        initialProps: { chats: [ chat('a', '1') ] }
+    });
+
+    rerender({ chats: [ chat('a', '2') ] });
+
+    expect(notifications.show).toHaveBeenCalledTimes(1);
 });
