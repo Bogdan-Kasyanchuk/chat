@@ -7,3 +7,17 @@ body,
 body {
     background-color: var(--mantine-color-gray-2);
 }
+
+/* Меню повідомлення відкривається під пальцем, і довге натискання на Android виділяло слово пункту під ним */
+.mantine-contextmenu {
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* З тієї ж причини мобільний браузер ставить :hover пунктові під пальцем; на дотик лишаємо тільки :active */
+@media (hover: none) {
+    .mantine-contextmenu-item-button:hover:not([disabled], :active),
+    [data-mantine-color-scheme='dark'] .mantine-contextmenu-item-button:hover:not([disabled], :active) {
+        background: transparent;
+    }
+}

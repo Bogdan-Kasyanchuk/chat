@@ -123,8 +123,8 @@ const longPress = async (page: Page, target: Locator, menu: Locator) => {
     await cdp.detach();
 };
 
-// Меню повідомлення: правий клік на десктопі, довге натискання на телефоні
-export const messageMenu = async (page: Page, text: string, item: string) => {
+// Відкриває меню повідомлення: правий клік на десктопі, довге натискання на телефоні
+export const openMessageMenu = async (page: Page, text: string) => {
     const target = message(page, text);
     const menu = page.locator('.mantine-contextmenu');
 
@@ -133,6 +133,12 @@ export const messageMenu = async (page: Page, text: string, item: string) => {
     } else {
         await target.click({ button: 'right' });
     }
+
+    return menu;
+};
+
+export const messageMenu = async (page: Page, text: string, item: string) => {
+    const menu = await openMessageMenu(page, text);
 
     await menu.getByRole('button', { name: item, exact: true }).click();
 };
