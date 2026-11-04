@@ -4,7 +4,7 @@ import { ConvexError, v } from 'convex/values';
 import type { Doc, Id } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import type { MutationCtx, QueryCtx } from './_generated/server';
-import { findMember, partnerOf, requireMember, requireUserId, userView } from './access';
+import { findMember, partnerOf, requireMember, requireUserId, userName } from './access';
 import {
     ACCOUNT_DELETED,
     BATCH_SIZE_INVALID,
@@ -75,7 +75,7 @@ const toView = async (
         const original = await ctx.db.get('messages', message.replyToId);
 
         replyTo = original
-            ? { id: original._id, authorName: (await userView(ctx, original.authorId)).name, body: original.body }
+            ? { id: original._id, authorName: await userName(ctx, original.authorId), body: original.body }
             : { id: null, authorName: '', body: DELETED_MESSAGE };
     }
 
@@ -85,7 +85,7 @@ const toView = async (
         createdAt: message._creationTime,
         authorIsMe,
         editedAt: message.editedAt ?? null,
-        forwardedFrom: message.forwardedFromId ? (await userView(ctx, message.forwardedFromId)).name : null,
+        forwardedFrom: message.forwardedFromId ? await userName(ctx, message.forwardedFromId) : null,
         replyTo,
         read: authorIsMe ? partnerReadAt >= message._creationTime : true
     };

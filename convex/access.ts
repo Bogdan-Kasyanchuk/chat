@@ -54,6 +54,13 @@ export const userView = async (ctx: QueryCtx, userId: Id<'users'>): Promise<User
     };
 };
 
+// Лише ім'я: запит, якому не потрібен статус, не читає presence і не перераховується від кожного heartbeat
+export const userName = async (ctx: QueryCtx, userId: Id<'users'>): Promise<string> => {
+    const user = await ctx.db.get('users', userId);
+
+    return user ? user.name ?? '' : DELETED_ACCOUNT;
+};
+
 // Співрозмовник береться з pairKey, а не з chatMembers: після видалення акаунта його рядків уже немає
 export const partnerIdOf = (chat: Doc<'chats'>, userId: Id<'users'>): Id<'users'> => {
     const partnerId = chat.pairKey.split('|').find(id => id !== userId);

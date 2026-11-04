@@ -349,6 +349,43 @@ test('forward keeps the original author through a second forward', async () => {
     expect(bob.userId).toBeTruthy();
 });
 
+// Інакше кожен heartbeat автора перераховував би стрічку: Convex повторює запит, що читав змінений рядок
+test('list names quoted and forwarded authors without reading their presence', async () => {
+    const { t, alice, bob, chatId } = await pair();
+    const original = await alice.client.mutation(api.messages.send, { chatId, body: 'hi' });
+
+    await bob.client.mutation(api.messages.send, { chatId, body: 'hello', replyToId: original });
+    await alice.client.mutation(api.messages.forward, { messageIds: [ original ], toChatId: chatId });
+    // Два рядки одного користувача: .unique() у presenceOf кине помилку, якщо запит прочитає присутність
+    await t.run(async ctx => {
+        const row = { userId: alice.userId, lastSeenAt: 0, online: false };
+
+        await ctx.db.insert('presence', row);
+        await ctx.db.insert('presence', row);
+    });
+
+    const result = await bob.client.query(api.messages.list, { chatId, paginationOpts: page });
+
+    expect(result.page[ 0 ].forwardedFrom).toBe('Alice');
+    expect(result.page[ 1 ].replyTo?.authorName).toBe('Alice');
+});
+
+test('a reply and a forward keep Deleted account as the author name after the account is gone', async () => {
+    const { t, alice, bob, chatId } = await pair();
+    const original = await alice.client.mutation(api.messages.send, { chatId, body: 'hi' });
+
+    await bob.client.mutation(api.messages.send, { chatId, body: 'hello', replyToId: original });
+    await alice.client.mutation(api.messages.forward, { messageIds: [ original ], toChatId: chatId });
+    await t.run(async ctx => {
+        await ctx.db.delete('users', alice.userId);
+    });
+
+    const result = await bob.client.query(api.messages.list, { chatId, paginationOpts: page });
+
+    expect(result.page[ 0 ].forwardedFrom).toBe('Deleted account');
+    expect(result.page[ 1 ].replyTo?.authorName).toBe('Deleted account');
+});
+
 test('forward has the side effects of send', async () => {
     const { t, alice, chatId } = await pair();
     const carol = await asUser(t, 'Carol');
