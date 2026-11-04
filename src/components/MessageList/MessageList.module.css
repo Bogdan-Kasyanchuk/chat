@@ -1,0 +1,45 @@
+.wrapper {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+
+.scroll {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Позицію при підвантаженні старіших сторінок тримає сама стрічка; рідне якорення браузера подвоїло б зсув */
+    overflow-anchor: none;
+}
+
+.content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 100%;
+    padding-block: var(--mantine-spacing-xs);
+
+    &[data-hidden] {
+        visibility: hidden;
+    }
+}
+
+.empty {
+    margin: auto;
+    padding: var(--mantine-spacing-md);
+    text-align: center;
+}
+
+.loader {
+    position: absolute;
+    inset: 0;
+}
+
+.topLoader {
+    position: absolute;
+    top: var(--mantine-spacing-xs);
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+}

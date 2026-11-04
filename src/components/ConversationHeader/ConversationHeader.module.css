@@ -1,0 +1,19 @@
+.header {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: var(--mantine-spacing-sm);
+    min-height: 64px;
+    padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+    border-bottom: 1px solid var(--mantine-color-gray-3);
+    background-color: var(--mantine-color-white);
+
+    @mixin smaller-than $mantine-breakpoint-md {
+        padding-inline: var(--mantine-spacing-xs);
+    }
+}
+
+.body {
+    flex: 1;
+    min-width: 0;
+}

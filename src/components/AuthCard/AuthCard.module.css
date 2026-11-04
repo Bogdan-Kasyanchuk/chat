@@ -1,0 +1,13 @@
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+    padding: var(--mantine-spacing-md);
+}
+
+.card {
+    width: 360px;
+    max-width: 100%;
+    background-color: var(--mantine-color-white);
+}

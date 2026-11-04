@@ -1,0 +1,19 @@
+.wrapper {
+    position: absolute;
+    right: var(--mantine-spacing-md);
+    bottom: var(--mantine-spacing-md);
+    z-index: 2;
+}
+
+.button {
+    box-shadow: var(--mantine-shadow-sm);
+}
+
+.badge {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    width: max-content;
+    transform: translateX(-50%);
+    pointer-events: none;
+}

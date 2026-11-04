@@ -1,0 +1,25 @@
+.layout {
+    display: flex;
+    height: 100%;
+}
+
+.sidebar {
+    flex-shrink: 0;
+    height: 100%;
+    width: 35%;
+    min-width: 340px;
+    border-right: 1px solid var(--mantine-color-gray-3);
+
+    @mixin smaller-than $mantine-breakpoint-md {
+        width: 100%;
+        min-width: 0;
+        border-right: 0;
+    }
+}
+
+.main {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background-color: var(--mantine-color-gray-0);
+}

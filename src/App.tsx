@@ -1,86 +1,55 @@
+import { LoadingOverlay } from '@mantine/core';
+import { useConvexAuth } from 'convex/react';
 import type { FC } from 'react';
-import { Outlet, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 
-import { Container, Flex, LoadingOverlay } from '@mantine/core';
-
-import { useUser } from '@/hooks';
-
-import { Footer, Header } from '@/layouts';
-
-import { ChatPage, Error_404Page, HomePage, LoginPage, RegisterPage } from '@/pages';
-
-import { PrivateRoute, PublicRoute } from '@/routes';
+import ChatLayout from '@/components/ChatLayout';
+import ConversationPage from '@/pages/ConversationPage';
+import NotFoundPage from '@/pages/NotFoundPage';
+import SignInPage from '@/pages/SignInPage';
+import SignUpPage from '@/pages/SignUpPage';
+import PrivateRoute from '@/routes/PrivateRoute';
+import PublicRoute from '@/routes/PublicRoute';
 
 const App: FC = () => {
-  const { loading } = useUser();
-  return (
-    <>
-      <LoadingOverlay
-        visible={loading}
-        overlayColor='dark.5'
-        overlayOpacity={0.3}
-        loaderProps={{ color: 'dark.5', size: 100 }}
-      />
-      {!loading && (
+    const { isLoading } = useConvexAuth();
+
+    if (isLoading) {
+        return (
+            <LoadingOverlay
+                zIndex={ 1000 }
+                visible
+            />
+        );
+    }
+
+    return (
         <Routes>
-          <Route
-            path='/'
-            element={
-              <Flex direction='column' h='100%'>
-                <Header />
-                <Container px={0} h='calc(100% - 119px)'>
-                  <Outlet />
-                </Container>
-                <Footer />
-              </Flex>
-            }
-          >
             <Route
-              index
-              element={
-                <PublicRoute>
-                  <HomePage />
-                </PublicRoute>
-              }
+                path="/login"
+                element={ <PublicRoute restricted><SignInPage /></PublicRoute> }
             />
             <Route
-              path='login'
-              element={
-                <PublicRoute>
-                  <LoginPage />
-                </PublicRoute>
-              }
+                path="/signup"
+                element={ <PublicRoute restricted><SignUpPage /></PublicRoute> }
             />
+            { /* ChatLayout сам вирішує, що показати на «/»: список (телефон) чи EmptyChat (десктоп) */ }
+            <Route element={ <PrivateRoute><ChatLayout /></PrivateRoute> }>
+                <Route
+                    path="/"
+                    element={ null }
+                />
+                <Route
+                    path="/chat/:chatId"
+                    element={ <ConversationPage /> }
+                />
+            </Route>
             <Route
-              path='register'
-              element={
-                <PublicRoute>
-                  <RegisterPage />
-                </PublicRoute>
-              }
+                path="*"
+                element={ <NotFoundPage /> }
             />
-            <Route
-              path='chat'
-              element={
-                <PrivateRoute>
-                  <ChatPage />
-                </PrivateRoute>
-              }
-            />
-          </Route>
-          <Route path='/*' element={<Error_404Page />} />
         </Routes>
-      )}
-    </>
-  );
+    );
 };
 
 export default App;
-
-// igor@aa.aa
-// igor@aaA1
-
-// pavlo@aa.aa
-// pavlo@aaA1
-
-//* Відображення кількості контактів у футері при логінізації і реєстрації

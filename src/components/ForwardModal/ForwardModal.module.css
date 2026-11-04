@@ -1,0 +1,15 @@
+.item {
+    display: flex;
+    align-items: center;
+    gap: var(--mantine-spacing-sm);
+    width: 100%;
+    padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
+
+    &:hover:not(:disabled) {
+        background-color: var(--mantine-color-gray-0);
+    }
+
+    &:disabled {
+        opacity: 0.6;
+    }
+}

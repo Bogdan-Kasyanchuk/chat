@@ -1,14 +1,28 @@
-import type { FC } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useConvexAuth } from 'convex/react';
+import type { FC, ReactElement } from 'react';
+import { Navigate } from 'react-router';
 
-import { useUser } from '@/hooks';
+import useFrom from '@/hooks/useFrom';
 
-import type { IRouteProps } from '@/interfaces';
+type PublicRouteProps = {
+    children: ReactElement,
+    restricted?: boolean
+};
 
-const PublicRoute: FC<IRouteProps> = ({ children }) => {
-  const { user } = useUser();
+const PublicRoute: FC<PublicRouteProps> = ({ children, restricted = false }) => {
+    const { isAuthenticated } = useConvexAuth();
+    const from = useFrom();
 
-  return user ? <Navigate to='/chat' /> : children;
+    if (isAuthenticated && restricted) {
+        return (
+            <Navigate
+                to={ from }
+                replace
+            />
+        );
+    }
+
+    return children;
 };
 
 export default PublicRoute;

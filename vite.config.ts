@@ -1,13 +1,17 @@
 import react from '@vitejs/plugin-react';
-import path from 'path';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+    plugins: [ react() ],
+    server: {
+        // Слухати й локальну мережу, щоб відкривати dev з інших пристроїв
+        host: true
     },
-  },
-  plugins: [react()],
+    resolve: {
+        alias: {
+            '@': path.resolve(import.meta.dirname, 'src'),
+            '@convex': path.resolve(import.meta.dirname, 'convex')
+        }
+    }
 });

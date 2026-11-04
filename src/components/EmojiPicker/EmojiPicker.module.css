@@ -1,0 +1,131 @@
+.root {
+    --emoji-cell: 44px;
+
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    background-color: var(--mantine-color-white);
+
+    &[data-desktop] {
+        --emoji-cell: 36px;
+
+        width: calc(9 * var(--emoji-cell) + 2 * var(--mantine-spacing-xs) + 12px);
+        height: 360px;
+    }
+}
+
+.top {
+    display: flex;
+    align-items: center;
+    gap: var(--mantine-spacing-xs);
+    padding: var(--mantine-spacing-xs);
+}
+
+.search {
+    flex: 1;
+    min-width: 0;
+    padding: 6px var(--mantine-spacing-sm);
+    font-size: var(--mantine-font-size-sm);
+    color: var(--mantine-color-dark-7);
+    border: 1px solid var(--mantine-color-gray-4);
+    border-radius: var(--mantine-radius-default);
+    background-color: var(--mantine-color-white);
+
+    &:focus {
+        outline: 2px solid var(--mantine-color-dark-5);
+        outline-offset: -1px;
+    }
+}
+
+.tone {
+    flex-shrink: 0;
+    width: var(--emoji-cell);
+    height: 32px;
+    font-size: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--mantine-radius-default);
+    background-color: transparent;
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--mantine-color-gray-2);
+    }
+}
+
+.recent {
+    padding: 0 var(--mantine-spacing-xs) var(--mantine-spacing-xs);
+}
+
+.recentRow {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.recentEmoji {
+    width: var(--emoji-cell);
+    height: var(--emoji-cell);
+    font-size: 22px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--mantine-radius-default);
+    background-color: transparent;
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--mantine-color-gray-2);
+    }
+}
+
+.viewport {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    border-top: 1px solid var(--mantine-color-gray-3);
+}
+
+.state {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--mantine-font-size-sm);
+    color: var(--mantine-color-dimmed);
+}
+
+.list {
+    user-select: none;
+
+    [frimousse-category-header] {
+        padding: 6px var(--mantine-spacing-xs);
+        font-size: var(--mantine-font-size-xs);
+        font-weight: 600;
+        color: var(--mantine-color-dimmed);
+        background-color: var(--mantine-color-white);
+    }
+
+    [frimousse-row] {
+        padding-inline: var(--mantine-spacing-xs);
+    }
+
+    [frimousse-emoji] {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: var(--emoji-cell);
+        height: var(--emoji-cell);
+        font-size: 22px;
+        padding: 0;
+        border: 0;
+        border-radius: var(--mantine-radius-default);
+        background-color: transparent;
+        cursor: pointer;
+
+        &[data-active] {
+            background-color: var(--mantine-color-gray-2);
+        }
+    }
+}

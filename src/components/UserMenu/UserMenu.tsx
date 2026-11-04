@@ -1,166 +1,96 @@
-import type { FC, MouseEvent } from 'react';
+import { Group, Menu, Skeleton, Text, UnstyledButton } from '@mantine/core';
+import { IconLogout, IconSettings } from '@tabler/icons-react';
+import { useQuery } from 'convex/react';
+import { type FC, useState } from 'react';
 
-import { Avatar, Group, Indicator, Menu, Text, UnstyledButton, rem } from '@mantine/core';
-import { useDidUpdate, useMediaQuery, useSetState } from '@mantine/hooks';
-
-import { IconChevronDown, IconLogout, IconSettings, IconTrash } from '@tabler/icons-react';
-
-import { deleteUser, firebaseAuth, updateStatusUser } from '@/service/firebase';
-
-import { useClassStatus, useStylesGlobal, useUser } from '@/hooks';
-
-import { showError } from '@/lib';
-
-import { STATUS, firstTUC } from '@/helpers';
-
-import { ModalConfirm, UpdateProfile } from '@/components';
-
-import useStyles from './UserMenu.styles';
+import ConfirmModal from '@/components/ConfirmModal';
+import PresenceAvatar from '@/components/PresenceAvatar';
+import SettingsModal from '@/components/SettingsModal';
+import useLogout from '@/hooks/useLogout';
+import { api } from '@convex/_generated/api';
 
 const UserMenu: FC = () => {
-  const { classes: c, cx } = useStyles();
-  const { classes: cG } = useStylesGlobal();
-  const { name, avatar, status, idUser } = useUser();
-  const { allStatus, userStatus, setUserStatus } = useClassStatus();
-  const min_576 = useMediaQuery(`(min-width: ${rem(576)})`);
-  const [state, setState] = useSetState({
-    update: false,
-    delete: false,
-    logOut: false,
-  });
+    const me = useQuery(api.users.me);
+    const { logout, loading } = useLogout();
+    const [ confirming, setConfirming ] = useState(false);
+    const [ settingsOpened, setSettingsOpened ] = useState(false);
 
-  useDidUpdate(() => {
-    if (!status) {
+    if (!me) {
+        return (
+            <Skeleton
+                height={ 40 }
+                width="60%"
+            />
+        );
     }
 
-    setUserStatus(status);
-  }, [status]);
-
-  const setStatus = (e: MouseEvent<HTMLButtonElement>) => {
-    const status = (e.target as HTMLButtonElement).textContent?.toLowerCase();
-
-    updateStatusUser(idUser, status as string);
-  };
-
-  return (
-    <>
-      <Menu
-        width={200}
-        position='bottom-end'
-        transitionProps={{ transition: 'scale-y' }}
-        withinPortal
-        classNames={{ dropdown: c.menu, item: c.menuItem }}
-      >
-        <Menu.Target>
-          <UnstyledButton p={4}>
-            <Group spacing={10}>
-              {min_576 && (
-                <>
-                  <IconChevronDown className={c.userIcon} stroke={2} />
-                  <Text component='p' fz={18} fw={600} color='white'>
-                    {name}
-                  </Text>
-                </>
-              )}
-              <Indicator
-                inline
-                size={16}
-                offset={4}
-                position='bottom-end'
-                withBorder
-                classNames={{ indicator: userStatus }}
-              >
-                <Avatar size={32} radius='xl' src={avatar} alt={name} />
-              </Indicator>
-            </Group>
-          </UnstyledButton>
-        </Menu.Target>
-        <Menu.Dropdown>
-          {!min_576 && (
-            <Text component='p' fz={18} fw={600} px={12} py={10} bg='gray.2'>
-              {name}
-            </Text>
-          )}
-          <Menu.Divider m={0} className={cG.borderT} />
-          {Object.keys(allStatus).map((el) => (
-            <Menu.Item
-              key={el}
-              icon={<div className={cx(c.userStatus, allStatus[`${el}`])} />}
-              onClick={setStatus}
-              fw={500}
+    return (
+        <>
+            <Menu
+                position="bottom-start"
+                width={ 200 }
             >
-              {firstTUC(el)}
-            </Menu.Item>
-          ))}
-          <Menu.Divider m={0} className={cG.borderT} />
-          <Menu.Item
-            icon={<IconSettings size={16} stroke={1.5} />}
-            onClick={() => {
-              setState({ update: true });
-            }}
-            fw={500}
-          >
-            Update profile
-          </Menu.Item>
-          <Menu.Item
-            color='red.7'
-            icon={<IconTrash size={16} stroke={1.5} />}
-            onClick={() => {
-              setState({ delete: true });
-            }}
-            fw={500}
-          >
-            Delete profile
-          </Menu.Item>
-          <Menu.Divider m={0} className={cG.borderT} />
-          <Menu.Item
-            icon={<IconLogout size={16} stroke={1.5} />}
-            onClick={() => {
-              setState({ logOut: true });
-            }}
-            fw={500}
-          >
-            Logout
-          </Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
-      <ModalConfirm
-        title='Exit the chat'
-        isOpened={state.logOut}
-        onClose={() => {
-          setState({ logOut: false });
-        }}
-        onConfirm={async () => {
-          await updateStatusUser(idUser, STATUS.OFFLINE);
-          firebaseAuth.signOut().catch((error) => {
-            showError(error);
-          });
-        }}
-      >
-        Are you sure you want to exit the chat?
-      </ModalConfirm>
-      <ModalConfirm
-        title='Delete profile'
-        isOpened={state.delete}
-        onClose={() => {
-          setState({ delete: false });
-        }}
-        onConfirm={() => {
-          deleteUser(idUser);
-        }}
-      >
-        Are you sure you want to delete your profile? After that, the profile cannot be restored!
-      </ModalConfirm>
-      <UpdateProfile
-        idUser={idUser}
-        avatar={avatar}
-        isOpened={state.update}
-        onClose={() => {
-          setState({ update: false });
-        }}
-      />
-    </>
-  );
+                <Menu.Target>
+                    <UnstyledButton aria-label="Account menu">
+                        <Group
+                            gap="sm"
+                            wrap="nowrap"
+                        >
+                            <PresenceAvatar
+                                name={ me.name }
+                                avatar={ me.avatar }
+                                size={ 40 }
+                            />
+                            <Text
+                                fw={ 600 }
+                                truncate
+                            >
+                                { me.name }
+                            </Text>
+                        </Group>
+                    </UnstyledButton>
+                </Menu.Target>
+                <Menu.Dropdown>
+                    <Menu.Item
+                        leftSection={ <IconSettings size={ 16 } /> }
+                        onClick={ () => {
+                            setSettingsOpened(true);
+                        } }
+                    >
+                        Settings
+                    </Menu.Item>
+                    <Menu.Item
+                        leftSection={ <IconLogout size={ 16 } /> }
+                        onClick={ () => {
+                            setConfirming(true);
+                        } }
+                    >
+                        Logout
+                    </Menu.Item>
+                </Menu.Dropdown>
+            </Menu>
+            <SettingsModal
+                opened={ settingsOpened }
+                onClose={ () => {
+                    setSettingsOpened(false);
+                } }
+            />
+            <ConfirmModal
+                opened={ confirming }
+                title="Log out?"
+                confirmLabel="Log out"
+                loading={ loading }
+                onConfirm={ () => {
+                    void logout();
+                } }
+                onClose={ () => {
+                    setConfirming(false);
+                } }
+            >
+                You will need to sign in again to read your messages.
+            </ConfirmModal>
+        </>
+    );
 };
 
 export default UserMenu;

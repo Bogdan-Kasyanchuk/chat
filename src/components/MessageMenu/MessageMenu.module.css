@@ -1,0 +1,7 @@
+/* На сенсорних екранах довге натискання відкриває меню, а не виділення тексту й системну виноску */
+@media (hover: none) {
+    .trigger {
+        user-select: none;
+        -webkit-touch-callout: none;
+    }
+}
