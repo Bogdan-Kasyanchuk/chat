@@ -11,7 +11,7 @@
 
 **Tech Stack:** Vite 8.3, React 19.3, TypeScript ~6.0.3, React Router 8.4, Mantine 9.7 (`@mantine/core`, `hooks`, `form`, `modals`, `notifications`), `mantine-contextmenu` 9.4, `frimousse` 0.4 + `emojibase-data` 16 (пікер емодзі), `@tabler/icons-react` 3, `postcss-preset-mantine` + `postcss-simple-vars`, Convex 1.47 + `@convex-dev/auth` 0.0.96 + `@auth/core` 0.41.3, `lucia` 3 (Scrypt), Vitest 5 + Testing Library + `convex-test`, Playwright, ESLint 9 + `@stylistic` + `perfectionist`, husky + lint-staged, Netlify.
 
-**Виконання:** стан на 2026-10-19 — усі 17 задач виконані (subagent-driven) і пройшли фінальне рев'ю гілки, крім 👤-кроків: задача 2 кроки 2–3 і задача 17 крок 4. Галочки `- [x]` у кроках показують, що вже зроблено.
+**Виконання:** стан на 2026-11-04 — усі 17 задач виконані (subagent-driven) і пройшли фінальне рев'ю гілки, PR #2 злитий у `main`, продакшн запущений: https://bogkas-chat.netlify.app. Галочки `- [x]` у кроках показують, що вже зроблено.
 
 **Spec:** окремого документа немає. Специфікація — запит власника від 2026-10-18 і відповіді на уточнення, зведені в розділ «Рішення». Зразок рішень і тулінгу — `D:\WebDev\Projects\tic-tac-toe` (`CLAUDE.md`, `docs/superpowers/plans/2026-10-12-vite-convex-migration.md`, `docs/superpowers/plans/2026-10-15-redesign-email-auth.md`).
 
@@ -1182,7 +1182,9 @@ git add -A && git commit -m "test: end-to-end chat and account flows with Playwr
   - поточна робота — посилання на `docs/superpowers/plans/2026-10-18-redesign.md`;
   - історія.
 
-- [ ] **Step 4: 👤 Продакшн**
+- [x] **Step 4: 👤 Продакшн** (виконано 2026-11-04: сайт `bogkas-chat.netlify.app`, Convex prod `reliable-bulldog-316`; на prod пройшли e2e — 19 тестів, 1 навмисно пропущений, власник перевірив вхід через Google і «Copy text» на телефоні)
+
+Порядок на практиці: спершу змінні й злиття PR, а репозиторій у Netlify підключати останнім, бо підключення одразу запускає збірку `main`.
 
 1. Netlify:
    - підключити сайт `075f926c-…` до `Bogdan-Kasyanchuk/chat`, production branch `main`;
@@ -1190,7 +1192,7 @@ git add -A && git commit -m "test: end-to-end chat and account flows with Playwr
    - deploy previews вимкнути;
    - видалити старі `VITE_API_KEY`, `VITE_AUTH_DOMAIN`, `VITE_PROJECT_ID`, `VITE_STORAGE_BUCKET`, `VITE_MESSAGING_SENDER_ID`, `VITE_APP_ID`, `VITE_UPLOAD_PRESET`, `VITE_CLOUD_NAME`.
 2. `npx @convex-dev/auth --prod` з `SITE_URL=https://<site>.netlify.app`, потім `npx convex env set --prod AUTH_GOOGLE_ID …` і `AUTH_GOOGLE_SECRET …`.
-3. У Google OAuth client додати origin `https://<site>.netlify.app` і redirect URI `https://<prod-deployment>.convex.site/api/auth/callback/google`.
+3. У Google OAuth client додати origin `https://<site>.netlify.app` і redirect URI `https://<prod-deployment>.<region>.convex.site/api/auth/callback/google` (для prod: `https://reliable-bulldog-316.eu-west-1.convex.site/api/auth/callback/google`; без регіону Google відповідає `redirect_uri_mismatch`).
 4. Після деплою — локальний `.env` з ключами Firebase і Cloudinary більше не потрібен; Firebase і Cloudinary вимикає власник, коли вирішить.
 
 - [x] **Step 5: Фінальна перевірка**
