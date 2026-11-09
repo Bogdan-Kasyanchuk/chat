@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { expect, test, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
@@ -46,10 +46,15 @@ test('the Google button is 50px like the fields and the submit button', () => {
         .toBe('var(--button-height-lg)');
 });
 
-// Десктоп — вітрина ліворуч і форма праворуч; телефон — знак над заголовком, вітрини немає (ховає CSS)
-test('the showcase sits beside the form and the phone gets the logo above the heading', () => {
+// Вітрина — поза формою (main), знак — у колонці форми над заголовком. Що з них видно на якій ширині,
+// вирішує CSS — це перевіряє e2e/theme.spec.ts
+test('the showcase is outside the form column and the logo is inside it, above the heading', () => {
     renderCard();
 
-    expect(screen.getByText('Messages that arrive the moment they are sent.')).toBeTruthy();
-    expect(screen.getByRole('main').textContent).toContain('Chat');
+    const main = screen.getByRole('main');
+    const logo = within(main).getByText('Chat');
+    const heading = within(main).getByRole('heading', { level: 1 });
+
+    expect(main.contains(screen.getByText('Messages that arrive the moment they are sent.'))).toBe(false);
+    expect(logo.compareDocumentPosition(heading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 });

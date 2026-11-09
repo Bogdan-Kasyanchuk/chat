@@ -19,6 +19,7 @@ const NotFoundPage: FC = () => (
                 />
             }
             title="Page not found"
+            headingOrder={ 1 }
             text="The link is broken or the page was removed."
             action={
                 <Button

@@ -32,6 +32,15 @@
     @mixin smaller-than $mantine-breakpoint-md {
         align-items: flex-start;
     }
+
+    /* Вітрина буває вища за екран (iPad 1024×768): колонка форми — на висоту екрана й липне до верху,
+       тож форма посередині екрана, а не розтягнутої колонки; довша за екран форма все одно докручується до кінця */
+    @mixin larger-than $mantine-breakpoint-md {
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        min-height: 100dvh;
+    }
 }
 
 .column {

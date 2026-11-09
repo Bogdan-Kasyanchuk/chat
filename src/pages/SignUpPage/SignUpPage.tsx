@@ -35,6 +35,10 @@ const SignUpPage: FC = () => {
             password: (value: string) => hasLength({ min: MIN_PASSWORD_LENGTH }, `Password must be at least ${ MIN_PASSWORD_LENGTH } characters`)(value)
                 ?? hasLength({ max: MAX_PASSWORD_LENGTH }, `Password must be at most ${ MAX_PASSWORD_LENGTH } characters`)(value),
             confirmPassword: matchesField('password', 'Passwords do not match')
+        },
+        // Помилка сервера стосується введеного: щойно людина щось змінює, вона зникає
+        onValuesChange: () => {
+            setFormError(null);
         }
     });
 

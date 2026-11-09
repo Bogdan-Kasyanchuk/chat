@@ -35,3 +35,29 @@ test('the text and the action are optional', () => {
     expect(container.querySelectorAll('p')).toHaveLength(0);
     expect(screen.queryByRole('button')).toBeNull();
 });
+
+// Порожній стан у панелі — h3; на окремій сторінці (404) він єдиний заголовок, тож рівень задає сторінка, а вигляд той самий
+test('the heading level can be raised for a page of its own', () => {
+    renderWithProviders(
+        <EmptyState
+            icon={ <svg /> }
+            title="Page not found"
+            headingOrder={ 1 }
+        />
+    );
+
+    const heading = screen.getByRole('heading', { level: 1, name: 'Page not found' });
+
+    expect(heading.style.getPropertyValue('--title-fz')).toBe('var(--mantine-h3-font-size)');
+});
+
+test('by default the heading is an h3', () => {
+    renderWithProviders(
+        <EmptyState
+            icon={ <svg /> }
+            title="No chats yet"
+        />
+    );
+
+    expect(screen.getByRole('heading', { level: 3, name: 'No chats yet' })).toBeTruthy();
+});

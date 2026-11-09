@@ -107,3 +107,15 @@ test('a server error is announced', async () => {
 
     expect((await screen.findByRole('alert')).textContent).toBe(EMAIL_TAKEN);
 });
+
+// Як на вході: помилка сервера стосується введеного, тож зникає, щойно людина щось змінює
+test('editing a field clears the server error', async () => {
+    signIn.mockRejectedValue(new ConvexError(EMAIL_TAKEN));
+
+    renderSignUp();
+    await fill({ name: 'Alice', email: 'alice@example.com', password: 'secret123' });
+    await screen.findByRole('alert');
+    await userEvent.setup().type(screen.getByLabelText('Email'), 'x');
+
+    expect(screen.queryByRole('alert')).toBeNull();
+});

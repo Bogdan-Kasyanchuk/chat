@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { expect, test } from 'vitest';
 
@@ -6,8 +6,9 @@ import { renderWithProviders } from '@/test/render';
 
 import PasswordField from './PasswordField';
 
-// Кнопка з оком на канвасі — справжня кнопка з підписом і aria-pressed, до неї можна дійти Tab-ом
-test('the eye button shows and hides the password and says what it will do', async () => {
+// Кнопка з оком — перемикач: незмінний підпис і aria-pressed (змінний підпис разом з aria-pressed читач екрана
+// озвучує як «Hide password, pressed» — стан двічі)
+test('the eye button is a toggle that shows and hides the password', async () => {
     const user = userEvent.setup();
 
     renderWithProviders(<PasswordField label="Password" />);
@@ -21,7 +22,11 @@ test('the eye button shows and hides the password and says what it will do', asy
     await user.click(toggle);
 
     expect(field.getAttribute('type')).toBe('text');
-    expect(screen.getByRole('button', { name: 'Hide password' }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Show password' }).getAttribute('aria-pressed')).toBe('true');
+
+    await user.click(toggle);
+
+    expect(field.getAttribute('type')).toBe('password');
 });
 
 test('the eye button is reachable with the keyboard', async () => {
@@ -33,6 +38,39 @@ test('the eye button is reachable with the keyboard', async () => {
     await user.tab();
 
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Show password' }));
+});
+
+test.each([ 'Enter', ' ' ])('the key %j toggles the password once', async key => {
+    const user = userEvent.setup();
+
+    renderWithProviders(<PasswordField label="Password" />);
+
+    screen.getByRole('button', { name: 'Show password' }).focus();
+    await user.keyboard(key === ' ' ? '[Space]' : `{${ key }}`);
+
+    expect(screen.getByLabelText('Password').getAttribute('type')).toBe('text');
+});
+
+// NVDA / JAWS у режимі огляду натискають кнопку подією click без mousedown (detail = 0); Mantine її не слухає
+test('a click from assistive technology toggles the password', () => {
+    renderWithProviders(<PasswordField label="Password" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show password' }), { detail: 0 });
+
+    expect(screen.getByLabelText('Password').getAttribute('type')).toBe('text');
+});
+
+// Класи того, хто викликає, не губляться (власний клас кнопки 44×44 додається поруч; у jsdom CSS modules порожні)
+test('classNames from the caller reach the field and the eye button', () => {
+    renderWithProviders(
+        <PasswordField
+            label="Password"
+            classNames={ { input: 'caller-input', visibilityToggle: 'caller-toggle' } }
+        />
+    );
+
+    expect(screen.getByRole('button', { name: 'Show password' }).className).toContain('caller-toggle');
+    expect(document.querySelector('.caller-input')).not.toBeNull();
 });
 
 // PasswordInput Mantine не ставить aria-invalid на внутрішній <input>, тож читач екрана не чує, що поле з помилкою

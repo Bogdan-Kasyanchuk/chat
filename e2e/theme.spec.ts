@@ -77,3 +77,49 @@ for (const path of [ '/login', '/signup' ]) {
         expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(800);
     });
 }
+
+// Кнопка з оком слухає ще й click читача екрана (detail = 0): Enter, Space і клік мишею мусять перемикати рівно один раз
+test('Enter, Space and a click on the eye button toggle the password once', async ({ page }) => {
+    await page.goto('/login');
+
+    const field = page.getByLabel('Password', { exact: true });
+    const toggle = page.getByRole('button', { name: 'Show password' });
+
+    await toggle.focus();
+    await page.keyboard.press('Space');
+    await expect(field).toHaveAttribute('type', 'text');
+    await page.keyboard.press('Enter');
+    await expect(field).toHaveAttribute('type', 'password');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await toggle.click();
+    await expect(field).toHaveAttribute('type', 'text');
+});
+
+// Від md вітрина ліворуч, знак у колонці форми схований (він у вітрині); на телефоні навпаки
+test('the auth screen shows the showcase on desktop and the logo above the heading on the phone', async ({ page }) => {
+    await page.goto('/login');
+
+    const showcase = page.locator('section[aria-hidden="true"]');
+    const formLogo = page.getByRole('main').getByText('Chat', { exact: true });
+
+    if (isPhone()) {
+        await expect(showcase).toBeHidden();
+        await expect(formLogo).toBeVisible();
+    } else {
+        await expect(showcase).toBeVisible();
+        await expect(formLogo).toBeHidden();
+    }
+});
+
+// iPad горизонтально (1024×768): вітрина входу вища за екран, а форма все одно посередині екрана, не колонки
+test('on a short desktop screen the sign-in form stays in the middle of the screen', async ({ page }) => {
+    test.skip(isPhone(), 'the phone has no showcase');
+    await page.setViewportSize({ width: 1024, height: 768 });
+    await page.goto('/login');
+
+    const column = await page.getByRole('main').locator('> div').boundingBox();
+
+    expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(768);
+    expect(column).not.toBeNull();
+    expect(Math.abs(column!.y + column!.height / 2 - 384)).toBeLessThanOrEqual(1);
+});

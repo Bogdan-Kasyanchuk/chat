@@ -8,7 +8,7 @@ import AuthCard from '@/components/AuthCard';
 import PasswordField from '@/components/PasswordField';
 import useFrom from '@/hooks/useFrom';
 import authError from '@/lib/authError';
-import { normalizeEmail } from '@convex/authRules';
+import { WRONG_CREDENTIALS, normalizeEmail } from '@convex/authRules';
 
 const SignInPage: FC = () => {
     const { signIn } = useAuthActions();
@@ -43,6 +43,8 @@ const SignInPage: FC = () => {
     });
 
     const passwordProps = form.getInputProps('password');
+    // Червоне поле пароля — лише для невірних пошти чи пароля; решта помилок (мережа, ліміт спроб, Google) — окремим рядком
+    const wrongCredentials = formError === WRONG_CREDENTIALS;
 
     return (
         <AuthCard
@@ -87,9 +89,18 @@ const SignInPage: FC = () => {
                         autoComplete="current-password"
                         size="lg"
                         { ...passwordProps }
-                        error={ passwordProps.error ?? formError }
-                        errorProps={ formError ? { role: 'alert' } : undefined }
+                        error={ passwordProps.error ?? (wrongCredentials ? formError : undefined) }
+                        errorProps={ wrongCredentials ? { role: 'alert' } : undefined }
                     />
+                    { formError && !wrongCredentials && (
+                        <Text
+                            c="red"
+                            size="xs"
+                            role="alert"
+                        >
+                            { formError }
+                        </Text>
+                    ) }
                     <Button
                         type="submit"
                         size="lg"

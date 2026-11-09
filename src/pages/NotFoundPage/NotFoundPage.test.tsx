@@ -23,7 +23,7 @@ test('explains the page is missing and leads back to the chats', async () => {
         { route: '/nope' }
     );
 
-    expect(screen.getByRole('heading', { name: 'Page not found' })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Page not found' })).toBeTruthy();
     expect(screen.getByText('The link is broken or the page was removed.')).toBeTruthy();
 
     await userEvent.setup().click(screen.getByRole('link', { name: 'Back to chats' }));
