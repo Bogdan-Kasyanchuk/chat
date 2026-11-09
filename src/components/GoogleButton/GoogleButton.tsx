@@ -41,6 +41,8 @@ const GoogleButton: FC<{ label: string }> = ({ label }) => {
         <Button
             variant="outline"
             color="gray"
+            // 50px, як поля й кнопки на екранах входу та реєстрації
+            size="lg"
             leftSection={ <GoogleIcon /> }
             fullWidth
             onClick={

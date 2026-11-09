@@ -60,3 +60,20 @@ test('a field with an error keeps the danger border and gets the danger ring in 
         await expect.poll(async () => style(field, 'border-top-color')).toBe(DANGER);
     }
 });
+
+// Між md (768) і ~1040px вітрина й форма звужуються поруч: вітрина не заходить під форму й нічого не прокручується вбік
+for (const path of [ '/login', '/signup' ]) {
+    test(`on a narrow desktop the showcase of ${ path } stays beside the form`, async ({ page }) => {
+        test.skip(isPhone(), 'the phone has no showcase');
+        await page.setViewportSize({ width: 800, height: 900 });
+        await page.goto(path);
+
+        const showcase = await page.locator('section[aria-hidden="true"]').boundingBox();
+        const form = await page.getByRole('main').boundingBox();
+
+        expect(showcase).not.toBeNull();
+        expect(form).not.toBeNull();
+        expect(showcase!.x + showcase!.width).toBeLessThanOrEqual(form!.x + 1);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(800);
+    });
+}

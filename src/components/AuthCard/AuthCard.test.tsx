@@ -38,6 +38,14 @@ test('the screen has one main heading with its subtitle', () => {
     expect(screen.getByText('footer')).toBeTruthy();
 });
 
+// Рішення «Розміри»: на екранах входу й реєстрації поля й кнопки 50px — і кнопка Google теж (Main, MobileSignIn)
+test('the Google button is 50px like the fields and the submit button', () => {
+    renderCard();
+
+    expect(screen.getByRole('button', { name: 'Continue with Google' }).style.getPropertyValue('--button-height'))
+        .toBe('var(--button-height-lg)');
+});
+
 // Десктоп — вітрина ліворуч і форма праворуч; телефон — знак над заголовком, вітрини немає (ховає CSS)
 test('the showcase sits beside the form and the phone gets the logo above the heading', () => {
     renderCard();

@@ -10,8 +10,10 @@
     flex: 1 1 rem(560px);
     min-width: 0;
 
+    /* min-width: 0 — інакше картки контактів (400px) не дають вітрині звузитись, і вона заходить під форму */
     > * {
         flex: 1;
+        min-width: 0;
     }
 
     @mixin smaller-than $mantine-breakpoint-md {
