@@ -27,7 +27,7 @@ const AuthCard: FC<AuthCardProps> = ({ title, googleLabel, footer, children }) =
                     { title }
                 </Title>
                 <GoogleButton label={ googleLabel } />
-                <Divider label="or with email" />
+                <Divider label="or" />
                 { children }
                 { footer }
             </Stack>

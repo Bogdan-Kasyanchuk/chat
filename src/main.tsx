@@ -8,14 +8,13 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 
-import '@fontsource-variable/onest';
 import '@mantine/core/styles.css';
 import '@mantine/notifications/styles.css';
 import 'mantine-contextmenu/styles.css';
 import '@/global.css';
 
 import App from '@/App';
-import theme, { colorSchemeManager, cssVariablesResolver } from '@/theme';
+import theme from '@/theme';
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL);
 
@@ -23,12 +22,7 @@ createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <ConvexAuthProvider client={ convex }>
             <BrowserRouter>
-                <MantineProvider
-                    theme={ theme }
-                    defaultColorScheme="auto"
-                    colorSchemeManager={ colorSchemeManager }
-                    cssVariablesResolver={ cssVariablesResolver }
-                >
+                <MantineProvider theme={ theme }>
                     <ContextMenuProvider>
                         <ModalsProvider>
                             <Notifications

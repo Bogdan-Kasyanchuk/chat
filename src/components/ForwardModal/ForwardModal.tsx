@@ -129,7 +129,6 @@ const ForwardModal: FC<ForwardModalProps> = ({ messageIds, onDone }) => {
                         } }
                     >
                         <PresenceAvatar
-                            userId={ target.userId }
                             name={ target.name }
                             avatar={ target.avatar }
                             size={ 40 }

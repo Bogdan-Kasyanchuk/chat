@@ -28,7 +28,6 @@ const ChatListItem: FC<ChatListItemProps> = ({ chat, active, now }) => {
             data-muted={ muted || undefined }
         >
             <PresenceAvatar
-                userId={ partner.userId }
                 name={ partner.name }
                 avatar={ partner.avatar }
                 size={ 48 }

@@ -57,7 +57,7 @@ const useIncomingNotifications = (chats: ChatSummary[] | undefined, activeChatId
                 id,
                 title: chat.partner.name,
                 message: clip(chat.lastMessage?.body ?? ''),
-                icon: createElement(PresenceAvatar, { userId: chat.partner.userId, name: chat.partner.name, avatar: chat.partner.avatar, size: 32 }),
+                icon: createElement(PresenceAvatar, { name: chat.partner.name, avatar: chat.partner.avatar, size: 32 }),
                 style: { cursor: 'pointer' },
                 onClick: () => {
                     notifications.hide(id);

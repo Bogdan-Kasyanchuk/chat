@@ -144,7 +144,6 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
                         mb="md"
                     >
                         <PresenceAvatar
-                            userId={ found.userId }
                             name={ found.name }
                             avatar={ found.avatar }
                             size={ 48 }

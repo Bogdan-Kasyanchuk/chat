@@ -10,12 +10,11 @@ import type { Id } from '@convex/_generated/dataModel';
 import { AVATAR_TOO_BIG, AVATAR_TYPE, AVATAR_TYPES, MAX_AVATAR_BYTES } from '@convex/chatRules';
 
 type AvatarUploadProps = {
-    userId: string,
     name: string,
     avatar: string | null
 };
 
-const AvatarUpload: FC<AvatarUploadProps> = ({ userId, name, avatar }) => {
+const AvatarUpload: FC<AvatarUploadProps> = ({ name, avatar }) => {
     const generateUrl = useMutation(api.users.generateAvatarUploadUrl);
     const setAvatar = useAction(api.users.setAvatar);
     const resetRef = useRef<() => void>(null);
@@ -93,7 +92,6 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ userId, name, avatar }) => {
         <Stack gap="xs">
             <Group wrap="nowrap">
                 <PresenceAvatar
-                    userId={ userId }
                     name={ name }
                     avatar={ preview ?? avatar }
                     size={ 72 }
