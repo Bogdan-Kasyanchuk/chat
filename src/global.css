@@ -5,7 +5,7 @@ body,
 }
 
 body {
-    background-color: var(--mantine-color-gray-2);
+    background-color: var(--chat-bg);
 }
 
 /* Меню повідомлення відкривається під пальцем, і довге натискання на Android виділяло слово пункту під ним */

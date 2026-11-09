@@ -14,6 +14,16 @@
     <meta name="msapplication-TileColor" content="#da532c" />
     <meta name="theme-color" content="#ffffff" />
     <title>Chat</title>
+    <!-- Статичний аналог ColorSchemeScript: тема ставиться до першого кадру, без мерехтіння. Ключ — COLOR_SCHEME_KEY з src/theme.ts -->
+    <script>
+      try {
+        var scheme = localStorage.getItem('chat-color-scheme');
+        if (scheme !== 'light' && scheme !== 'dark') {
+          scheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-mantine-color-scheme', scheme);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

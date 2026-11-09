@@ -37,6 +37,7 @@ const UserMenu: FC = () => {
                             wrap="nowrap"
                         >
                             <PresenceAvatar
+                                userId={ me.id }
                                 name={ me.name }
                                 avatar={ me.avatar }
                                 size={ 40 }

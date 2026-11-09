@@ -35,6 +35,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ opened, onClose }) => {
                     </Tabs.List>
                     <Tabs.Panel value="profile">
                         <AvatarUpload
+                            userId={ me.id }
                             name={ me.name }
                             avatar={ me.avatar }
                         />

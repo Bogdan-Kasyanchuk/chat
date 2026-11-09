@@ -21,6 +21,7 @@ const ContactItem: FC<ContactItemProps> = ({ contact, now, onOpen }) => (
         } }
     >
         <PresenceAvatar
+            userId={ contact.userId }
             name={ contact.name }
             avatar={ contact.avatar }
             size={ 48 }
