@@ -87,9 +87,9 @@ renderVals() {
 const s = this.state || {};
 const pw = !!s.showPw, cf = !!s.showCf;
 return {
-pwType: pw ? 'text' : 'password', pwHidden: !pw, pwShown: pw, pwAria: pw ? 'Hide password' : 'Show password', pwPressed: pw ? 'true' : 'false',
+pwType: pw ? 'text' : 'password', pwHidden: !pw, pwShown: pw, pwAria: 'Show password', pwPressed: pw ? 'true' : 'false',
 togglePw: () => this.setState({ showPw: !pw }),
-cfType: cf ? 'text' : 'password', cfHidden: !cf, cfShown: cf, cfAria: cf ? 'Hide confirm password' : 'Show confirm password', cfPressed: cf ? 'true' : 'false',
+cfType: cf ? 'text' : 'password', cfHidden: !cf, cfShown: cf, cfAria: 'Show confirm password', cfPressed: cf ? 'true' : 'false',
 toggleCf: () => this.setState({ showCf: !cf })
 };
 }

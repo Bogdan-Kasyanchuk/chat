@@ -1,45 +1,38 @@
-import { Box, Button, Flex, Text, Title } from '@mantine/core';
+import { Button } from '@mantine/core';
+import { IconCompass } from '@tabler/icons-react';
 import type { FC } from 'react';
-import { useNavigate } from 'react-router';
+import { Link } from 'react-router';
+
+import EmptyState from '@/components/EmptyState';
 
 import classes from './NotFoundPage.module.css';
 
-const NotFoundPage: FC = () => {
-    const navigate = useNavigate();
-
-    return (
-        <Flex
-            h="100%"
-            px={ 20 }
-            direction="column"
-            justify="center"
-            align="center"
-            gap={ 40 }
-        >
-            <div className={ classes.label }>404</div>
-            <Box>
-                <Title className={ classes.title }>Something is not right...</Title>
-                <Text
-                    fz={ 18 }
-                    maw={ 500 }
+// Блок «404 · empty state style» на аркуші Components: той самий вигляд, що й порожні стани, посередині сторінки
+const NotFoundPage: FC = () => (
+    <main className={ classes.page }>
+        <EmptyState
+            icon={
+                <IconCompass
+                    size={ 36 }
+                    stroke={ 1.8 }
+                    aria-hidden
+                />
+            }
+            title="Page not found"
+            headingOrder={ 1 }
+            text="The link is broken or the page was removed."
+            action={
+                <Button
+                    component={ Link }
+                    to="/"
+                    radius="xl"
+                    fz="md"
                 >
-                    Page you are trying to open does not exist. You may have mistyped the address, or the page
-                    has been moved to another URL. If you think this is an error contact support.
-                </Text>
-            </Box>
-            <Button
-                size="lg"
-                tt="uppercase"
-                onClick={
-                    () => {
-                        void navigate('/');
-                    }
-                }
-            >
-                Back to home page
-            </Button>
-        </Flex>
-    );
-};
+                    Back to chats
+                </Button>
+            }
+        />
+    </main>
+);
 
 export default NotFoundPage;

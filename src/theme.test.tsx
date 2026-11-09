@@ -86,6 +86,12 @@ describe('TOKENS', () => {
         expect(Object.keys(TOKENS.light).every(key => key.startsWith('--chat-'))).toBe(true);
     });
 
+    // Кільце фокусу поля з помилкою — dangerRing з об'єктів L / D у Chats.dc.html
+    test('a field with an error has its own soft danger focus ring', () => {
+        expect(TOKENS.light[ '--chat-danger-ring' ]).toBe('rgba(194, 55, 44, 0.18)');
+        expect(TOKENS.dark[ '--chat-danger-ring' ]).toBe('rgba(255, 138, 122, 0.25)');
+    });
+
     test('cssVariablesResolver hands the tokens to each scheme', () => {
         const resolved = cssVariablesResolver(mergeMantineTheme(DEFAULT_THEME, theme));
 
@@ -105,7 +111,9 @@ describe('TOKENS', () => {
                 '--mantine-color-dimmed': 'var(--chat-muted)',
                 '--mantine-color-anchor': 'var(--chat-accent-text)',
                 // Плейсхолдер — muted: сірий Mantine (gray-5 / dark-3) не дотягує до 4.5:1
-                '--mantine-color-placeholder': 'var(--chat-muted)'
+                '--mantine-color-placeholder': 'var(--chat-muted)',
+                // c="red" і червоні пункти меню — той самий danger, що й помилки полів (у темній Mantine дав би red-4)
+                '--mantine-color-red-text': 'var(--chat-danger)'
             });
         }
 
@@ -172,6 +180,21 @@ describe('control sizes', () => {
         );
 
         expect(wrapperStyle('Email').getPropertyValue('--input-bd')).toBe('');
+    });
+
+    // На канвасі (Main, SignUp, «Auth · dark») червоні лише рамка й підпис помилки: текст, плейсхолдер
+    // і кнопка з оком лишаються своїх кольорів (Mantine фарбує їх у колір помилки)
+    test('a field with an error keeps its text, placeholder and icon colours', () => {
+        renderWithProviders(
+            <TextInput
+                label="Email"
+                error="Enter a valid email"
+            />
+        );
+
+        expect(wrapperStyle('Email').getPropertyValue('--input-color')).toBe('var(--mantine-color-text)');
+        expect(wrapperStyle('Email').getPropertyValue('--input-placeholder-color')).toBe('var(--mantine-color-placeholder)');
+        expect(wrapperStyle('Email').getPropertyValue('--input-section-color')).toBe('var(--chat-muted)');
     });
 
     test('size="lg" fields keep Mantine\'s 50px', () => {

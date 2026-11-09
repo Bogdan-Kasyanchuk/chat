@@ -7,12 +7,13 @@ import { renderWithProviders } from '@/test/render';
 
 import NotFoundPage from './NotFoundPage';
 
-test('explains the page is missing and leads back home', async () => {
+// Тексти — блок «404 · empty state style» на аркуші Components
+test('explains the page is missing and leads back to the chats', async () => {
     renderWithProviders(
         <Routes>
             <Route
                 path="/"
-                element={ <p>home page</p> }
+                element={ <p>chats page</p> }
             />
             <Route
                 path="*"
@@ -22,9 +23,10 @@ test('explains the page is missing and leads back home', async () => {
         { route: '/nope' }
     );
 
-    expect(screen.getByText('Something is not right...')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Page not found' })).toBeTruthy();
+    expect(screen.getByText('The link is broken or the page was removed.')).toBeTruthy();
 
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Back to home page' }));
+    await userEvent.setup().click(screen.getByRole('link', { name: 'Back to chats' }));
 
-    expect(screen.getByText('home page')).toBeTruthy();
+    expect(screen.getByText('chats page')).toBeTruthy();
 });

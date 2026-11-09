@@ -1,0 +1,196 @@
+/* Тло розмови з крапковим візерунком (артборди Main і SignUp; у темній — темне тло й візерунок) */
+.root {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: rem(40px);
+    padding: rem(40px) rem(60px);
+    background-color: var(--chat-bg);
+    background-image: radial-gradient(circle at 1px 1px, var(--chat-pattern) 1px, transparent 0);
+    background-size: rem(22px) rem(22px);
+    color: var(--chat-text);
+}
+
+.messages,
+.contacts {
+    display: flex;
+    flex-direction: column;
+}
+
+.messages {
+    gap: rem(4px);
+}
+
+.contacts {
+    gap: rem(12px);
+}
+
+.chip {
+    align-self: center;
+    margin-bottom: rem(8px);
+    padding: rem(4px) rem(10px);
+    border-radius: var(--mantine-radius-md);
+    background-color: var(--chat-date-chip);
+    color: var(--chat-date-chip-text);
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 600;
+}
+
+/* Бульбашка: кут 4 внизу з боку автора; у наступних повідомленнях групи — ще й угорі */
+.bubble {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: rem(2px) rem(12px);
+    max-width: rem(300px);
+    margin-top: rem(8px);
+    padding: rem(6px) rem(12px);
+    box-shadow: var(--chat-bubble-shadow);
+    font-size: var(--mantine-font-size-md);
+}
+
+.in {
+    align-self: flex-start;
+    border-radius: rem(12px) rem(12px) rem(12px) rem(4px);
+    background-color: var(--chat-bubble-in);
+    color: var(--chat-bubble-in-text);
+}
+
+.out {
+    align-self: flex-end;
+    border-radius: rem(12px) rem(12px) rem(4px) rem(12px);
+    background-color: var(--chat-bubble-out);
+    color: var(--chat-bubble-out-text);
+}
+
+.next {
+    margin-top: 0;
+}
+
+.in.next {
+    border-top-left-radius: rem(4px);
+}
+
+.out.next {
+    border-top-right-radius: rem(4px);
+}
+
+.forwarded {
+    flex-basis: 100%;
+    color: var(--chat-accent-text);
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 600;
+}
+
+.meta {
+    display: inline-flex;
+    align-items: center;
+    gap: rem(4px);
+    margin-left: auto;
+    color: var(--chat-bubble-meta);
+    font-size: var(--mantine-font-size-xs);
+}
+
+.read {
+    color: var(--chat-tick-read);
+}
+
+.sent {
+    color: var(--chat-tick);
+}
+
+.typing {
+    gap: rem(4px);
+    padding: rem(10px) rem(14px);
+}
+
+.dot {
+    width: rem(7px);
+    height: rem(7px);
+    border-radius: 50%;
+    background-color: var(--chat-typing);
+}
+
+.contact {
+    display: flex;
+    align-items: center;
+    gap: rem(8px);
+    width: 100%;
+    max-width: rem(400px);
+    padding: rem(10px);
+    border-radius: var(--mantine-radius-md);
+    background-color: var(--chat-bubble-in);
+    box-shadow: var(--chat-bubble-shadow);
+}
+
+/* Аватар 44 з ініціалами 16 / 600 і значком «онлайн» 14 з рамкою 2.5 кольору рядка */
+.avatar {
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: rem(44px);
+    height: rem(44px);
+    border-radius: 50%;
+    color: var(--mantine-color-white);
+    font-size: var(--mantine-font-size-md);
+    font-weight: 600;
+}
+
+.online {
+    position: absolute;
+    right: rem(1px);
+    bottom: rem(1px);
+    box-sizing: border-box;
+    width: rem(14px);
+    height: rem(14px);
+    border: rem(2.5px) solid var(--chat-bubble-in);
+    border-radius: 50%;
+    background-color: var(--chat-online);
+}
+
+.person {
+    display: flex;
+    flex-direction: column;
+    gap: rem(2px);
+    min-width: 0;
+}
+
+.name {
+    font-size: var(--mantine-font-size-md);
+    font-weight: 600;
+}
+
+.status,
+.statusAccent {
+    font-size: var(--mantine-font-size-sm);
+}
+
+.status {
+    color: var(--chat-muted);
+}
+
+.statusAccent {
+    color: var(--chat-accent-text);
+}
+
+.copy {
+    display: flex;
+    flex-direction: column;
+    gap: rem(12px);
+}
+
+.title {
+    margin: 0;
+    font-size: rem(42px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.03em;
+}
+
+.text {
+    margin: 0;
+    color: var(--chat-muted);
+    font-size: var(--mantine-font-size-md);
+}

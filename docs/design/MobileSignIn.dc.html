@@ -74,7 +74,7 @@ class Component extends DCLogic {
 renderVals() {
 const pw = !!(this.state && this.state.showPw);
 return {
-pwType: pw ? 'text' : 'password', pwHidden: !pw, pwShown: pw, pwAria: pw ? 'Hide password' : 'Show password', pwPressed: pw ? 'true' : 'false',
+pwType: pw ? 'text' : 'password', pwHidden: !pw, pwShown: pw, pwAria: 'Show password', pwPressed: pw ? 'true' : 'false',
 togglePw: () => this.setState({ showPw: !pw })
 };
 }
