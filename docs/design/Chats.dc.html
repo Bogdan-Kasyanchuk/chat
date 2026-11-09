@@ -435,12 +435,6 @@ Also delete for Marko Shevchuk
 </div>
 <button class="ib" type="button" aria-label="Close" style="width: 44px; height: 44px; margin: -6px -12px 0 0; flex: none; border: 0; border-radius: 22px; background: transparent; color: {{c.muted}}; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
 </div>
-<sc-if value="{{cf.needsPassword}}" hint-placeholder-val="{{ false }}">
-<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600"><span style="line-height: 1">Password</span>
-<input class="field" type="password" value="kovalenko26" style="margin: 0; height: 44px; padding: 0 14px; border-radius: 12px; border: 1px solid {{c.border}}; background: {{c.bg}}; color: {{c.text}}; font: 400 18px 'Onest', sans-serif">
-<span style="margin-top: -4px; font-size: 12px; font-weight: 400; color: {{c.muted}}; line-height: 1">Enter your password to confirm.</span>
-</label>
-</sc-if>
 <div style="display: flex; gap: 8px">
 <button class="btn-secondary" type="button" style="flex: 1; min-width: 0; height: 44px; border: 0; border-radius: 12px; background: {{c.field}}; color: {{c.text}}; font: 600 18px 'Onest', sans-serif; cursor: pointer">Cancel</button>
 <button class="btn-primary" type="button" style="flex: 1; min-width: 0; height: 44px; border: 0; border-radius: 12px; background: {{cf.bg}}; color: {{cf.color}}; font: 600 18px 'Onest', sans-serif; cursor: pointer">{{cf.action}}</button>
@@ -682,9 +676,9 @@ const ac = {
 };
 const CF = {
   logout: { title: 'Log out?', text: 'You will need your email and password to sign in again on this device.', action: 'Log out', bg: c.accent, color: c.onAccent },
-  deleteAccount: { title: 'Delete account?', text: 'Your profile, contacts and chats are deleted for good. People you talked to will see “Deleted account”.', action: 'Delete account', bg: c.dangerSolid, color: c.onDanger, needsPassword: true }
+  deleteAccount: { title: 'Delete account?', text: 'Your profile, contacts and chats are deleted for good. People you talked to will see “Deleted account”.', action: 'Delete account', bg: c.dangerSolid, color: c.onDanger }
 }[overlay] || { title: '', text: '', action: '', bg: c.accent, color: c.onAccent };
-const cf = { ...CF, needsPassword: !!CF.needsPassword };
+const cf = CF;
 const skeleton = [ ['60%', '85%'], ['45%', '70%'], ['55%', '90%'], ['40%', '65%'], ['65%', '80%'], ['50%', '75%'], ['58%', '88%'], ['42%', '60%'] ].map((x) => ({ w1: x[0], w2: x[1] }));
 const skeletonMsgs = [ ['flex-start', '42%'], ['flex-start', '28%'], ['flex-end', '36%'], ['flex-end', '22%'], ['flex-start', '48%'], ['flex-end', '30%'] ].map((x) => ({ align: x[0], w: x[1] }));
 const recentEmoji = [ '👍', '❤️', '😂', '🙌', '🔥', '😊', '🎉', '🙏', '👀' ].map((e) => ({ e, bg: 'transparent' }));
