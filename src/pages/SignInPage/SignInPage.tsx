@@ -1,10 +1,11 @@
 import { useAuthActions } from '@convex-dev/auth/react';
-import { Anchor, Button, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
+import { Anchor, Button, Stack, Text, TextInput } from '@mantine/core';
 import { isEmail, isNotEmpty, useForm } from '@mantine/form';
 import { type FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import AuthCard from '@/components/AuthCard';
+import PasswordField from '@/components/PasswordField';
 import useFrom from '@/hooks/useFrom';
 import authError from '@/lib/authError';
 import { normalizeEmail } from '@convex/authRules';
@@ -20,6 +21,10 @@ const SignInPage: FC = () => {
         validate: {
             email: (value: string) => isEmail('Enter a valid email')(value.trim()),
             password: isNotEmpty('Enter your password')
+        },
+        // Помилка сервера стосується введеного: щойно людина щось змінює, вона зникає
+        onValuesChange: () => {
+            setFormError(null);
         }
     });
 
@@ -37,14 +42,18 @@ const SignInPage: FC = () => {
         }
     });
 
+    const passwordProps = form.getInputProps('password');
+
     return (
         <AuthCard
             title="Sign in"
+            subtitle="Welcome back. Pick up where you left off."
             googleLabel="Continue with Google"
+            showcase="messages"
             footer={
                 <Text
                     ta="center"
-                    size="sm"
+                    c="dimmed"
                 >
                     No account?
                     { ' ' }
@@ -52,8 +61,9 @@ const SignInPage: FC = () => {
                         component={ Link }
                         to="/signup"
                         state={ { from } }
+                        fw={ 600 }
                     >
-                        Sign up
+                        Create account
                     </Anchor>
                 </Text>
             }
@@ -62,29 +72,27 @@ const SignInPage: FC = () => {
                 noValidate
                 onSubmit={ submit }
             >
-                <Stack gap="sm">
+                <Stack gap="md">
                     <TextInput
                         label="Email"
                         type="email"
+                        placeholder="you@example.com"
                         autoComplete="email"
+                        size="lg"
                         { ...form.getInputProps('email') }
                     />
-                    <PasswordInput
+                    { /* На канвасі помилка входу стоїть під полем пароля, і поле підсвічене червоним */ }
+                    <PasswordField
                         label="Password"
                         autoComplete="current-password"
-                        { ...form.getInputProps('password') }
+                        size="lg"
+                        { ...passwordProps }
+                        error={ passwordProps.error ?? formError }
+                        errorProps={ formError ? { role: 'alert' } : undefined }
                     />
-                    { formError && (
-                        <Text
-                            c="red"
-                            size="sm"
-                            role="alert"
-                        >
-                            { formError }
-                        </Text>
-                    ) }
                     <Button
                         type="submit"
+                        size="lg"
                         loading={ submitting }
                     >
                         Sign in

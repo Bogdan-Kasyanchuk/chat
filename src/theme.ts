@@ -85,7 +85,11 @@ const light = {
     '--chat-disabled-bg': '#E2E9E7',
     '--chat-disabled-text': '#7A8986',
     '--chat-ring': '#0B7A75',
-    '--chat-ring-soft': 'rgba(11, 122, 117, 0.18)'
+    '--chat-ring-soft': 'rgba(11, 122, 117, 0.18)',
+    // Кільце фокусу поля з помилкою (dangerRing у L / D)
+    '--chat-danger-ring': 'rgba(194, 55, 44, 0.18)',
+    // Крапки «друкує» у вітрині входу (Main); у темній канвас їх не має — тон між border-hover і disabled text
+    '--chat-typing': '#9BB0AC'
 };
 
 export type ChatToken = keyof typeof light;
@@ -143,7 +147,9 @@ const dark: Record<ChatToken, string> = {
     '--chat-disabled-bg': '#243032',
     '--chat-disabled-text': '#6E7F7C',
     '--chat-ring': '#4FD1C5',
-    '--chat-ring-soft': 'rgba(79, 209, 197, 0.25)'
+    '--chat-ring-soft': 'rgba(79, 209, 197, 0.25)',
+    '--chat-danger-ring': 'rgba(255, 138, 122, 0.25)',
+    '--chat-typing': '#5E716E'
 };
 
 export const TOKENS: Record<'light' | 'dark', Record<ChatToken, string>> = { light, dark };
@@ -156,7 +162,7 @@ const brand: MantineColorsTuple = [ '#E4F4F1', '#CDEDE9', '#9BDCD5', '#7FE0D6', 
 const gray: MantineColorsTuple = [ '#F1F5F4', '#E6ECEA', '#E2E9E7', '#DCE4E1', '#D5DEDB', '#7A8986', '#5A6B68', '#4D6662', '#2C3B39', '#16201F' ];
 const darkColors: MantineColorsTuple = [ '#E6EDEC', '#C3D2CF', '#93A4A1', '#6E7F7C', '#2C3A3B', '#243032', '#1B2425', '#151C1D', '#0E1415', '#0A0F10' ];
 
-// Небезпечні дії: red-7 у світлій, red-5 (danger solid) у темній; red-3 — червоний текст темної
+// Небезпечні дії: red-7 у світлій, red-5 (danger solid) у темній; червоний текст (c="red") — --chat-danger, див. mantineFromTokens
 const red: MantineColorsTuple = [ '#FDF4F3', '#FBEAE8', '#F7DAD6', '#FF8A7A', '#EE6A5E', '#E5574A', '#CC4A3E', '#C2372C', '#A82F25', '#8F271F' ];
 
 // Текст на залитих кнопках: у темній темі акцент світлий, тож текст на ньому темний
@@ -293,7 +299,11 @@ const theme = createTheme({
                         // Поле на тлі сторінки з рамкою (і в діалогах темної теми); filled — тло field, як пошук
                         '--input-bg': v === 'default' ? 'var(--chat-sidebar-bg)' : (v === 'filled' ? 'var(--chat-field)' : undefined),
                         // З помилкою рамку ставить Mantine (--mantine-color-error → --chat-danger)
-                        '--input-bd': v === 'default' && !error ? 'var(--chat-border)' : undefined
+                        '--input-bd': v === 'default' && !error ? 'var(--chat-border)' : undefined,
+                        // З помилкою червоні лише рамка й підпис, як на канвасі; Mantine фарбував би ще текст, плейсхолдер і іконки
+                        '--input-color': error ? 'var(--mantine-color-text)' : undefined,
+                        '--input-placeholder-color': error ? 'var(--mantine-color-placeholder)' : undefined,
+                        '--input-section-color': error ? 'var(--chat-muted)' : undefined
                     }
                 };
             }
@@ -402,7 +412,9 @@ const mantineFromTokens = {
     '--mantine-color-dimmed': 'var(--chat-muted)',
     '--mantine-color-anchor': 'var(--chat-accent-text)',
     // Плейсхолдер — muted: сірий Mantine (gray-5 / dark-3) не дотягує до 4.5:1 (рішення власника 2026-11-09)
-    '--mantine-color-placeholder': 'var(--chat-muted)'
+    '--mantine-color-placeholder': 'var(--chat-muted)',
+    // Червоний текст (c="red", Menu.Item color="red") — той самий danger, що й помилки полів; у темній Mantine дав би red-4
+    '--mantine-color-red-text': 'var(--chat-danger)'
 };
 
 export const cssVariablesResolver: CSSVariablesResolver = () => ({

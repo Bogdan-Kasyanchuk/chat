@@ -1,0 +1,29 @@
+.root {
+    display: flex;
+    align-items: center;
+    gap: rem(12px);
+}
+
+.mark {
+    flex: none;
+}
+
+/* Квадрат знака лишається brand-7 і в темній темі, як на канвасі */
+.tile {
+    fill: var(--mantine-color-brand-7);
+}
+
+.bubble {
+    fill: var(--mantine-color-white);
+}
+
+.reply {
+    stroke: var(--mantine-color-brand-2);
+}
+
+.name {
+    font-size: rem(30px);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}

@@ -5,6 +5,8 @@ import { addContact, isPhone, newUserPage, signUp } from './helpers';
 // Стани полів і чекбоксів з артборду Components живуть у global.css, тож jsdom їх не бачить — перевіряємо в браузері
 const ACCENT = 'rgb(11, 122, 117)';
 const MUTED = 'rgb(90, 107, 104)';
+const DANGER = 'rgb(194, 55, 44)';
+const DANGER_RING = 'rgba(194, 55, 44, 0.18)';
 
 const style = (locator: Locator, property: string) => locator.evaluate((element, name) => getComputedStyle(element).getPropertyValue(name), property);
 
@@ -40,4 +42,21 @@ test('an unchecked checkbox is a 2px muted ring', async ({ page, browser }) => {
     await expect(checkbox).not.toBeChecked();
     expect(await style(checkbox, 'border-top-width')).toBe('2px');
     expect(await style(checkbox, 'border-top-color')).toBe(MUTED);
+});
+
+// Поле з помилкою у фокусі — червоні рамка й м'яке кільце (dangerRing), а не акцентні
+test('a field with an error keeps the danger border and gets the danger ring in focus', async ({ page }) => {
+    await page.goto('/login');
+    await page.getByRole('button', { name: 'Sign in' }).click();
+
+    const email = page.getByLabel('Email');
+    const password = page.locator('.mantine-PasswordInput-root .mantine-Input-input');
+
+    await expect(email).toHaveAttribute('aria-invalid', 'true');
+
+    for (const [ field, focus ] of [ [ email, email ], [ password, page.getByLabel('Password', { exact: true }) ] ] as const) {
+        await focus.focus();
+        await expect.poll(async () => style(field, 'box-shadow')).toContain(DANGER_RING);
+        await expect.poll(async () => style(field, 'border-top-color')).toBe(DANGER);
+    }
 });

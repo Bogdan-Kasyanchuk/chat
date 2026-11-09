@@ -1,10 +1,11 @@
 import { useAuthActions } from '@convex-dev/auth/react';
-import { Anchor, Button, PasswordInput, Stack, Text, TextInput } from '@mantine/core';
+import { Anchor, Button, Stack, Text, TextInput } from '@mantine/core';
 import { hasLength, isEmail, matchesField, useForm } from '@mantine/form';
 import { type FC, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import AuthCard from '@/components/AuthCard';
+import PasswordField from '@/components/PasswordField';
 import useFrom from '@/hooks/useFrom';
 import authError from '@/lib/authError';
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH, NAME_REQUIRED, NAME_TOO_LONG, normalizeEmail } from '@convex/authRules';
@@ -54,11 +55,13 @@ const SignUpPage: FC = () => {
     return (
         <AuthCard
             title="Create account"
+            subtitle="It takes less than a minute."
             googleLabel="Continue with Google"
+            showcase="contacts"
             footer={
                 <Text
                     ta="center"
-                    size="sm"
+                    c="dimmed"
                 >
                     Have an account?
                     { ' ' }
@@ -66,6 +69,7 @@ const SignUpPage: FC = () => {
                         component={ Link }
                         to="/login"
                         state={ { from } }
+                        fw={ 600 }
                     >
                         Sign in
                     </Anchor>
@@ -76,32 +80,41 @@ const SignUpPage: FC = () => {
                 noValidate
                 onSubmit={ submit }
             >
-                <Stack gap="sm">
+                <Stack gap="md">
                     <TextInput
                         label="Name"
+                        placeholder="How contacts will see you"
                         autoComplete="name"
+                        size="lg"
                         { ...form.getInputProps('name') }
                     />
                     <TextInput
                         label="Email"
                         type="email"
+                        placeholder="you@example.com"
                         autoComplete="email"
+                        size="lg"
                         { ...form.getInputProps('email') }
                     />
-                    <PasswordInput
+                    { /* Підказка під полем, як на канвасі (у Mantine вона над полем) */ }
+                    <PasswordField
                         label="Password"
+                        description={ `At least ${ MIN_PASSWORD_LENGTH } characters` }
+                        inputWrapperOrder={ [ 'label', 'input', 'description', 'error' ] }
                         autoComplete="new-password"
+                        size="lg"
                         { ...form.getInputProps('password') }
                     />
-                    <PasswordInput
+                    <PasswordField
                         label="Confirm password"
                         autoComplete="new-password"
+                        size="lg"
                         { ...form.getInputProps('confirmPassword') }
                     />
                     { formError && (
                         <Text
                             c="red"
-                            size="sm"
+                            size="xs"
                             role="alert"
                         >
                             { formError }
@@ -109,6 +122,7 @@ const SignUpPage: FC = () => {
                     ) }
                     <Button
                         type="submit"
+                        size="lg"
                         loading={ submitting }
                     >
                         Create account
