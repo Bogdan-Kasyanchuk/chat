@@ -2,6 +2,7 @@ import {
     ActionIcon,
     Badge,
     Button,
+    Divider,
     Drawer,
     Input,
     Menu,
@@ -237,6 +238,11 @@ const theme = createTheme({
                 dropdown: { padding: rem(8) },
                 item: { minHeight: rem(40), borderRadius: rem(12), fontSize: 'var(--mantine-font-size-md)' }
             }
+        }),
+        // Розділювач «or» на екранах входу: як на канвасі, 14px приглушеним текстом на лінії line
+        Divider: Divider.extend({
+            defaultProps: { color: 'var(--chat-line)' },
+            styles: { label: { fontSize: 'var(--mantine-font-size-sm)', color: 'var(--chat-muted)' } }
         }),
         Badge: Badge.extend({
             defaultProps: { radius: 'xl' }

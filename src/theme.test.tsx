@@ -1,4 +1,4 @@
-import { Button, DEFAULT_THEME, PasswordInput, TextInput, Textarea, mergeMantineTheme, rem } from '@mantine/core';
+import { Button, DEFAULT_THEME, Divider, PasswordInput, TextInput, Textarea, mergeMantineTheme, rem } from '@mantine/core';
 import { screen } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
@@ -113,4 +113,15 @@ describe('control sizes', () => {
         expect(root.style.getPropertyValue('--button-height')).toBe(rem(44));
         expect(root.style.getPropertyValue('--button-fz')).toBe('var(--mantine-font-size-md)');
     });
+});
+
+// Розділювач «or» на екранах входу: 14px, приглушений текст, лінія кольору line
+test('divider label is 14px muted text on a line-coloured rule', () => {
+    renderWithProviders(<Divider label="or" />);
+    const label = screen.getByText('or');
+    const root = label.closest('.mantine-Divider-root') as HTMLElement;
+
+    expect(label.style.fontSize).toBe('var(--mantine-font-size-sm)');
+    expect(label.style.color).toBe('var(--chat-muted)');
+    expect(root.style.getPropertyValue('--divider-color')).toBe('var(--chat-line)');
 });
