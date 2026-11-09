@@ -2,12 +2,18 @@ import {
     ActionIcon,
     Badge,
     Button,
+    Checkbox,
+    CloseButton,
     Divider,
     Drawer,
     Input,
     Menu,
     Modal,
     Notification,
+    Popover,
+    Radio,
+    SegmentedControl,
+    Title,
     createTheme,
     localStorageColorSchemeManager,
     rem
@@ -25,6 +31,8 @@ import type { CSSVariablesResolver, MantineColorsTuple } from '@mantine/core';
 //   danger solid → --chat-danger-solid, hover → --chat-hover, pressed → --chat-pressed, disabled → --chat-disabled-bg.
 // Чого в палітрі немає (вхідна бульбашка, час і галочки в бульбашці, бейджі, toast, тіні, затемнення) —
 // з L / D у Chats.dc.html. Сіра галочка «надіслано» має колір часу в бульбашці.
+// Таблиця всіх токенів з ролями — розділ tokens на артборді Components; іконка помилки в toast (--chat-toast-danger)
+// і hover м'якої червоної кнопки (--chat-danger-soft-hover) додані разом з нею.
 const light = {
     '--chat-sidebar-bg': '#FFFFFF',
     '--chat-bg': '#E6EEEB',
@@ -65,6 +73,7 @@ const light = {
     '--chat-danger-solid': '#C2372C',
     '--chat-on-danger': '#FFFFFF',
     '--chat-danger-soft': '#FBEAE8',
+    '--chat-danger-soft-hover': '#F7DAD6',
     '--chat-popover': '#FFFFFF',
     '--chat-shadow': '0 10px 30px rgba(16, 32, 30, 0.16)',
     '--chat-overlay': 'rgba(14, 24, 23, 0.45)',
@@ -72,6 +81,7 @@ const light = {
     '--chat-toast-bg': '#16201F',
     '--chat-toast-text': '#F0F5F4',
     '--chat-toast-accent': '#7FE0D6',
+    '--chat-toast-danger': '#FF8A7A',
     '--chat-disabled-bg': '#E2E9E7',
     '--chat-disabled-text': '#7A8986',
     '--chat-ring': '#0B7A75',
@@ -121,6 +131,7 @@ const dark: Record<ChatToken, string> = {
     '--chat-danger-solid': '#E5574A',
     '--chat-on-danger': '#1A0806',
     '--chat-danger-soft': '#3A1F1C',
+    '--chat-danger-soft-hover': '#4A2622',
     '--chat-popover': '#1E2829',
     '--chat-shadow': '0 14px 36px rgba(0, 0, 0, 0.5)',
     '--chat-overlay': 'rgba(0, 0, 0, 0.6)',
@@ -128,6 +139,7 @@ const dark: Record<ChatToken, string> = {
     '--chat-toast-bg': '#E6EDEC',
     '--chat-toast-text': '#16201F',
     '--chat-toast-accent': '#0B7A75',
+    '--chat-toast-danger': '#C2372C',
     '--chat-disabled-bg': '#243032',
     '--chat-disabled-text': '#6E7F7C',
     '--chat-ring': '#4FD1C5',
@@ -160,6 +172,31 @@ const filledText = (variant: string | undefined, color: string | undefined): str
     return color === 'red' ? 'var(--chat-on-danger)' : undefined;
 };
 
+// Варіанти кнопок канвасу (Components → States):
+//   filled — primary, текст on-accent; filled red — destructive, текст on-danger;
+//   default — secondary: тло field, без рамки; outline gray — контурна кнопка входу (Google);
+//   light / subtle red — danger soft
+const variantVars = (variant: string | undefined, color: string | undefined) => {
+    const v = variant ?? 'filled';
+
+    if (v === 'default') {
+        return { bg: 'var(--chat-field)', hover: 'var(--chat-pressed)', color: 'var(--chat-text)', bd: 'none' };
+    }
+
+    if (v === 'outline' && color === 'gray') {
+        return { bg: 'var(--chat-sidebar-bg)', hover: 'var(--chat-hover)', color: 'var(--chat-text)', bd: `${ rem(1) } solid var(--chat-border)` };
+    }
+
+    if ((v === 'light' || v === 'subtle') && color === 'red') {
+        return { bg: 'var(--chat-danger-soft)', hover: 'var(--chat-danger-soft-hover)', color: 'var(--chat-danger)', bd: undefined };
+    }
+
+    return { bg: undefined, hover: undefined, color: filledText(variant, color), bd: undefined };
+};
+
+// Звичайний розмір: undefined або sm (InputBase сам ставить sm); size="lg" лишається 50 / 18 Mantine
+const isBase = (size: string | number | undefined) => size === undefined || size === 'sm';
+
 const overlay = { backgroundOpacity: 1, color: 'var(--chat-overlay)' };
 
 const theme = createTheme({
@@ -169,10 +206,20 @@ const theme = createTheme({
     black: '#16201F',
     white: '#FFFFFF',
     fontFamily: '\'Onest Variable\', system-ui, sans-serif',
+    // Текст 1.35, заголовки 1.2; h1 — заголовок входу 42, h2 — діалогів і нижніх панелей 28, h3 — ім'я профілю й порожні стани 20
+    lineHeights: { xs: '1.35', sm: '1.35', md: '1.35', lg: '1.35', xl: '1.35' },
     headings: {
         fontFamily: '\'Onest Variable\', system-ui, sans-serif',
-        fontWeight: '700'
+        fontWeight: '700',
+        sizes: {
+            h1: { fontSize: rem(42), lineHeight: '1.2' },
+            h2: { fontSize: rem(28), lineHeight: '1.2' },
+            h3: { fontSize: rem(20), lineHeight: '1.2' }
+        }
     },
+    cursorType: 'pointer',
+    // Натиснута кнопка зменшується до 98% (global.css)
+    activeClassName: 'chat-active',
     defaultRadius: 'md',
     radius: {
         xs: rem(4),
@@ -196,63 +243,150 @@ const theme = createTheme({
         lg: '64em',
         xl: '90em'
     },
-    // Розміри з «Рішень» плану: 44 — звичайні кнопки й поля (текст 16), 50 — size="lg" (текст 18, вхід і композер)
+    // Розміри з канвасу (Components → control sizes): 44 — звичайні кнопки й поля, 50 — size="lg" (вхід); текст 18
     components: {
         Button: Button.extend({
-            vars: (_, { size, variant, color }) => ({
-                root: {
-                    '--button-height': size === undefined ? rem(44) : undefined,
-                    '--button-fz': size === undefined ? 'var(--mantine-font-size-md)' : undefined,
-                    '--button-color': filledText(variant, color)
-                }
-            })
-        }),
-        ActionIcon: ActionIcon.extend({
-            vars: (_, { variant, color }) => ({
-                root: { '--ai-color': filledText(variant, color) }
-            })
-        }),
-        // TextInput, PasswordInput і Textarea малюють Input; 16px не дає iOS збільшувати сторінку при фокусі
-        // InputBase сам ставить size="sm", тож дефолтний розмір поля — і undefined, і sm
-        Input: Input.extend({
-            vars: (_, { size }) => {
-                const base = size === undefined || size === 'sm';
+            vars: (_, { size, variant, color }) => {
+                const v = variantVars(variant, color);
 
                 return {
-                    wrapper: {
-                        '--input-height': base ? rem(44) : undefined,
-                        '--input-fz': base ? 'var(--mantine-font-size-md)' : undefined
+                    root: {
+                        '--button-height': size === undefined ? rem(44) : undefined,
+                        '--button-fz': size === undefined ? 'var(--mantine-font-size-lg)' : undefined,
+                        '--button-bg': v.bg,
+                        '--button-hover': v.hover,
+                        '--button-color': v.color,
+                        '--button-bd': v.bd
                     }
                 };
             }
         }),
+        // Іконкові кнопки 44×44, круглі; сірі subtle — колір muted і hover рядків
+        ActionIcon: ActionIcon.extend({
+            defaultProps: { radius: 'xl' },
+            vars: (_, { size, variant, color }) => {
+                const muted = (variant === 'subtle' || variant === 'transparent') && color === 'gray';
+
+                return {
+                    root: {
+                        '--ai-size': size === undefined || size === 'md' || size === 'lg' ? rem(44) : undefined,
+                        '--ai-color': muted ? 'var(--chat-muted)' : filledText(variant, color),
+                        '--ai-hover': muted && variant === 'subtle' ? 'var(--chat-hover)' : undefined
+                    }
+                };
+            }
+        }),
+        CloseButton: CloseButton.extend({
+            defaultProps: { radius: 'xl' },
+            vars: (_, { size }) => ({ root: { '--cb-size': size === undefined ? rem(44) : undefined } }),
+            styles: { root: { color: 'var(--chat-muted)' } }
+        }),
+        // TextInput, PasswordInput і Textarea малюють Input; 18px більше за 16, тож iOS не збільшує сторінку при фокусі
+        Input: Input.extend({
+            vars: (_, { size, variant, error }) => {
+                const v = variant ?? 'default';
+
+                return {
+                    wrapper: {
+                        '--input-height': isBase(size) ? rem(44) : undefined,
+                        '--input-fz': isBase(size) ? 'var(--mantine-font-size-lg)' : undefined,
+                        // Поле на тлі сторінки з рамкою (і в діалогах темної теми); filled — тло field, як пошук
+                        '--input-bg': v === 'default' ? 'var(--chat-sidebar-bg)' : (v === 'filled' ? 'var(--chat-field)' : undefined),
+                        // З помилкою рамку ставить Mantine (--mantine-color-error → --chat-danger)
+                        '--input-bd': v === 'default' && !error ? 'var(--chat-border)' : undefined
+                    }
+                };
+            }
+        }),
+        // Підпис 14 / 600 на 8 над полем, підказка й помилка 12 на 4 під ним — і для полів входу 50
+        InputWrapper: Input.Wrapper.extend({
+            styles: {
+                label: { fontSize: 'var(--mantine-font-size-sm)', fontWeight: 600, marginBottom: rem(8) },
+                description: { fontSize: 'var(--mantine-font-size-xs)' },
+                error: { fontSize: 'var(--mantine-font-size-xs)', marginTop: rem(4) }
+            }
+        }),
+        Checkbox: Checkbox.extend({
+            vars: () => ({ root: { '--checkbox-size': rem(22), '--checkbox-radius': rem(6) } }),
+            styles: { label: { fontSize: 'var(--mantine-font-size-md)' } }
+        }),
+        Radio: Radio.extend({
+            vars: () => ({ root: { '--radio-size': rem(20), '--radio-icon-size': rem(10) } }),
+            styles: { label: { fontWeight: 600 } }
+        }),
+        // Перемикач теми: рамка field з відступом 4, сегменти 36 з радіусом 8, текст 14 / 600
+        SegmentedControl: SegmentedControl.extend({
+            defaultProps: { radius: 'md' },
+            vars: () => ({ root: { '--sc-padding': rem(4), '--sc-shadow': 'none', '--sc-font-size': 'var(--mantine-font-size-sm)' } }),
+            styles: {
+                root: { backgroundColor: 'var(--chat-field)' },
+                indicator: { backgroundColor: 'var(--chat-segment-on)', borderRadius: rem(8) },
+                label: { minHeight: rem(36), display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, color: 'var(--chat-text)' }
+            }
+        }),
+        Title: Title.extend({
+            styles: { root: { letterSpacing: '-0.02em' } }
+        }),
         Modal: Modal.extend({
-            defaultProps: { radius: 'lg', padding: 'lg', overlayProps: overlay }
+            defaultProps: { radius: 'lg', padding: rem(24), size: rem(420), overlayProps: overlay },
+            styles: {
+                content: { backgroundColor: 'var(--chat-popover)' },
+                header: { backgroundColor: 'var(--chat-popover)' },
+                title: { fontSize: rem(28), fontWeight: 700, lineHeight: 1.2, letterSpacing: '-0.02em' }
+            }
         }),
         Drawer: Drawer.extend({
-            defaultProps: { overlayProps: overlay }
+            defaultProps: { overlayProps: overlay },
+            styles: {
+                content: { backgroundColor: 'var(--chat-popover)' },
+                header: { backgroundColor: 'var(--chat-popover)' }
+            }
         }),
         Menu: Menu.extend({
             defaultProps: { radius: 'lg', shadow: 'md' },
             styles: {
-                dropdown: { padding: rem(8) },
-                item: { minHeight: rem(40), borderRadius: rem(12), fontSize: 'var(--mantine-font-size-md)' }
+                dropdown: { padding: rem(8), backgroundColor: 'var(--chat-popover)', border: 0 },
+                item: { minHeight: rem(44), borderRadius: rem(12), fontSize: 'var(--mantine-font-size-md)', fontWeight: 600 },
+                divider: { borderColor: 'var(--chat-line)' }
             }
+        }),
+        Popover: Popover.extend({
+            defaultProps: { radius: 'lg', shadow: 'md' },
+            styles: { dropdown: { backgroundColor: 'var(--chat-popover)', border: 0 } }
         }),
         // Розділювач «or» на екранах входу: як на канвасі, 14px приглушеним текстом на лінії line
         Divider: Divider.extend({
             defaultProps: { color: 'var(--chat-line)' },
             styles: { label: { fontSize: 'var(--mantine-font-size-sm)', color: 'var(--chat-muted)' } }
         }),
+        // Лічильник непрочитаних 20 / радіус 10, текст 12 / 700; сірий — лічильник замʼюченого чату
         Badge: Badge.extend({
-            defaultProps: { radius: 'xl' }
+            defaultProps: { radius: 'xl' },
+            vars: (_, { variant, color }) => {
+                if ((variant ?? 'filled') !== 'filled') {
+                    return { root: {} };
+                }
+
+                if (color === 'gray') {
+                    return { root: { '--badge-bg': 'var(--chat-badge-muted)', '--badge-color': 'var(--chat-badge-muted-text)' } };
+                }
+
+                return color === undefined || color === 'brand'
+                    ? { root: { '--badge-bg': 'var(--chat-badge)', '--badge-color': 'var(--chat-badge-text)' } }
+                    : { root: {} };
+            },
+            styles: { root: { textTransform: 'none', fontWeight: 700 } }
         }),
+        // Toast: інверсне тло, текст 16; колір (смужка чи іконка) — toast accent, для помилок — toast danger
         Notification: Notification.extend({
             defaultProps: { radius: 'lg' },
+            vars: (_, { color }) => ({
+                root: { '--notification-color': color === 'red' ? 'var(--chat-toast-danger)' : 'var(--chat-toast-accent)' }
+            }),
             styles: {
-                root: { backgroundColor: 'var(--chat-toast-bg)', boxShadow: 'var(--chat-shadow)' },
-                title: { color: 'var(--chat-toast-text)' },
-                description: { color: 'var(--chat-toast-text)' },
+                root: { backgroundColor: 'var(--chat-toast-bg)', boxShadow: 'var(--chat-shadow)', minHeight: rem(44) },
+                title: { color: 'var(--chat-toast-text)', fontSize: 'var(--mantine-font-size-md)' },
+                description: { color: 'var(--chat-toast-text)', fontSize: 'var(--mantine-font-size-md)' },
                 closeButton: { color: 'var(--chat-toast-text)' }
             }
         })
@@ -260,11 +394,24 @@ const theme = createTheme({
 });
 
 // Токени --chat-* для кожної схеми; у темній ще hover акценту й небезпечної кнопки світлішає, як на канвасі
+// Кольори Mantine, які бачать усі компоненти, ведуть на токени, щоб у кожної ролі було одне джерело
+const mantineFromTokens = {
+    '--mantine-color-body': 'var(--chat-sidebar-bg)',
+    '--mantine-color-text': 'var(--chat-text)',
+    '--mantine-color-error': 'var(--chat-danger)',
+    '--mantine-color-dimmed': 'var(--chat-muted)',
+    '--mantine-color-anchor': 'var(--chat-accent-text)'
+};
+
 export const cssVariablesResolver: CSSVariablesResolver = () => ({
     variables: {},
-    light: TOKENS.light,
+    light: { ...TOKENS.light, ...mantineFromTokens },
     dark: {
         ...TOKENS.dark,
+        ...mantineFromTokens,
+        // Поля й outline-кнопки в темній — на тлі сторінки з рамкою, як на канвасі (Mantine бере dark-6)
+        '--mantine-color-default': 'var(--chat-sidebar-bg)',
+        '--mantine-color-default-hover': 'var(--chat-hover)',
         '--mantine-color-brand-filled-hover': '#52D0C5',
         '--mantine-color-red-filled-hover': '#EE6A5E'
     }

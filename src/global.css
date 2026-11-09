@@ -8,6 +8,38 @@ body {
     background-color: var(--chat-bg);
 }
 
+/* Стани з артборду Components, яких не задати пропсами теми */
+
+/* Натиснута кнопка зменшується до 98% (theme.activeClassName) */
+@media (prefers-reduced-motion: no-preference) {
+    .chat-active:active {
+        transform: scale(0.98);
+    }
+}
+
+fieldset:disabled .chat-active:active {
+    transform: none;
+}
+
+/* Поле: рамка темнішає під курсором, у фокусі — м'яке кільце 3px */
+.mantine-Input-wrapper:not([data-error]) .mantine-Input-input:hover:not(:focus, :disabled) {
+    border-color: var(--chat-border-hover);
+}
+
+.mantine-Input-input:focus {
+    box-shadow: 0 0 0 3px var(--chat-ring-soft);
+}
+
+/* Радіо без вибору — кільце 2px кольору muted */
+.mantine-Radio-radio:not(:checked) {
+    border: 2px solid var(--chat-muted);
+}
+
+/* Скелетони — колір поля, як рядки-заглушки на канвасі */
+.mantine-Skeleton-root[data-visible]::after {
+    background-color: var(--chat-field);
+}
+
 /* Меню повідомлення відкривається під пальцем, і довге натискання на Android виділяло слово пункту під ним */
 .mantine-contextmenu {
     user-select: none;
