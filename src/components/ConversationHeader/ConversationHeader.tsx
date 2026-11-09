@@ -36,6 +36,7 @@ const ConversationHeader: FC<ConversationHeaderProps> = ({ chat, now, actions })
                 </ActionIcon>
             ) }
             <PresenceAvatar
+                userId={ partner.userId }
                 name={ partner.name }
                 avatar={ partner.avatar }
                 size={ 40 }

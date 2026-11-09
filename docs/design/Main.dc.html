@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+*{box-sizing:border-box}
+a{color:#0B7A75;text-decoration:none;font-weight:600}a:hover{color:#08625E;text-decoration:underline}
+input::placeholder{color:#5A6B68}
+button,a,input{transition:background-color .15s ease,border-color .15s ease,color .15s ease,box-shadow .15s ease,transform .1s ease}
+button:not(:disabled){cursor:pointer}
+button:disabled{cursor:not-allowed}
+input:hover:not(:focus):not(:disabled):not([aria-invalid="true"]){border-color:#B9C6C2 !important}
+input:focus{outline:none;border-color:#0B7A75 !important;box-shadow:0 0 0 3px rgba(11,122,117,.18)}
+input[aria-invalid="true"]{border-color:#C2372C !important}
+input[aria-invalid="true"]:focus{box-shadow:0 0 0 3px rgba(194,55,44,.18)}
+input:disabled{background:#F1F5F4 !important;color:#7A8986 !important;border-color:#E2E9E7 !important}
+button:focus-visible,a:focus-visible{outline:2px solid #0B7A75;outline-offset:2px}
+.btn-primary:hover{background:#08625E !important}
+.btn-primary:active{background:#06504D !important;transform:scale(.98)}
+.btn-primary:disabled{background:#E2E9E7 !important;color:#7A8986 !important;transform:none}
+.btn-outline:hover{background:#F1F5F4 !important;border-color:#B9C6C2 !important}
+.btn-outline:active{background:#E6ECEA !important;transform:scale(.98)}
+.btn-outline:disabled{background:#FFFFFF !important;color:#7A8986 !important;border-color:#E2E9E7 !important;transform:none}
+.btn-show:hover{background:#F1F5F4 !important}
+.btn-show:active{background:#E6ECEA !important}
+a:active{color:#06504D}
+</style>
+</helmet>
+<div style="min-height: 800px; display: flex; flex-wrap: wrap; background: #FFFFFF; color: #16201F; font-family: 'Onest', system-ui, sans-serif; line-height: 1.35">
+<section aria-hidden="true" style="flex: 1 1 560px; display: flex; flex-direction: column; justify-content: space-between; padding: 48px; background-color: #E6EEEB; background-image: radial-gradient(circle at 1px 1px, rgba(11, 122, 117, 0.16) 1px, transparent 0); background-size: 22px 22px; padding-top: 40px; padding-right: 60px; padding-bottom: 40px; padding-left: 60px; height: 820px">
+<div style="display: flex; align-items: center; gap: 12px">
+<svg width="36" height="36" viewBox="0 0 40 40"><rect width="40" height="40" rx="12" fill="#0B7A75"></rect><path d="M11 13.5h13a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-7l-4.5 3.5v-3.5H11a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3z" fill="#FFFFFF"></path><path d="M29.5 17.5h.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-.5v2.5l-3.2-2.5" fill="none" stroke="#9BDCD5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span style="font-size: 30px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2">Chat</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; align-self: stretch">
+<div style="align-self: center; margin-bottom: 8px; padding: 4px 10px; border-radius: 12px; background: #D5E1DD; color: #2C3B39; font-size: 14px; font-weight: 600">Today</div>
+<div style="align-self: flex-start; max-width: 300px; display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 12px; row-gap: 2px; padding: 8px 12px 6px; background: #FFFFFF; color: #16201F; box-shadow: 0 1px 1.5px rgba(16, 32, 30, 0.10); font-size: 16px; padding-top: 6px; padding-bottom: 6px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-bottom-right-radius: 12px; border-bottom-left-radius: 4px"><span>Are we still on for tonight?</span><span style="margin-left: auto; font-size: 12px; color: #4D6662">19:02</span></div>
+<div style="align-self: flex-end; max-width: 300px; margin-top: 8px; display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 12px; row-gap: 2px; padding: 8px 12px 6px; border-radius: 12px 12px 4px 12px; background: #D3F0EB; color: #0E2725; box-shadow: 0 1px 1.5px rgba(16, 32, 30, 0.10); font-size: 16px; padding-top: 6px"><span>Yes! Table for two at eight</span><span style="margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #4D6662">19:03<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B7A75" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 12 5 5L18 6"></path><path d="m12 15 2 2L24 6"></path></svg></span></div>
+<div style="align-self: flex-end; max-width: 300px; display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 12px; row-gap: 2px; padding: 8px 12px 6px; border-radius: 12px 4px 4px 12px; background: #D3F0EB; color: #0E2725; box-shadow: 0 1px 1.5px rgba(16, 32, 30, 0.10); font-size: 16px; padding-top: 6px"><span>Booked the place by the river</span><span style="margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #4D6662">19:03<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0B7A75" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m2 12 5 5L18 6"></path><path d="m12 15 2 2L24 6"></path></svg></span></div>
+<div style="align-self: flex-start; max-width: 300px; margin-top: 8px; display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 12px; row-gap: 2px; padding: 8px 12px 6px; border-radius: 12px 12px 12px 4px; background: #FFFFFF; color: #16201F; box-shadow: 0 1px 1.5px rgba(16, 32, 30, 0.10); font-size: 16px; padding-top: 6px; padding-bottom: 6px"><span style="flex-basis: 100%; font-size: 14px; font-weight: 600; color: #0B7A75">Forwarded from Iryna Bondar</span><span>Their terrace opens at 19:30</span><span style="margin-left: auto; font-size: 12px; color: #4D6662">19:05</span></div>
+<div style="align-self: flex-start; max-width: 300px; display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 12px; row-gap: 2px; padding: 8px 12px 6px; border-radius: 4px 12px 12px 4px; background: #FFFFFF; color: #16201F; box-shadow: 0 1px 1.5px rgba(16, 32, 30, 0.10); font-size: 16px; padding-top: 6px"><span>Perfect, see you there</span><span style="margin-left: auto; font-size: 12px; color: #4D6662">19:05</span></div>
+<div style="align-self: flex-end; max-width: 300px; margin-top: 8px; display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 12px; row-gap: 2px; padding: 8px 12px 6px; border-radius: 12px 12px 4px 12px; background: #D3F0EB; color: #0E2725; box-shadow: 0 1px 1.5px rgba(16, 32, 30, 0.10); font-size: 16px; padding-top: 6px"><span>See you!</span><span style="margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #4D6662">19:06<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4D6662" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5L20 7"></path></svg></span></div>
+<div style="align-self: flex-start; margin-top: 8px; display: inline-flex; gap: 4px; padding: 12px 14px; border-radius: 12px 12px 12px 4px; background: #FFFFFF; box-shadow: 0 1px 1.5px rgba(16, 32, 30, 0.10); padding-top: 10px; padding-bottom: 10px"><span style="width: 7px; height: 7px; border-radius: 4px; background: #9BB0AC"></span><span style="width: 7px; height: 7px; border-radius: 4px; background: #9BB0AC"></span><span style="width: 7px; height: 7px; border-radius: 4px; background: #9BB0AC"></span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px; align-self: stretch">
+<p style="margin: 0; font-size: 42px; line-height: 1.2; font-weight: 700; letter-spacing: -0.03em">Messages that arrive the moment they are sent.</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.35; color: #5A6B68">See who is online, reply, forward and keep your contacts in one place.</p>
+</div>
+</section>
+<main style="flex: 1 1 480px; display: flex; align-items: center; justify-content: center; padding: 48px 32px; padding-top: 40px; padding-right: 20px; padding-bottom: 40px; padding-left: 20px">
+<form style="width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<h1 style="margin: 0; font-size: 42px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em">Sign in</h1>
+<p style="margin: 0; font-size: 16px; color: #5A6B68">Welcome back. Pick up where you left off.</p>
+</div>
+<button type="button" class="btn-outline" style="height: 50px; display: flex; align-items: center; justify-content: center; gap: 12px; border-radius: 12px; border: 1px solid #D5DEDB; background: #FFFFFF; color: #16201F; font: 600 18px 'Onest', sans-serif; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.58-5.17 3.58-8.81z"></path><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.9l-3.88-3.01c-1.07.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.95H1.28v3.11A12 12 0 0 0 12 24z"></path><path fill="#FBBC05" d="M5.29 14.29a7.2 7.2 0 0 1 0-4.58V6.6H1.28a12 12 0 0 0 0 10.8z"></path><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.61 4.59 1.8l3.44-3.44A11.97 11.97 0 0 0 12 0 12 12 0 0 0 1.28 6.6l4.01 3.11C6.23 6.88 8.88 4.77 12 4.77z"></path></svg>
+Continue with Google
+</button>
+<div style="display: flex; align-items: center; gap: 12px; color: #5A6B68; font-size: 14px; line-height: 1"><span style="flex: 1; height: 1px; background: #E2E9E7"></span>or with email<span style="flex: 1; height: 1px; background: #E2E9E7"></span></div>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600"><span style="line-height: 1">Email</span>
+<input type="email" value="olena@example.com" style="height: 50px; padding: 0 14px; border-radius: 12px; border: 1px solid #D5DEDB; background: #FFFFFF; color: #16201F; font: 400 18px 'Onest', sans-serif">
+</label>
+<label style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; font-weight: 600"><span style="line-height: 1">Password</span>
+<span style="position: relative; display: flex">
+<input type="{{pwType}}" value="wrongpass" aria-invalid="true" style="flex: 1; min-width: 0; height: 50px; padding: 0 48px 0 14px; border-radius: 12px; border: 1px solid #C2372C; background: #FFFFFF; color: #16201F; font: 400 18px 'Onest', sans-serif">
+<button type="button" class="btn-show" onClick="{{ togglePw }}" aria-pressed="{{pwPressed}}" aria-label="{{pwAria}}" style="position: absolute; right: 3px; top: 3px; width: 44px; height: 44px; border: 0; border-radius: 12px; background: transparent; color: #5A6B68; cursor: pointer; display: flex; align-items: center; justify-content: center"><sc-if value="{{pwHidden}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></sc-if><sc-if value="{{pwShown}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 5.1A10.8 10.8 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.1"></path><path d="M6.6 6.6C3.8 8.4 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg></sc-if></button>
+</span>
+</label>
+<span role="alert" style="margin-top: -12px; font-size: 12px; font-weight: 400; color: #C2372C; line-height: 1">Wrong email or password</span>
+</div>
+<button type="submit" class="btn-primary" style="margin-top: -8px; height: 50px; border: 0; border-radius: 12px; background: #0B7A75; color: #FFFFFF; font: 600 18px 'Onest', sans-serif; cursor: pointer">Sign in</button>
+<p style="margin: 0; text-align: center; font-size: 16px; color: #5A6B68">No account? <a href="SignUp.dc.html">Create account</a></p>
+</form>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+renderVals() {
+const pw = !!(this.state && this.state.showPw);
+return {
+pwType: pw ? 'text' : 'password', pwHidden: !pw, pwShown: pw, pwAria: pw ? 'Hide password' : 'Show password', pwPressed: pw ? 'true' : 'false',
+togglePw: () => this.setState({ showPw: !pw })
+};
+}
+}
+</script>
+</body>
+</html>
