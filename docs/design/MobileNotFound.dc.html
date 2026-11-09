@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Page not found on a phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400..700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FFFFFF}
+*{box-sizing:border-box}
+a{transition:background-color .15s ease,transform .1s ease}
+a:focus-visible{outline:2px solid #0B7A75;outline-offset:2px}
+.btn-primary:hover{background:#08625E !important}
+.btn-primary:active{background:#06504D !important;transform:scale(.98)}
+</style>
+</helmet>
+<main style="width: 390px; height: 860px; overflow: hidden; display: flex; align-items: center; justify-content: center; padding: 20px; background: #FFFFFF; color: #16201F; font-family: 'Onest', system-ui, sans-serif; line-height: 1.35">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 20px; text-align: center">
+<span style="width: 80px; height: 80px; flex: none; border-radius: 40px; background: #F1F5F4; color: #0B7A75; display: flex; align-items: center; justify-content: center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 16l2 -6l6 -2l-2 6l-6 2"></path><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"></path><path d="M12 3l0 2"></path><path d="M12 19l0 2"></path><path d="M3 12l2 0"></path><path d="M19 12l2 0"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em">Page not found</h1>
+<p style="margin: 0; font-size: 14px; color: #5A6B68">The link is broken or the page was removed.</p>
+</div>
+<a href="MobileChats.dc.html" class="btn-primary" style="height: 44px; display: inline-flex; align-items: center; padding: 0 20px; border-radius: 22px; background: #0B7A75; color: #FFFFFF; font: 600 16px 'Onest', sans-serif; text-decoration: none">Back to chats</a>
+</div>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":860}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

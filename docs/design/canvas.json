@@ -10,6 +10,38 @@
       "x": 4080,
       "y": 2484
     },
+    "AddContactExists.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Add contact: already a contact",
+      "w": 1280,
+      "x": 10880,
+      "y": 5044
+    },
+    "AddContactNotFound.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Add contact: email not found",
+      "w": 1280,
+      "x": 9520,
+      "y": 5044
+    },
+    "ChatDeleted.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Chat: deleted account",
+      "w": 1280,
+      "x": 2720,
+      "y": 8968
+    },
+    "ChatEdit.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Editing a message",
+      "w": 1280,
+      "x": 0,
+      "y": 8968
+    },
     "ChatMenu.dc.html": {
       "expand": "fill",
       "h": 880,
@@ -17,6 +49,14 @@
       "w": 1280,
       "x": 4080,
       "y": 5044
+    },
+    "ChatStranger.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Chat: not in your contacts",
+      "w": 1280,
+      "x": 1360,
+      "y": 8968
     },
     "Chats.dc.html": {
       "expand": "fill",
@@ -43,9 +83,9 @@
       "y": 2484
     },
     "Components.dc.html": {
-      "h": 13600,
+      "h": 8000,
       "title": "Components and states",
-      "w": 1440,
+      "w": 1439,
       "x": 0,
       "y": 11532
     },
@@ -63,6 +103,14 @@
       "title": "Message menu (right click)",
       "w": 1280,
       "x": 0,
+      "y": 5044
+    },
+    "DeleteAccountDialog.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Delete account",
+      "w": 1280,
+      "x": 13600,
       "y": 5044
     },
     "DeleteDialog.dc.html": {
@@ -89,6 +137,22 @@
       "x": 6800,
       "y": 5044
     },
+    "Loading.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Loading",
+      "w": 1280,
+      "x": 9520,
+      "y": 8968
+    },
+    "LogoutDialog.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Log out",
+      "w": 1280,
+      "x": 12240,
+      "y": 5044
+    },
     "Main.dc.html": {
       "expand": "fill",
       "h": 820,
@@ -112,12 +176,40 @@
       "x": 0,
       "y": 7704
     },
+    "MobileAddContact.dc.html": {
+      "h": 844,
+      "title": "Add contact",
+      "w": 390,
+      "x": 0,
+      "y": 10268
+    },
+    "MobileChatMenu.dc.html": {
+      "h": 844,
+      "title": "Chat settings menu",
+      "w": 390,
+      "x": 1880,
+      "y": 10268
+    },
     "MobileChats.dc.html": {
       "h": 844,
       "title": "Chats",
       "w": 390,
       "x": 0,
       "y": 6324
+    },
+    "MobileChatsDark.dc.html": {
+      "h": 844,
+      "title": "Chats: dark",
+      "w": 390,
+      "x": 2820,
+      "y": 10268
+    },
+    "MobileChatsEmpty.dc.html": {
+      "h": 844,
+      "title": "Chats: new account",
+      "w": 390,
+      "x": 2350,
+      "y": 10268
     },
     "MobileContacts.dc.html": {
       "h": 844,
@@ -133,6 +225,13 @@
       "x": 470,
       "y": 6324
     },
+    "MobileConversationDark.dc.html": {
+      "h": 844,
+      "title": "Conversation: dark",
+      "w": 390,
+      "x": 3290,
+      "y": 10268
+    },
     "MobileDelete.dc.html": {
       "h": 844,
       "title": "Delete chat",
@@ -140,12 +239,33 @@
       "x": 940,
       "y": 7704
     },
+    "MobileEdit.dc.html": {
+      "h": 844,
+      "title": "Edit message",
+      "w": 390,
+      "x": 940,
+      "y": 10268
+    },
     "MobileEmoji.dc.html": {
       "h": 844,
       "title": "Emoji panel",
       "w": 390,
       "x": 1410,
       "y": 7704
+    },
+    "MobileForward.dc.html": {
+      "h": 844,
+      "title": "Forward to",
+      "w": 390,
+      "x": 1410,
+      "y": 10268
+    },
+    "MobileReply.dc.html": {
+      "h": 844,
+      "title": "Reply",
+      "w": 390,
+      "x": 470,
+      "y": 10268
     },
     "MobileSelection.dc.html": {
       "h": 844,
@@ -174,6 +294,22 @@
       "w": 390,
       "x": 470,
       "y": 1220
+    },
+    "ScrollDown.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Scrolled up: jump to newest",
+      "w": 1280,
+      "x": 4080,
+      "y": 8968
+    },
+    "SearchEmpty.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Search: no results",
+      "w": 1280,
+      "x": 8160,
+      "y": 8968
     },
     "Selection.dc.html": {
       "expand": "fill",
@@ -207,70 +343,6 @@
       "x": 1360,
       "y": 0
     },
-    "AddContactNotFound.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Add contact: email not found",
-      "w": 1280,
-      "x": 9520,
-      "y": 5044
-    },
-    "AddContactExists.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Add contact: already a contact",
-      "w": 1280,
-      "x": 10880,
-      "y": 5044
-    },
-    "LogoutDialog.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Log out",
-      "w": 1280,
-      "x": 12240,
-      "y": 5044
-    },
-    "DeleteAccountDialog.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Delete account",
-      "w": 1280,
-      "x": 13600,
-      "y": 5044
-    },
-    "ChatEdit.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Editing a message",
-      "w": 1280,
-      "x": 0,
-      "y": 8968
-    },
-    "ChatStranger.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Chat: not in your contacts",
-      "w": 1280,
-      "x": 1360,
-      "y": 8968
-    },
-    "ChatDeleted.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Chat: deleted account",
-      "w": 1280,
-      "x": 2720,
-      "y": 8968
-    },
-    "ScrollDown.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Scrolled up: jump to newest",
-      "w": 1280,
-      "x": 4080,
-      "y": 8968
-    },
     "ToastCopied.dc.html": {
       "expand": "fill",
       "h": 880,
@@ -287,77 +359,20 @@
       "x": 6800,
       "y": 8968
     },
-    "SearchEmpty.dc.html": {
+    "NotFound.dc.html": {
       "expand": "fill",
-      "h": 880,
-      "title": "Search: no results",
+      "h": 820,
+      "title": "Page not found",
       "w": 1280,
-      "x": 8160,
-      "y": 8968
+      "x": 2720,
+      "y": 0
     },
-    "Loading.dc.html": {
-      "expand": "fill",
-      "h": 880,
-      "title": "Loading",
-      "w": 1280,
-      "x": 9520,
-      "y": 8968
-    },
-    "MobileAddContact.dc.html": {
-      "h": 844,
-      "title": "Add contact",
-      "w": 390,
-      "x": 0,
-      "y": 10268
-    },
-    "MobileReply.dc.html": {
-      "h": 844,
-      "title": "Reply",
-      "w": 390,
-      "x": 470,
-      "y": 10268
-    },
-    "MobileEdit.dc.html": {
-      "h": 844,
-      "title": "Edit message",
+    "MobileNotFound.dc.html": {
+      "h": 860,
+      "title": "Page not found",
       "w": 390,
       "x": 940,
-      "y": 10268
-    },
-    "MobileForward.dc.html": {
-      "h": 844,
-      "title": "Forward to",
-      "w": 390,
-      "x": 1410,
-      "y": 10268
-    },
-    "MobileChatMenu.dc.html": {
-      "h": 844,
-      "title": "Chat settings menu",
-      "w": 390,
-      "x": 1880,
-      "y": 10268
-    },
-    "MobileChatsEmpty.dc.html": {
-      "h": 844,
-      "title": "Chats: new account",
-      "w": 390,
-      "x": 2350,
-      "y": 10268
-    },
-    "MobileChatsDark.dc.html": {
-      "h": 844,
-      "title": "Chats: dark",
-      "w": 390,
-      "x": 2820,
-      "y": 10268
-    },
-    "MobileConversationDark.dc.html": {
-      "h": 844,
-      "title": "Conversation: dark",
-      "w": 390,
-      "x": 3290,
-      "y": 10268
+      "y": 1220
     }
   },
   "createdOnFiles": {
@@ -383,8 +398,8 @@
   "notes": {
     "rowActionsDesktop": {
       "kind": "title1",
-      "maxW": 14880,
-      "text": "Actions \u00b7 desktop",
+      "maxW": 8000,
+      "text": "Actions · desktop",
       "w": 240,
       "x": 0,
       "y": 4744
@@ -392,23 +407,23 @@
     "rowActionsPhone": {
       "kind": "title1",
       "maxW": 1800,
-      "text": "Actions \u00b7 phone",
+      "text": "Actions · phone",
       "w": 240,
       "x": 0,
       "y": 7404
     },
     "rowAuthDesktop": {
       "kind": "title1",
-      "maxW": 2640,
-      "text": "Auth \u00b7 desktop",
+      "maxW": 4000,
+      "text": "Auth · desktop",
       "w": 240,
       "x": 0,
       "y": -300
     },
     "rowAuthPhone": {
       "kind": "title1",
-      "maxW": 860,
-      "text": "Auth \u00b7 phone",
+      "maxW": 1330,
+      "text": "Auth · phone",
       "w": 240,
       "x": 0,
       "y": 920
@@ -416,7 +431,7 @@
     "rowChatDark": {
       "kind": "title1",
       "maxW": 2640,
-      "text": "Chat \u00b7 desktop \u00b7 dark",
+      "text": "Chat · desktop · dark",
       "w": 240,
       "x": 0,
       "y": 3464
@@ -424,7 +439,7 @@
     "rowChatLight": {
       "kind": "title1",
       "maxW": 6720,
-      "text": "Chat \u00b7 desktop \u00b7 light",
+      "text": "Chat · desktop · light",
       "w": 240,
       "x": 0,
       "y": 2184
@@ -432,7 +447,7 @@
     "rowChatPhone": {
       "kind": "title1",
       "maxW": 1800,
-      "text": "Chat \u00b7 phone",
+      "text": "Chat · phone",
       "w": 240,
       "x": 0,
       "y": 6024
@@ -447,8 +462,8 @@
     },
     "rowMoreDesktop": {
       "kind": "title1",
-      "maxW": 10800,
-      "text": "More states \u00b7 desktop",
+      "maxW": 8000,
+      "text": "More states · desktop",
       "w": 240,
       "x": 0,
       "y": 8668
@@ -456,7 +471,7 @@
     "rowMorePhone": {
       "kind": "title1",
       "maxW": 3680,
-      "text": "More states \u00b7 phone",
+      "text": "More states · phone",
       "w": 240,
       "x": 0,
       "y": 9968
@@ -467,6 +482,8 @@
     "SignUp.dc.html",
     "MobileSignIn.dc.html",
     "MobileSignUp.dc.html",
+    "NotFound.dc.html",
+    "MobileNotFound.dc.html",
     "Chats.dc.html",
     "ChatsEmpty.dc.html",
     "Contacts.dc.html",

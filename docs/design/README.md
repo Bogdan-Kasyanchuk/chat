@@ -1,6 +1,6 @@
 # Дизайн редизайну chat
 
-Копія канвасу «Chat redesign» https://claude.ai/artifact/XLx5GvCkUuVC57mLRdFhid станом на 2026-11-10 (версія `1794261796-1583`, 47 артбордів), щоб будь-яка сесія читала дизайн без доступу до claude.ai. Канвас — джерело правди: якщо власник змінює його, ця тека оновлюється новою копією, а нижче з'являється запис у «Змінах».
+Копія канвасу «Chat redesign» https://claude.ai/artifact/XLx5GvCkUuVC57mLRdFhid станом на 2026-11-10 (версія `1794262463-5a6d`, 49 артбордів), щоб будь-яка сесія читала дизайн без доступу до claude.ai. Канвас — джерело правди: якщо власник змінює його, ця тека оновлюється новою копією, а нижче з'являється запис у «Змінах».
 
 План і стан робіт — `docs/superpowers/plans/2026-10-18-redesign.md`, там же таблиця «Відповідність канвасу, коду й етапів».
 
@@ -27,7 +27,7 @@
 
 Решта артбордів (`ChatsDark`, `ContextMenu`, `MobileReply` та інші) — це один рядок `<dc-import name="Chats" overlay="…">`. Щоб побачити розмітку такого екрана, шукай у базовому файлі гілку з відповідним значенням перемикача (наприклад, `overlay === 'forward'` або `<sc-if value="{{toastDeleted}}">`).
 
-Окрему власну розмітку мають `Main` (Sign in), `SignUp`, `MobileSignIn`, `MobileSignUp` і `Components`.
+Окрему власну розмітку мають `Main` (Sign in), `SignUp`, `MobileSignIn`, `MobileSignUp`, `NotFound`, `MobileNotFound` (404) і `Components`.
 
 ## Аркуш `Components`
 
@@ -56,6 +56,7 @@
 
 ## Зміни
 
+- **2026-11-10, версія `1794262463-5a6d`** — нові артборди `NotFound` (1280×820, ряд «Auth · desktop») і `MobileNotFound` (390×860, ряд «Auth · phone»): сторінка 404 у світлій темі, як у коді етапу 2 — компас у колі 80, «Page not found» (h1, 20 / 700), «The link is broken or the page was removed.», pill-посилання «Back to chats» (44, радіус 22, текст 16) посередині сторінки. Тепер 49 артбордів.
 - **2026-11-10, версія `1794261796-1583`** — канвас підтягнуто до коду етапу 2:
   - кнопка з оком на `Main`, `SignUp`, `MobileSignIn`, `MobileSignUp` — перемикач з незмінним підписом «Show password» / «Show confirm password» і `aria-pressed` (раніше підпис мінявся на «Hide…»);
   - крапки вітрини на `Main` і `SignUp` — токен `--chat-pattern` `rgba(11, 122, 117, 0.10)` замість 0.16; картки контактів на `SignUp` — `width: 100%; max-width: 400px`;
