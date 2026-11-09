@@ -32,6 +32,7 @@ afterEach(() => {
 const pick = async (file: File) => {
     const { container } = renderWithProviders(
         <AvatarUpload
+            userId="k17me"
             name="Alice"
             avatar={ null }
         />
@@ -69,6 +70,7 @@ test('AvatarUpload removes the photo', async () => {
 
     renderWithProviders(
         <AvatarUpload
+            userId="k17me"
             name="Alice"
             avatar="https://img.test/a.png"
         />
@@ -88,6 +90,7 @@ test('AvatarUpload lets the same file be picked twice', async () => {
     const file = new File([ 'x' ], 'a.png', { type: 'image/png' });
     const { container } = renderWithProviders(
         <AvatarUpload
+            userId="k17me"
             name="Alice"
             avatar={ null }
         />

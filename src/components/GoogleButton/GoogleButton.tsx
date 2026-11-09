@@ -39,7 +39,8 @@ const GoogleButton: FC<{ label: string }> = ({ label }) => {
 
     return (
         <Button
-            variant="default"
+            variant="outline"
+            color="gray"
             leftSection={ <GoogleIcon /> }
             fullWidth
             onClick={
