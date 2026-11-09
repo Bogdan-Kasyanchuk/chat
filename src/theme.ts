@@ -50,7 +50,7 @@ const light = {
     '--chat-pressed': '#E6ECEA',
     '--chat-active': '#0B7A75',
     '--chat-active-text': '#FFFFFF',
-    '--chat-active-muted': '#CDEDE9',
+    '--chat-active-muted': '#E4F4F1',
     '--chat-select-row': 'rgba(11, 122, 117, 0.12)',
     '--chat-bubble-in': '#FFFFFF',
     '--chat-bubble-in-text': '#16201F',
@@ -307,11 +307,11 @@ const theme = createTheme({
             }
         }),
         Checkbox: Checkbox.extend({
-            vars: () => ({ root: { '--checkbox-size': rem(22), '--checkbox-radius': rem(6) } }),
+            vars: () => ({ root: { '--checkbox-size': rem(22), '--checkbox-radius': rem(6), '--checkbox-icon-color': 'var(--chat-on-accent)' } }),
             styles: { label: { fontSize: 'var(--mantine-font-size-md)' } }
         }),
         Radio: Radio.extend({
-            vars: () => ({ root: { '--radio-size': rem(20), '--radio-icon-size': rem(10) } }),
+            vars: () => ({ root: { '--radio-size': rem(20), '--radio-icon-size': rem(10), '--radio-icon-color': 'var(--chat-on-accent)' } }),
             styles: { label: { fontWeight: 600 } }
         }),
         // Перемикач теми: рамка field з відступом 4, сегменти 36 з радіусом 8, текст 14 / 600
@@ -400,7 +400,9 @@ const mantineFromTokens = {
     '--mantine-color-text': 'var(--chat-text)',
     '--mantine-color-error': 'var(--chat-danger)',
     '--mantine-color-dimmed': 'var(--chat-muted)',
-    '--mantine-color-anchor': 'var(--chat-accent-text)'
+    '--mantine-color-anchor': 'var(--chat-accent-text)',
+    // Плейсхолдер — muted: сірий Mantine (gray-5 / dark-3) не дотягує до 4.5:1 (рішення власника 2026-11-09)
+    '--mantine-color-placeholder': 'var(--chat-muted)'
 };
 
 export const cssVariablesResolver: CSSVariablesResolver = () => ({

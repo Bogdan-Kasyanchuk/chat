@@ -38,12 +38,25 @@ describe('TOKENS', () => {
             [ '--chat-danger', '--chat-sidebar-bg' ],
             [ '--chat-badge-text', '--chat-badge' ],
             [ '--chat-badge-muted-text', '--chat-badge-muted' ],
-            [ '--chat-toast-text', '--chat-toast-bg' ]
+            [ '--chat-toast-text', '--chat-toast-bg' ],
+            [ '--chat-active-muted', '--chat-active' ],
+            [ '--chat-on-accent', '--chat-accent' ],
+            [ '--chat-on-danger', '--chat-danger-solid' ],
+            [ '--chat-danger', '--chat-danger-soft' ],
+            [ '--chat-muted', '--chat-field' ],
+            [ '--chat-muted', '--chat-popover' ],
+            [ '--chat-text', '--chat-field' ],
+            [ '--chat-text', '--chat-popover' ],
+            [ '--chat-accent-text', '--chat-popover' ],
+            [ '--chat-danger', '--chat-popover' ]
         ];
         // Іконки (3:1): помилка й успіх у toast
         const icons: Array<[ ChatToken, ChatToken ]> = [
             [ '--chat-toast-danger', '--chat-toast-bg' ],
-            [ '--chat-toast-accent', '--chat-toast-bg' ]
+            [ '--chat-toast-accent', '--chat-toast-bg' ],
+            [ '--chat-tick-read', '--chat-bubble-out' ],
+            [ '--chat-tick', '--chat-bubble-out' ],
+            [ '--chat-tick-read', '--chat-bubble-in' ]
         ];
 
         for (const [ icon, bg ] of icons) {
@@ -90,7 +103,9 @@ describe('TOKENS', () => {
                 '--mantine-color-text': 'var(--chat-text)',
                 '--mantine-color-error': 'var(--chat-danger)',
                 '--mantine-color-dimmed': 'var(--chat-muted)',
-                '--mantine-color-anchor': 'var(--chat-accent-text)'
+                '--mantine-color-anchor': 'var(--chat-accent-text)',
+                // Плейсхолдер — muted: сірий Mantine (gray-5 / dark-3) не дотягує до 4.5:1
+                '--mantine-color-placeholder': 'var(--chat-muted)'
             });
         }
 
@@ -229,6 +244,9 @@ describe('control sizes', () => {
         expect(checkbox.style.getPropertyValue('--checkbox-radius')).toBe(rem(6));
         expect(radio.style.getPropertyValue('--radio-size')).toBe(rem(20));
         expect(radio.style.getPropertyValue('--radio-icon-size')).toBe(rem(10));
+        // Галочка й крапка на акценті: у темній темі акцент світлий, тож вони мають колір on-accent, а не білий
+        expect(checkbox.style.getPropertyValue('--checkbox-icon-color')).toBe('var(--chat-on-accent)');
+        expect(radio.style.getPropertyValue('--radio-icon-color')).toBe('var(--chat-on-accent)');
     });
 });
 

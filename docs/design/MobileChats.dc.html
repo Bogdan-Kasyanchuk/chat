@@ -405,9 +405,9 @@ const chats = [
   { name: 'Marko Shevchuk', ini: 'MS', col: '#2F74B5', online: true, preview: 'It fails for HEIC photos from my phone', time: '14:02', unread: '2' },
   { name: 'Iryna Bondar', ini: 'IB', col: '#B84F84', preview: 'You: See you at 10:30', time: '13:47', ticks: 'read' },
   { name: 'Ostap Savchenko', ini: 'OS', col: '#9C6A0E', preview: 'Hi! We met at the meetup, is this Olena?', time: '12:20', unread: '1' },
-  { name: 'Taras Melnyk', ini: 'TM', col: '#3E8A4A', online: true, preview: 'Sounds good, let’s do Friday', time: 'Mon', unread: '5', muted: true },
+  { name: 'Taras Melnyk', ini: 'TM', col: '#3A8445', online: true, preview: 'Sounds good, let’s do Friday', time: 'Mon', unread: '5', muted: true },
   { name: 'Sofia Hrytsenko', ini: 'SH', col: '#7553C2', preview: 'You: Sent the slides', time: 'Sun', ticks: 'sent' },
-  { name: 'Dmytro Lysenko', ini: 'DL', col: '#C4573F', preview: 'Thanks!', time: 'Oct 12' },
+  { name: 'Dmytro Lysenko', ini: 'DL', col: '#BD5139', preview: 'Thanks!', time: 'Oct 12' },
   { name: 'Anna Tkachuk', ini: 'AT', col: '#1F7F7C', preview: 'You: Happy birthday!', time: 'Oct 9', ticks: 'read' },
   { name: 'Deleted account', ini: '', col: '#7C8B88', deleted: true, preview: 'Sure, talk later', time: 'Oct 3' }
 ].map((x) => ({
@@ -424,11 +424,11 @@ const chats = [
 
 const contacts = [
   { name: 'Anna Tkachuk', ini: 'AT', col: '#1F7F7C', status: 'last seen yesterday at 22:10' },
-  { name: 'Dmytro Lysenko', ini: 'DL', col: '#C4573F', status: 'last seen Oct 12' },
+  { name: 'Dmytro Lysenko', ini: 'DL', col: '#BD5139', status: 'last seen Oct 12' },
   { name: 'Iryna Bondar', ini: 'IB', col: '#B84F84', status: 'last seen 5 minutes ago' },
   { name: 'Marko Shevchuk', ini: 'MS', col: '#2F74B5', status: 'online', online: true },
   { name: 'Sofia Hrytsenko', ini: 'SH', col: '#7553C2', status: 'last seen today at 09:05' },
-  { name: 'Taras Melnyk', ini: 'TM', col: '#3E8A4A', status: 'online', online: true }
+  { name: 'Taras Melnyk', ini: 'TM', col: '#3A8445', status: 'online', online: true }
 ].map((x) => ({ ...x, online: !!x.online, statusColor: x.online ? c.accentText : c.muted }));
 
 const sel = { 'Tomorrow morning, promise': true, 'Thanks, I’ll be there': true };
@@ -528,7 +528,7 @@ const chatMenuItems = [
 const forwardList = [
   { heading: 'Chats', hm: '0 10px 4px' },
   { name: 'Iryna Bondar', ini: 'IB', col: '#B84F84', status: 'last seen 5 minutes ago' },
-  { name: 'Taras Melnyk', ini: 'TM', col: '#3E8A4A', status: 'online', online: true },
+  { name: 'Taras Melnyk', ini: 'TM', col: '#3A8445', status: 'online', online: true },
   { name: 'Sofia Hrytsenko', ini: 'SH', col: '#7553C2', status: 'last seen today at 09:05' },
   { name: 'Ostap Savchenko', ini: 'OS', col: '#9C6A0E', status: 'last seen 2 hours ago' },
   { heading: 'Contacts', hm: '20px 10px 4px' },
