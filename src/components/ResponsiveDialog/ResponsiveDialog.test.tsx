@@ -47,3 +47,33 @@ test('Escape closes the bottom sheet', async () => {
 
     expect(onClose).toHaveBeenCalled();
 });
+
+// Поки дія виконується (вихід, видалення), діалог не закривається: ні хрестиком, ні Escape
+test('a busy dialog cannot be closed on the desktop or the phone', async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    const renderBusy = () => renderWithProviders(
+        <ResponsiveDialog
+            title="Log out?"
+            opened
+            busy
+            onClose={ onClose }
+        >
+            <p>text</p>
+        </ResponsiveDialog>
+    );
+
+    mockViewport(true);
+
+    const { unmount } = renderBusy();
+
+    expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+    await user.keyboard('{Escape}');
+
+    unmount();
+    mockViewport(false);
+    renderBusy();
+    await user.keyboard('{Escape}');
+
+    expect(onClose).not.toHaveBeenCalled();
+});

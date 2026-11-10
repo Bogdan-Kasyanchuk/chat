@@ -23,7 +23,8 @@ type ConfirmProps = {
     onClose: () => void
 };
 
-// Діалоги LogoutDialog і DeleteAccountDialog (на телефоні — нижні панелі): текст, «Cancel» і дія
+// Діалоги LogoutDialog і DeleteAccountDialog (на телефоні — нижні панелі): текст, «Cancel» і дія.
+// Фокус спершу на «Cancel»: на телефоні хрестика немає, і першою кнопкою була б сама дія
 const Confirm: FC<ConfirmProps> = ({ opened, title, text, action, busy, onClose }) => (
     <ResponsiveDialog
         opened={ opened }
@@ -42,6 +43,7 @@ const Confirm: FC<ConfirmProps> = ({ opened, title, text, action, busy, onClose 
                 <Button
                     variant="default"
                     disabled={ busy }
+                    data-autofocus
                     onClick={ onClose }
                 >
                     Cancel

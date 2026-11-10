@@ -123,3 +123,18 @@ test('Log out asks for confirmation in a dialog on the desktop', async () => {
 
     expect(buttons).toEqual([ 'Close', 'Cancel', 'Log out' ]);
 });
+
+// Хрестика в нижній панелі немає: без підказки фокус став би на першу кнопку — на саме видалення
+test('the confirmation starts on Cancel, not on the destructive action', async () => {
+    const user = userEvent.setup();
+
+    renderWithProviders(<AccountSettings />);
+
+    await user.click(screen.getByRole('button', { name: 'Delete account' }));
+
+    const sheet = screen.getByRole('dialog', { name: 'Delete account?' });
+
+    await waitFor(() => {
+        expect(document.activeElement).toBe(within(sheet).getByRole('button', { name: 'Cancel' }));
+    });
+});

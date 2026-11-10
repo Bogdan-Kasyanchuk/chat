@@ -321,8 +321,10 @@ const theme = createTheme({
             vars: () => ({ root: { '--checkbox-size': rem(22), '--checkbox-radius': rem(6), '--checkbox-icon-color': 'var(--chat-on-accent)' } }),
             styles: { label: { fontSize: 'var(--mantine-font-size-md)' } }
         }),
+        // Радіо 20: вибране — кільце 2 і крапка 10 кольору акценту на прозорому тлі (outline; кільце — global.css)
         Radio: Radio.extend({
-            vars: () => ({ root: { '--radio-size': rem(20), '--radio-icon-size': rem(10), '--radio-icon-color': 'var(--chat-on-accent)' } }),
+            defaultProps: { variant: 'outline' },
+            vars: () => ({ root: { '--radio-size': rem(20), '--radio-icon-size': rem(10), '--radio-color': 'var(--chat-accent)' } }),
             styles: { label: { fontWeight: 600 } }
         }),
         // Перемикач теми: рамка field з відступом 4, сегменти 36 з радіусом 8 без роздільників, текст 14 / 600
@@ -373,7 +375,8 @@ const theme = createTheme({
         }),
         // Ініціали 16 / 600 на аватарі 44 (Components → avatars); на інших розмірах — та сама пропорція
         Avatar: Avatar.extend({
-            styles: { placeholder: { fontSize: 'calc(var(--avatar-size) * 0.364)', fontWeight: 600 } }
+            // Ініціали 16 на аватарі 44 і пропорційно; --avatar-initials-fz — де канвас відходить від пропорції (фото профілю)
+            styles: { placeholder: { fontSize: 'var(--avatar-initials-fz, calc(var(--avatar-size) * 0.364))', fontWeight: 600 } }
         }),
         // Лічильник непрочитаних 20 / радіус 10, текст 12 / 700; сірий — лічильник замʼюченого чату
         Badge: Badge.extend({
