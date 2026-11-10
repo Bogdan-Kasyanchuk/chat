@@ -1,0 +1,24 @@
+/* Рядок як пункт меню: 44, радіус 12, текст 16 / 600; «Delete account» — кольору danger */
+.row {
+    display: flex;
+    align-items: center;
+    gap: rem(8px);
+    min-height: rem(44px);
+    padding: 0 rem(10px);
+    border-radius: rem(12px);
+    font-size: var(--mantine-font-size-md);
+    font-weight: 600;
+    color: var(--chat-text);
+
+    @mixin hover {
+        background-color: var(--chat-hover);
+    }
+
+    &[data-danger] {
+        color: var(--chat-danger);
+
+        @mixin hover {
+            background-color: var(--chat-danger-soft);
+        }
+    }
+}

@@ -47,7 +47,7 @@ const showSidebar = async (page: Page) => {
 const searchbox = (page: Page, name: 'Search' | 'Search contacts') => page.getByRole('searchbox', { name, exact: true });
 
 // Розділ бічної панелі: на десктопі — меню ☰ (з контактів назад веде стрілка), на телефоні — нижні вкладки.
-// Після кожного переходу чекаємо пошук потрібного розділу, а Settings — свій діалог (його чекає openSettings)
+// Після кожного переходу чекаємо пошук потрібного розділу, а Settings — свою панель (її чекає openSettings)
 export const sidebarSection = async (page: Page, section: 'Chats' | 'Contacts' | 'Settings') => {
     await showSidebar(page);
 
@@ -61,14 +61,19 @@ export const sidebarSection = async (page: Page, section: 'Chats' | 'Contacts' |
         return;
     }
 
-    // Панель показує або чати, або контакти: дочекатися, доки відмалюється одне з двох
-    await expect(searchbox(page, 'Search').or(searchbox(page, 'Search contacts'))).toBeVisible();
+    // Панель показує чати, контакти чи налаштування: дочекатися, доки відмалюється одне з трьох
+    const settings = page.getByRole('region', { name: 'Settings', exact: true });
 
-    if (await searchbox(page, 'Search contacts').isVisible()) {
-        if (section === 'Contacts') {
-            return;
-        }
+    await expect(searchbox(page, 'Search').or(searchbox(page, 'Search contacts')).or(settings)).toBeVisible();
 
+    const contacts = await searchbox(page, 'Search contacts').isVisible() ? 'Contacts' : 'Chats';
+    const current = await settings.isVisible() ? 'Settings' : contacts;
+
+    if (current === section) {
+        return;
+    }
+
+    if (current !== 'Chats') {
         await page.getByRole('button', { name: 'Back to chats', exact: true }).click();
         await expect(searchbox(page, 'Search')).toBeVisible();
     }
@@ -182,14 +187,17 @@ export const messageMenu = async (page: Page, text: string, item: string) => {
 export const openSettings = async (page: Page) => {
     await sidebarSection(page, 'Settings');
 
-    return page.getByRole('dialog', { name: 'Settings' });
+    const settings = page.getByRole('region', { name: 'Settings', exact: true });
+
+    await expect(settings.getByLabel('Name', { exact: true })).toBeVisible();
+
+    return settings;
 };
 
-// Вихід: Settings → Account → Log out і підтвердження
+// Вихід: Settings → Log out (розділ Account) і підтвердження
 export const logOut = async (page: Page) => {
     const settings = await openSettings(page);
 
-    await settings.getByRole('tab', { name: 'Account' }).click();
     await settings.getByRole('button', { name: 'Log out' }).click();
     await page.getByRole('dialog', { name: 'Log out?' }).getByRole('button', { name: 'Log out' }).click();
     await expect(page).toHaveURL(/\/login$/);

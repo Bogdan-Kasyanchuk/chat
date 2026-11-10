@@ -17,6 +17,7 @@ const findByEmail = vi.fn();
 vi.mock('convex/react', () => ({
     useQuery: (ref: FunctionReference<'query'>) => queries[ getFunctionName(ref) ],
     useMutation: () => openChat,
+    useAction: () => vi.fn(),
     useConvex: () => ({ query: findByEmail })
 }));
 
@@ -159,8 +160,43 @@ test('a chat opened from Add contact also returns the sidebar to chats', async (
     expect(await screen.findByRole('searchbox', { name: 'Search' })).toBeTruthy();
 });
 
-test('Settings in the main menu opens the settings dialog', async () => {
+// Налаштування — панель у бічній панелі, а не модалка: розмова праворуч лишається відкритою
+test('settings open in the sidebar and keep the conversation on the right', async () => {
     mockViewport(true);
+    queries[ 'users:me' ] = { id: 'u1', name: 'Alice', email: 'alice@example.com', avatar: null, sound: 'classic' };
+
+    const user = userEvent.setup();
+
+    renderWithProviders(
+        <>
+            <History />
+            <Routes>
+                <Route
+                    path="/chat/:chatId"
+                    element={ <Sidebar /> }
+                />
+            </Routes>
+        </>,
+        { route: '/chat/c-Bob' }
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Open menu' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Settings' }));
+
+    expect(await screen.findByRole('region', { name: 'Settings' })).toBeTruthy();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByRole('searchbox')).toBeNull();
+    expect(screen.getByRole('status').textContent).toBe('/chat/c-Bob');
+
+    await user.click(screen.getByRole('button', { name: 'Back to chats' }));
+
+    expect(screen.getByRole('searchbox', { name: 'Search' })).toBeTruthy();
+});
+
+// Пункт меню зникає разом з меню: фокус переходить на стрілку «назад», а з неї — у пошук чатів
+test('settings opened from the menu focus the back arrow, and back focuses the search', async () => {
+    mockViewport(true);
+    queries[ 'users:me' ] = { id: 'u1', name: 'Alice', email: 'alice@example.com', avatar: null, sound: 'classic' };
 
     const user = userEvent.setup();
 
@@ -169,7 +205,15 @@ test('Settings in the main menu opens the settings dialog', async () => {
     await user.click(screen.getByRole('button', { name: 'Open menu' }));
     await user.click(screen.getByRole('menuitem', { name: 'Settings' }));
 
-    expect(await screen.findByRole('dialog', { name: 'Settings' })).toBeTruthy();
+    await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Back to chats' }));
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Back to chats' }));
+
+    await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByRole('searchbox', { name: 'Search' }));
+    });
 });
 
 test('Add contact in the contacts section opens the dialog', async () => {
@@ -214,12 +258,15 @@ test('on the phone the tabs switch between Chats and Contacts with a 32px headin
     expect(screen.getByRole('heading', { level: 1, name: 'Contacts' })).toBeTruthy();
 });
 
-test('the Settings tab opens the settings dialog on the phone', async () => {
+test('the Settings tab shows the settings screen on the phone', async () => {
+    queries[ 'users:me' ] = { id: 'u1', name: 'Alice', email: 'alice@example.com', avatar: null, sound: 'classic' };
     renderSidebar();
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Settings' }));
 
-    expect(await screen.findByRole('dialog', { name: 'Settings' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Settings' })).toBeTruthy();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Settings' }).getAttribute('aria-current')).toBe('page');
 });
 
 // Канвас MobileChats: олівець «New chat» у шапці телефона — кольору accent text (Mantine ставить --ai-color інлайн)

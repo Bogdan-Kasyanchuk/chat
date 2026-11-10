@@ -1,12 +1,14 @@
-import { Button, Stack, TextInput } from '@mantine/core';
+import { Button, Input } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation } from 'convex/react';
-import { type FC, type SubmitEvent, useState } from 'react';
+import { type FC, type SubmitEvent, useId, useState } from 'react';
 
 import errorMessage from '@/lib/errorMessage';
 import { api } from '@convex/_generated/api';
 import { NAME_REQUIRED, NAME_TOO_LONG } from '@convex/authRules';
 import { MAX_NAME_LENGTH } from '@convex/chatRules';
+
+import classes from './ProfileSettings.module.css';
 
 type ProfileSettingsProps = {
     name: string
@@ -23,7 +25,9 @@ const validate = (value: string): string | null => {
     return trimmed.length > MAX_NAME_LENGTH ? NAME_TOO_LONG : null;
 };
 
+// Артборд Settings: поле Name з кнопкою Save у тому ж рядку
 const ProfileSettings: FC<ProfileSettingsProps> = ({ name }) => {
+    const id = useId();
     const updateName = useMutation(api.users.updateName);
     const [ value, setValue ] = useState(name);
     const [ error, setError ] = useState<string | null>(null);
@@ -58,23 +62,31 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({ name }) => {
                 void save(e);
             } }
         >
-            <Stack>
-                <TextInput
-                    label="Name"
-                    value={ value }
-                    error={ error }
-                    onChange={ e => {
-                        setValue(e.currentTarget.value);
-                        setError(null);
-                    } }
-                />
-                <Button
-                    type="submit"
-                    loading={ saving }
-                >
-                    Save
-                </Button>
-            </Stack>
+            <Input.Wrapper
+                id={ id }
+                label="Name"
+                error={ error }
+            >
+                <div className={ classes.field }>
+                    <Input
+                        id={ id }
+                        className={ classes.input }
+                        value={ value }
+                        error={ Boolean(error) }
+                        aria-describedby={ error ? `${ id }-error` : undefined }
+                        onChange={ e => {
+                            setValue(e.currentTarget.value);
+                            setError(null);
+                        } }
+                    />
+                    <Button
+                        type="submit"
+                        loading={ saving }
+                    >
+                        Save
+                    </Button>
+                </div>
+            </Input.Wrapper>
         </form>
     );
 };

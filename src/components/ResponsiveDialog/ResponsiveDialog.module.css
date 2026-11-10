@@ -1,0 +1,53 @@
+/* Заголовок і текст діалогу — на 8 один від одного (Modal ставить висоту шапки 60) */
+.header {
+    min-height: 0;
+    padding-bottom: rem(8px);
+}
+
+/* Нижня панель: радіус 16 зверху, відступи 20, ручка 40×4 на 8 від верху */
+.sheet {
+    position: relative;
+    border-radius: rem(16px) rem(16px) 0 0;
+}
+
+.sheetHeader {
+    position: static;
+    min-height: 0;
+    padding: rem(20px) rem(20px) rem(8px);
+}
+
+.sheetBody {
+    padding: 0 rem(20px) rem(20px);
+}
+
+.handle {
+    position: absolute;
+    top: rem(8px);
+    left: 50%;
+    width: rem(40px);
+    height: rem(4px);
+    margin-left: rem(-20px);
+    border-radius: rem(2px);
+    background-color: var(--chat-border);
+}
+
+.actions {
+    display: flex;
+    gap: rem(8px);
+    margin-top: rem(24px);
+
+    & > * {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Стовпчиком кнопки мають висоту 44, а не ділять висоту ряду */
+    @mixin smaller-than $mantine-breakpoint-md {
+        flex-direction: column;
+        margin-top: rem(20px);
+
+        & > * {
+            flex: none;
+        }
+    }
+}

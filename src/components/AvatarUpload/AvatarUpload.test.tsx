@@ -107,3 +107,34 @@ test('AvatarUpload lets the same file be picked twice', async () => {
         expect(setAvatar).toHaveBeenCalledTimes(2);
     });
 });
+
+// Артборд Settings → Profile: фото 104, кругла кнопка «Change photo» знизу праворуч, «Remove photo» — зверху праворуч
+test('the profile photo is 104px with Change photo and Remove photo buttons', () => {
+    renderWithProviders(
+        <AvatarUpload
+            userId="k17me"
+            name="Alice"
+            avatar="https://img.test/a.png"
+        />
+    );
+
+    const avatar = screen.getByRole('img', { name: 'Alice' }).closest('.mantine-Avatar-root') as HTMLElement;
+
+    expect(avatar.style.getPropertyValue('--avatar-size')).toContain('6.5rem');
+    expect(screen.getByRole('button', { name: 'Change photo' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Remove photo' })).toBeTruthy();
+});
+
+// Без фото прибирати нічого: кнопки «Remove photo» немає, а не вимкнена
+test('without a photo there is no Remove photo button', () => {
+    renderWithProviders(
+        <AvatarUpload
+            userId="k17me"
+            name="Alice"
+            avatar={ null }
+        />
+    );
+
+    expect(screen.getByRole('button', { name: 'Change photo' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Remove photo' })).toBeNull();
+});

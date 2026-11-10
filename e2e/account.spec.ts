@@ -27,7 +27,7 @@ test('renaming and a new avatar reach the other person live', async ({ page, bro
 
     const chooser = page.waitForEvent('filechooser');
 
-    await settings.getByRole('button', { name: 'Upload photo' }).click();
+    await settings.getByRole('button', { name: 'Change photo' }).click();
     await (await chooser).setFiles(AVATAR);
     await expect(page.getByRole('alert').filter({ hasText: 'Photo updated' })).toBeVisible();
 
@@ -53,7 +53,6 @@ test('deleting an account leaves the partner a read-only Deleted account chat', 
 
     const settings = await openSettings(page);
 
-    await settings.getByRole('tab', { name: 'Account' }).click();
     await settings.getByRole('button', { name: 'Delete account' }).click();
     await page.getByRole('dialog', { name: 'Delete account?' }).getByRole('button', { name: 'Delete account' }).click();
     await expect(page).toHaveURL(/\/login$/);
