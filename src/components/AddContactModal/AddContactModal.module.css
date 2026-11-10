@@ -62,10 +62,6 @@
     padding: rem(10px) rem(20px) 0 rem(10px);
 }
 
-.backButton {
-    --ai-color: var(--chat-accent-text);
-}
-
 .screenBody {
     display: flex;
     flex: 1;

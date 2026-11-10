@@ -25,9 +25,7 @@
     box-shadow: var(--chat-shadow);
 }
 
-/* «New chat» у шапці телефона: іконка кольору акценту */
+/* «New chat» у шапці телефона; колір іконки — accent text (style у Sidebar) */
 .newChat {
-    --ai-color: var(--chat-accent-text);
-
     margin: rem(-3px) rem(-10px) rem(-3px) 0;
 }

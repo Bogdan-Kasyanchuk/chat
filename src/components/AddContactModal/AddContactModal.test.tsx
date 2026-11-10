@@ -176,3 +176,17 @@ test('on the phone Add contact is a full screen with Back to contacts', async ()
 
     expect(onClose).toHaveBeenCalled();
 });
+
+// Канвас AddContact: кнопка закриття з підписом «Close»
+test('the close button of the desktop dialog is named Close', () => {
+    mockViewport(true);
+    renderModal();
+
+    expect(screen.getByRole('button', { name: 'Close' })).toBeTruthy();
+});
+
+test('the phone back arrow takes the accent text colour', () => {
+    renderModal();
+
+    expect(screen.getByRole('button', { name: 'Back to contacts' }).style.getPropertyValue('--ai-color')).toBe('var(--chat-accent-text)');
+});

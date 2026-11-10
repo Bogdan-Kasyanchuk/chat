@@ -339,7 +339,7 @@ const theme = createTheme({
             styles: { root: { letterSpacing: '-0.02em' } }
         }),
         Modal: Modal.extend({
-            defaultProps: { radius: 'lg', padding: rem(24), size: rem(420), overlayProps: overlay },
+            defaultProps: { radius: 'lg', padding: rem(24), size: rem(420), overlayProps: overlay, closeButtonProps: { 'aria-label': 'Close' } },
             styles: {
                 content: { backgroundColor: 'var(--chat-popover)' },
                 header: { backgroundColor: 'var(--chat-popover)' },

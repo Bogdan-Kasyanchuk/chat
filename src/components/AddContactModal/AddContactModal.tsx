@@ -3,7 +3,7 @@ import { notifications } from '@mantine/notifications';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useConvex, useMutation } from 'convex/react';
 import type { FunctionReturnType } from 'convex/server';
-import { type FC, type SubmitEvent, useId, useState } from 'react';
+import { type CSSProperties, type FC, type SubmitEvent, useId, useState } from 'react';
 
 import PresenceAvatar from '@/components/PresenceAvatar';
 import useIsDesktop from '@/hooks/useIsDesktop';
@@ -16,7 +16,8 @@ import classes from './AddContactModal.module.css';
 type AddContactModalProps = {
     opened: boolean,
     onClose: () => void,
-    // Чат з людиною відкрито («Message» чи «Open chat»)
+    // Чат з людиною відкрито («Message» чи «Open chat»): чат заміняє запис діалогу в історії,
+    // тож діалог закривається сам (opened стає false), без onClose
     onOpened?: () => void
 };
 
@@ -25,6 +26,8 @@ type Found = NonNullable<FunctionReturnType<typeof api.users.findByEmail>>;
 const TITLE = 'Add contact';
 const HINT = 'Enter the exact email the person signed up with.';
 const NOT_FOUND = 'No one has signed up with this email. Check the spelling.';
+// Mantine ставить --ai-color інлайн-стилем з varsResolver; style застосовується після нього
+const ACCENT_ICON = { '--ai-color': 'var(--chat-accent-text)' } as CSSProperties;
 
 // Артборди AddContact, AddContactNotFound, AddContactExists (діалог 420 на десктопі) і MobileAddContact
 // (екран на телефоні: «назад», заголовок 32, кнопки внизу)
@@ -49,9 +52,13 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
         setError(null);
     };
 
-    const close = () => {
+    const reset = () => {
         setEmail('');
         clearResult();
+    };
+
+    const close = () => {
+        reset();
         onClose();
     };
 
@@ -97,8 +104,8 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
 
         setActing(true);
 
-        if (await openChatWith(found.userId)) {
-            close();
+        if (await openChatWith(found.userId, { replace: true })) {
+            reset();
             onOpened?.();
         }
 
@@ -258,16 +265,13 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
             fullScreen
             onClose={ close }
         >
-            <Modal.Content
-                aria-label={ TITLE }
-                data-full-screen
-            >
+            <Modal.Content aria-label={ TITLE }>
                 <Modal.Body className={ classes.screen }>
                     <div className={ classes.back }>
                         <ActionIcon
                             variant="subtle"
                             aria-label="Back to contacts"
-                            className={ classes.backButton }
+                            style={ ACCENT_ICON }
                             onClick={ close }
                         >
                             <IconArrowLeft

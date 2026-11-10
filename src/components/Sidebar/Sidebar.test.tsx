@@ -1,7 +1,7 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
-import { Route, Routes } from 'react-router';
+import { Route, Routes, useLocation, useNavigate } from 'react-router';
 import { beforeEach, expect, test, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
@@ -36,17 +36,40 @@ const contact = (name: string): ContactView => ({
     userId: `u-${ name }` as never, name, avatar: null, online: false, lastSeenAt: null, chatId: null
 });
 
+// Системний «назад» браузера чи Android і поточна адреса
+const History = () => {
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    return (
+        <>
+            <button
+                type="button"
+                onClick={ () => {
+                    void navigate(-1);
+                } }
+            >
+                history back
+            </button>
+            <output>{ `${ location.pathname }${ location.search }` }</output>
+        </>
+    );
+};
+
 const renderSidebar = () => renderWithProviders(
-    <Routes>
-        <Route
-            path="/"
-            element={ <Sidebar /> }
-        />
-        <Route
-            path="/chat/:chatId"
-            element={ <Sidebar /> }
-        />
-    </Routes>
+    <>
+        <History />
+        <Routes>
+            <Route
+                path="/"
+                element={ <Sidebar /> }
+            />
+            <Route
+                path="/chat/:chatId"
+                element={ <Sidebar /> }
+            />
+        </Routes>
+    </>
 );
 
 beforeEach(() => {
@@ -197,4 +220,75 @@ test('the Settings tab opens the settings dialog on the phone', async () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Settings' }));
 
     expect(await screen.findByRole('dialog', { name: 'Settings' })).toBeTruthy();
+});
+
+// Канвас MobileChats: олівець «New chat» у шапці телефона — кольору accent text (Mantine ставить --ai-color інлайн)
+test('the phone New chat icon takes the accent text colour', () => {
+    renderSidebar();
+
+    expect(screen.getByRole('button', { name: 'New chat' }).style.getPropertyValue('--ai-color')).toBe('var(--chat-accent-text)');
+});
+
+// Add contact на телефоні — окремий екран: системний «назад» має закривати його, а не йти з застосунку
+test('the system back closes Add contact and keeps the contacts section', async () => {
+    const user = userEvent.setup();
+
+    renderSidebar();
+
+    await user.click(screen.getByRole('button', { name: 'Contacts' }));
+    await user.click(screen.getByRole('button', { name: 'Add contact' }));
+
+    expect(await screen.findByRole('dialog', { name: 'Add contact' })).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toBe('/?add=contact');
+
+    await user.click(screen.getByRole('button', { name: 'history back' }));
+
+    await waitFor(() => {
+        expect(screen.queryByRole('dialog', { name: 'Add contact' })).toBeNull();
+    });
+    expect(screen.getByRole('heading', { level: 1, name: 'Contacts' })).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toBe('/');
+});
+
+test('Back to contacts closes Add contact without leaving a history entry', async () => {
+    const user = userEvent.setup();
+
+    renderSidebar();
+
+    await user.click(screen.getByRole('button', { name: 'Contacts' }));
+    await user.click(screen.getByRole('button', { name: 'Add contact' }));
+    await user.click(await screen.findByRole('button', { name: 'Back to contacts' }));
+
+    await waitFor(() => {
+        expect(screen.getByRole('status').textContent).toBe('/');
+    });
+    expect(screen.queryByRole('dialog', { name: 'Add contact' })).toBeNull();
+});
+
+// Чат, відкритий з Add contact, заміняє запис діалогу: «назад» з чату веде до списку, а не знову в діалог
+test('back from a chat opened in Add contact returns to the list, not to the dialog', async () => {
+    mockViewport(true);
+    findByEmail.mockResolvedValue({ userId: 'u-Erin', name: 'Erin', avatar: null, isContact: true });
+    openChat.mockResolvedValue('c-Erin');
+
+    const user = userEvent.setup();
+
+    renderSidebar();
+
+    await user.click(screen.getByRole('button', { name: 'New chat' }));
+    await user.click(screen.getByRole('button', { name: 'Add contact' }));
+    await user.type(screen.getByLabelText('Email'), 'erin@example.com');
+    await user.click(screen.getByRole('button', { name: 'Find' }));
+    await user.click(await screen.findByRole('button', { name: 'Open chat' }));
+
+    await waitFor(() => {
+        expect(screen.getByRole('status').textContent).toBe('/chat/c-Erin');
+    });
+
+    await user.click(screen.getByRole('button', { name: 'history back' }));
+
+    await waitFor(() => {
+        expect(screen.getByRole('status').textContent).toBe('/');
+    });
+    expect(screen.queryByRole('dialog', { name: 'Add contact' })).toBeNull();
 });

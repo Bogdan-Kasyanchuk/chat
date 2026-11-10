@@ -13,11 +13,12 @@ const useOpenChatWith = () => {
     const openChat = useMutation(api.chats.open);
     const navigate = useNavigate();
 
-    return useCallback(async (userId: Id<'users'>): Promise<boolean> => {
+    // replace — чат заміняє поточний запис історії (діалог Add contact), щоб «назад» не відкривав його знову
+    return useCallback(async (userId: Id<'users'>, { replace = false }: { replace?: boolean } = {}): Promise<boolean> => {
         try {
             const chatId = await openChat({ userId });
 
-            await navigate(`/chat/${ chatId }`);
+            await navigate(`/chat/${ chatId }`, { replace });
 
             return true;
         } catch (error) {
