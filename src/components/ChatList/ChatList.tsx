@@ -78,6 +78,11 @@ const ChatList: FC<ChatListProps> = ({ search, onAddContact, footer }) => {
         ? (contacts ?? []).filter(contact => !partners.has(contact.userId) && includes(contact.name, query))
         : [];
 
+    // Без чатів, що підійшли, «No results» правдивий лише після відповіді контактів
+    if (query && visible.length === 0 && contacts === undefined) {
+        return <ChatListSkeleton />;
+    }
+
     if (visible.length === 0 && people.length === 0) {
         return (
             <div className={ classes.center }>
@@ -103,6 +108,7 @@ const ChatList: FC<ChatListProps> = ({ search, onAddContact, footer }) => {
             <nav
                 aria-label="Chats"
                 className={ classes.list }
+                data-footer={ footer ? true : undefined }
             >
                 { visible.map(chat => (
                     <ChatListItem

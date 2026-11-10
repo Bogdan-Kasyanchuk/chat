@@ -38,8 +38,8 @@ test('a deleted account gets the neutral colour and an icon instead of initials'
     expect(root.style.getPropertyValue('--avatar-bg')).toBe(AVATAR_NEUTRAL);
 });
 
-// Components → presence: крапка 14 з рамкою 2.5 кольору тла (рядок відкритого чату підміняє --presence-ring)
-test('the online dot is 14px with a 2.5px ring of the background', () => {
+// Components → presence: крапка 14 на аватарі 44 (рамку 2.5 кольору --presence-ring малює CSS-модуль)
+test('the online dot is 14px on a 44px avatar', () => {
     renderWithProviders(
         <PresenceAvatar
             userId="u1"
@@ -53,7 +53,20 @@ test('the online dot is 14px with a 2.5px ring of the background', () => {
     const dot = screen.getByTestId('online-dot');
 
     expect(dot.style.getPropertyValue('--presence-dot')).toBe('14px');
-    expect(screen.queryByTestId('online-dot')).toBeTruthy();
+});
+
+test('the online dot keeps the proportion on a large avatar', () => {
+    renderWithProviders(
+        <PresenceAvatar
+            userId="u1"
+            name="Bob"
+            avatar={ null }
+            size={ 104 }
+            online
+        />
+    );
+
+    expect(screen.getByTestId('online-dot').style.getPropertyValue('--presence-dot')).toBe('33px');
 });
 
 test('an offline avatar has no dot', () => {

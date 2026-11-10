@@ -1,6 +1,7 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
+import type { ReactNode } from 'react';
 import { afterEach, expect, test, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
@@ -30,12 +31,13 @@ const contact = (name: string): ContactView => ({
     userId: `u-${ name }` as never, name, avatar: null, online: false, lastSeenAt: null, chatId: null
 });
 
-const renderList = (search = '') => {
+const renderList = (search = '', footer?: ReactNode) => {
     const onAddContact = vi.fn();
 
     renderWithProviders(
         <ChatList
             search={ search }
+            footer={ footer }
             onAddContact={ onAddContact }
         />
     );
@@ -112,4 +114,33 @@ test('search keeps a matching chat and does not repeat its partner among contact
     expect(screen.queryByRole('link', { name: /Carol/ })).toBeNull();
     expect(screen.queryByRole('button', { name: /Bob/ })).toBeNull();
     expect(screen.queryByText('Contacts')).toBeNull();
+});
+
+// Кнопка «New chat» висить над списком: під нею лишається місце й тоді, коли пошук знайшов лише контакти
+test('the list leaves room for the footer button, also with contacts only', () => {
+    queries[ 'chats:list' ] = [ chat('Bob') ];
+    queries[ 'contacts:list' ] = [ contact('Olha') ];
+
+    renderList('olh', <button type="button">New chat</button>);
+
+    expect(screen.getByRole('navigation', { name: 'Chats' }).hasAttribute('data-footer')).toBe(true);
+});
+
+test('without a footer the list has no extra room', () => {
+    queries[ 'chats:list' ] = [ chat('Bob') ];
+    queries[ 'contacts:list' ] = [];
+
+    renderList();
+
+    expect(screen.getByRole('navigation', { name: 'Chats' }).hasAttribute('data-footer')).toBe(false);
+});
+
+// Поки контакти не завантажились, «No results» був би неправдою: пошук показує скелетон
+test('search waits for contacts before saying No results', () => {
+    queries[ 'chats:list' ] = [ chat('Bob') ];
+
+    renderList('olh');
+
+    expect(screen.queryByRole('heading', { name: 'No results' })).toBeNull();
+    expect(screen.getByLabelText('Loading chats')).toBeTruthy();
 });

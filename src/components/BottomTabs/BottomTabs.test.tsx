@@ -48,5 +48,18 @@ test('the Chats tab caps the unread counter at 99+ and hides zero', () => {
         />
     );
 
-    expect(screen.getByRole('button', { name: 'Chats' }).textContent).toBe('Chats');
+    expect(screen.getByRole('button', { name: 'Chats' })).toBeTruthy();
+});
+
+// Читач екрана чує «Chats, 5 unread», а не злите «Chats5»
+test('the Chats tab is named with the unread count', () => {
+    renderWithProviders(
+        <BottomTabs
+            view="chats"
+            unread={ 5 }
+            onSelect={ vi.fn() }
+        />
+    );
+
+    expect(screen.getByRole('button', { name: 'Chats, 5 unread' })).toBeTruthy();
 });

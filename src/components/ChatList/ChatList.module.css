@@ -3,6 +3,11 @@
     flex-direction: column;
     gap: rem(4px);
     padding: rem(6px) rem(10px) rem(10px);
+
+    /* Останній рядок не ховається під кнопкою «New chat» (50 + відступ 20) */
+    &[data-footer] {
+        padding-bottom: rem(80px);
+    }
 }
 
 .heading {

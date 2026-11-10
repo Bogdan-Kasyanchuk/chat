@@ -189,9 +189,9 @@ test('Add contact in the contacts section opens the dialog', async () => {
 test('bottom tabs show the unread total without muted chats', () => {
     renderSidebar();
 
-    const chats = within(screen.getByRole('navigation', { name: 'Sections' })).getByRole('button', { name: /Chats/ });
+    const tabs = within(screen.getByRole('navigation', { name: 'Sections' }));
 
-    expect(chats.textContent).toBe('Chats5');
+    expect(tabs.getByRole('button', { name: 'Chats, 5 unread' })).toBeTruthy();
 });
 
 test('on the phone the tabs switch between Chats and Contacts with a 32px heading', async () => {
@@ -291,4 +291,49 @@ test('back from a chat opened in Add contact returns to the list, not to the dia
         expect(screen.getByRole('status').textContent).toBe('/');
     });
     expect(screen.queryByRole('dialog', { name: 'Add contact' })).toBeNull();
+});
+
+// Кнопка, що перемкнула розділ, зникає — фокус переходить у пошук нового розділу, а не на body
+test('switching sections on the desktop moves the focus to the new search', async () => {
+    mockViewport(true);
+
+    const user = userEvent.setup();
+
+    renderSidebar();
+
+    await user.click(screen.getByRole('button', { name: 'Open menu' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Contacts' }));
+
+    await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByRole('searchbox', { name: 'Search contacts' }));
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Back to chats' }));
+
+    await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByRole('searchbox', { name: 'Search' }));
+    });
+});
+
+// На телефоні фокус у пошуку відкрив би клавіатуру: вкладки лишаються на місці, фокус теж
+test('switching tabs on the phone does not focus the search', async () => {
+    const user = userEvent.setup();
+
+    renderSidebar();
+
+    await user.click(screen.getByRole('button', { name: 'Contacts' }));
+
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Contacts' }));
+});
+
+test('Add contact opened from Chats on the phone goes back to chats', async () => {
+    queries[ 'chats:list' ] = [];
+
+    const user = userEvent.setup();
+
+    renderSidebar();
+
+    await user.click(screen.getByRole('button', { name: 'Add contact' }));
+
+    expect(await screen.findByRole('button', { name: 'Back to chats' })).toBeTruthy();
 });

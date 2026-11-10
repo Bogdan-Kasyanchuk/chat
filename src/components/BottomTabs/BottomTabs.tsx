@@ -1,4 +1,4 @@
-import { UnstyledButton } from '@mantine/core';
+import { UnstyledButton, VisuallyHidden } from '@mantine/core';
 import { IconMessageCircle, IconSettings, IconUsers } from '@tabler/icons-react';
 import type { FC } from 'react';
 
@@ -43,7 +43,16 @@ const BottomTabs: FC<BottomTabsProps> = ({ view, unread, onSelect }) => (
                 />
                 { label }
                 { tab === 'chats' && unread > 0 && (
-                    <span className={ classes.badge }>{ unread > MAX_BADGE ? `${ MAX_BADGE }+` : unread }</span>
+                    <>
+                        <span
+                            className={ classes.badge }
+                            aria-hidden
+                        >
+                            { unread > MAX_BADGE ? `${ MAX_BADGE }+` : unread }
+                        </span>
+                        { /* Ім'я вкладки для читача екрана: «Chats, 5 unread» */ }
+                        <VisuallyHidden>{ `, ${ unread } unread` }</VisuallyHidden>
+                    </>
                 ) }
             </UnstyledButton>
         )) }

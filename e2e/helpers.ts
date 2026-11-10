@@ -25,7 +25,7 @@ export const signUp = async (page: Page, name: string, email = testEmail(name.to
     await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
     await page.getByLabel('Confirm password', { exact: true }).fill(PASSWORD);
     await page.getByRole('button', { name: 'Create account' }).click();
-    await expect(page.getByRole('searchbox', { name: 'Search' })).toBeVisible();
+    await expect(searchbox(page, 'Search')).toBeVisible();
 
     return email;
 };
@@ -43,25 +43,43 @@ const showSidebar = async (page: Page) => {
     }
 };
 
-// Розділ бічної панелі: на десктопі — меню ☰ (з контактів назад веде стрілка), на телефоні — нижні вкладки
+// Пошук розділу бічної панелі; exact — щоб «Search» не збігався з «Search contacts»
+const searchbox = (page: Page, name: 'Search' | 'Search contacts') => page.getByRole('searchbox', { name, exact: true });
+
+// Розділ бічної панелі: на десктопі — меню ☰ (з контактів назад веде стрілка), на телефоні — нижні вкладки.
+// Після кожного переходу чекаємо пошук потрібного розділу, а Settings — свій діалог (його чекає openSettings)
 export const sidebarSection = async (page: Page, section: 'Chats' | 'Contacts' | 'Settings') => {
     await showSidebar(page);
 
     if (isPhone()) {
         await page.getByRole('navigation', { name: 'Sections' }).getByRole('button', { name: new RegExp(`^${ section }`) }).click();
 
+        if (section !== 'Settings') {
+            await expect(searchbox(page, section === 'Chats' ? 'Search' : 'Search contacts')).toBeVisible();
+        }
+
         return;
     }
 
-    const back = page.getByRole('button', { name: 'Back to chats' });
+    // Панель показує або чати, або контакти: дочекатися, доки відмалюється одне з двох
+    await expect(searchbox(page, 'Search').or(searchbox(page, 'Search contacts'))).toBeVisible();
 
-    if (await back.isVisible()) {
-        await back.click();
+    if (await searchbox(page, 'Search contacts').isVisible()) {
+        if (section === 'Contacts') {
+            return;
+        }
+
+        await page.getByRole('button', { name: 'Back to chats', exact: true }).click();
+        await expect(searchbox(page, 'Search')).toBeVisible();
     }
 
     if (section !== 'Chats') {
         await page.getByRole('button', { name: 'Open menu' }).click();
         await page.getByRole('menuitem', { name: section }).click();
+
+        if (section === 'Contacts') {
+            await expect(searchbox(page, 'Search contacts')).toBeVisible();
+        }
     }
 };
 

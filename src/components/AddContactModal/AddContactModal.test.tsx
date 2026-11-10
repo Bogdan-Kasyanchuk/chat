@@ -21,13 +21,14 @@ vi.mock('convex/react', () => ({
 
 const onClose = vi.fn();
 
-const renderModal = () => renderWithProviders(
+const routes = (opened: boolean, backLabel?: string) => (
     <Routes>
         <Route
             path="/"
             element={
                 <AddContactModal
-                    opened
+                    opened={ opened }
+                    backLabel={ backLabel }
                     onClose={ onClose }
                 />
             }
@@ -38,6 +39,18 @@ const renderModal = () => renderWithProviders(
         />
     </Routes>
 );
+
+const renderModal = (backLabel?: string) => renderWithProviders(routes(true, backLabel));
+
+// Відповідь сервера, яку тест відпускає сам
+const deferred = () => {
+    let resolve: (value: unknown) => void = () => {};
+    const promise = new Promise(done => {
+        resolve = done;
+    });
+
+    return { promise, resolve };
+};
 
 const find = async (email: string) => {
     const user = userEvent.setup();
@@ -189,4 +202,53 @@ test('the phone back arrow takes the accent text colour', () => {
     renderModal();
 
     expect(screen.getByRole('button', { name: 'Back to contacts' }).style.getPropertyValue('--ai-color')).toBe('var(--chat-accent-text)');
+});
+
+// Пізня відповідь на пошук не має показати картку для пошти, якої вже немає в полі
+test('a late answer for an edited email is ignored', async () => {
+    mockViewport(true);
+
+    const answer = deferred();
+
+    findByEmail.mockReturnValue(answer.promise);
+
+    renderModal();
+
+    const user = await find('bob@example.com');
+
+    await user.type(screen.getByLabelText('Email'), 'x');
+    answer.resolve({ userId: 'u2', name: 'Bob', avatar: null, isContact: false });
+
+    await waitFor(() => {
+        expect(screen.getByRole('button', { name: 'Find' }).hasAttribute('data-loading')).toBe(false);
+    });
+    expect(screen.queryByText('Bob')).toBeNull();
+});
+
+// Діалог можуть закрити ззовні (системний «назад»): наступне відкриття — з порожнім полем і без картки
+test('a dialog closed from outside opens empty next time, even with a late answer', async () => {
+    mockViewport(true);
+
+    const answer = deferred();
+
+    findByEmail.mockReturnValue(answer.promise);
+
+    const { rerender } = renderModal();
+
+    await find('bob@example.com');
+    rerender(routes(false));
+    answer.resolve({ userId: 'u2', name: 'Bob', avatar: null, isContact: false });
+    rerender(routes(true));
+
+    await waitFor(() => {
+        expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe('');
+    });
+    expect(screen.queryByText('Bob')).toBeNull();
+});
+
+// Екран на телефоні відкривається й з вкладки Chats: стрілка називає той розділ, куди повертає
+test('the phone back arrow is named after the section it returns to', () => {
+    renderModal('Back to chats');
+
+    expect(screen.getByRole('button', { name: 'Back to chats' })).toBeTruthy();
 });

@@ -235,6 +235,6 @@ test('a new account sees No chats yet and Add contact explains an unknown email'
     await dialog.getByRole('button', { name: 'Find' }).click();
     await expect(dialog.getByRole('alert')).toHaveText('No one has signed up with this email. Check the spelling.');
     await expect(dialog.getByRole('button', { name: 'Add to contacts' })).toBeDisabled();
-    await dialog.getByRole('button', { name: isPhone() ? 'Back to contacts' : 'Cancel' }).click();
+    await dialog.getByRole('button', { name: isPhone() ? 'Back to chats' : 'Cancel' }).click();
     await expect(dialog).toHaveCount(0);
 });

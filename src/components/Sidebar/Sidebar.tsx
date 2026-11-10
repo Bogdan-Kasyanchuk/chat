@@ -1,7 +1,7 @@
 import { ActionIcon } from '@mantine/core';
 import { IconArrowLeft, IconPencil } from '@tabler/icons-react';
 import { useQuery } from 'convex/react';
-import { type CSSProperties, type FC, useState } from 'react';
+import { type CSSProperties, type FC, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 import AddContactModal from '@/components/AddContactModal';
@@ -38,16 +38,28 @@ const Sidebar: FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const adding = params.get(ADD_PARAM) === 'contact';
+    const searchRef = useRef<HTMLInputElement>(null);
+    // Кнопка, що перемкнула розділ (☰, «назад», «New chat»), зникає: фокус переходить у пошук нового розділу
+    const focusSearch = useRef(false);
+
+    useEffect(() => {
+        if (focusSearch.current) {
+            focusSearch.current = false;
+            searchRef.current?.focus();
+        }
+    }, [ view ]);
 
     const unread = chats?.reduce((sum, chat) => chat.muted ? sum : sum + chat.unread, 0) ?? 0;
 
-    const select = (next: SidebarView) => {
+    // focus — перемкнули кнопкою, що зникає; на телефоні фокус у пошуку відкрив би клавіатуру, тож лише десктоп
+    const select = (next: SidebarView, focus = false) => {
         if (next === 'settings') {
             setSettingsOpened(true);
 
             return;
         }
 
+        focusSearch.current = focus && isDesktop;
         setView(next);
         setSearch('');
     };
@@ -83,7 +95,7 @@ const Sidebar: FC = () => {
             className={ isDesktop ? classes.fab : classes.newChat }
             style={ isDesktop ? undefined : ACCENT_ICON }
             onClick={ () => {
-                select('contacts');
+                select('contacts', true);
             } }
         >
             <IconPencil
@@ -97,7 +109,9 @@ const Sidebar: FC = () => {
         ? (
             <MainMenu
                 view={ view }
-                onSelect={ select }
+                onSelect={ next => {
+                    select(next, true);
+                } }
             />
         )
         : (
@@ -106,7 +120,7 @@ const Sidebar: FC = () => {
                 color="gray"
                 aria-label="Back to chats"
                 onClick={ () => {
-                    select('chats');
+                    select('chats', true);
                 } }
             >
                 <IconArrowLeft
@@ -124,12 +138,10 @@ const Sidebar: FC = () => {
                 end={ view === 'chats' ? newChat : undefined }
                 searchLabel={ view === 'chats' ? 'Search' : 'Search contacts' }
                 search={ search }
+                searchRef={ searchRef }
                 onSearch={ setSearch }
             />
-            <div
-                className={ classes.list }
-                data-fab={ isDesktop && view === 'chats' && chats !== undefined && chats.length > 0 ? true : undefined }
-            >
+            <div className={ classes.list }>
                 { view === 'chats'
                     ? (
                         <ChatList
@@ -157,6 +169,7 @@ const Sidebar: FC = () => {
             ) }
             <AddContactModal
                 opened={ adding }
+                backLabel={ view === 'chats' ? 'Back to chats' : 'Back to contacts' }
                 onClose={ closeAddContact }
                 onOpened={ () => {
                     select('chats');

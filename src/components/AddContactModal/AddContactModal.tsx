@@ -3,7 +3,7 @@ import { notifications } from '@mantine/notifications';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useConvex, useMutation } from 'convex/react';
 import type { FunctionReturnType } from 'convex/server';
-import { type CSSProperties, type FC, type SubmitEvent, useId, useState } from 'react';
+import { type CSSProperties, type FC, type SubmitEvent, useId, useRef, useState } from 'react';
 
 import PresenceAvatar from '@/components/PresenceAvatar';
 import useIsDesktop from '@/hooks/useIsDesktop';
@@ -18,7 +18,9 @@ type AddContactModalProps = {
     onClose: () => void,
     // Чат з людиною відкрито («Message» чи «Open chat»): чат заміняє запис діалогу в історії,
     // тож діалог закривається сам (opened стає false), без onClose
-    onOpened?: () => void
+    onOpened?: () => void,
+    // Підпис стрілки на телефоні: розділ, куди вона повертає
+    backLabel?: string
 };
 
 type Found = NonNullable<FunctionReturnType<typeof api.users.findByEmail>>;
@@ -29,13 +31,20 @@ const NOT_FOUND = 'No one has signed up with this email. Check the spelling.';
 // Mantine ставить --ai-color інлайн-стилем з varsResolver; style застосовується після нього
 const ACCENT_ICON = { '--ai-color': 'var(--chat-accent-text)' } as CSSProperties;
 
-// Артборди AddContact, AddContactNotFound, AddContactExists (діалог 420 на десктопі) і MobileAddContact
-// (екран на телефоні: «назад», заголовок 32, кнопки внизу)
-const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }) => {
+type AddContactFormProps = {
+    isDesktop: boolean,
+    onCancel: () => void,
+    onOpened?: () => void,
+    // Обгортка кнопок дій: на телефоні вони притиснуті донизу екрана
+    actionsClassName?: string
+};
+
+// Пошук за поштою, картка і дії. Стан живе тут: Modal демонтує вміст, коли закривається (і ззовні,
+// системним «назад»), тож наступне відкриття починається з порожнього поля
+const AddContactForm: FC<AddContactFormProps> = ({ isDesktop, onCancel, onOpened, actionsClassName }) => {
     const convex = useConvex();
     const addContact = useMutation(api.contacts.add);
     const openChatWith = useOpenChatWith();
-    const isDesktop = useIsDesktop();
     const id = useId();
     const [ email, setEmail ] = useState('');
     // Пошта, за якою знайдено людину: показується в картці
@@ -45,38 +54,40 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
     const [ error, setError ] = useState<string | null>(null);
     const [ busy, setBusy ] = useState(false);
     const [ acting, setActing ] = useState(false);
+    // Номер пошуку: відповідь застосовується, лише якщо відтоді пошту не змінили
+    const request = useRef(0);
 
     const clearResult = () => {
+        request.current += 1;
+        setBusy(false);
         setFound(null);
         setMissing(false);
         setError(null);
     };
 
-    const reset = () => {
-        setEmail('');
-        clearResult();
-    };
-
-    const close = () => {
-        reset();
-        onClose();
-    };
-
     const find = async (event: SubmitEvent) => {
         event.preventDefault();
-        setBusy(true);
         clearResult();
+        setBusy(true);
+
+        const current = request.current;
 
         try {
             const user = await convex.query(api.users.findByEmail, { email });
 
-            setFound(user);
-            setMissing(user === null);
-            setFoundEmail(email.trim());
+            if (current === request.current) {
+                setFound(user);
+                setMissing(user === null);
+                setFoundEmail(email.trim());
+            }
         } catch (e) {
-            setError(errorMessage(e));
+            if (current === request.current) {
+                setError(errorMessage(e));
+            }
         } finally {
-            setBusy(false);
+            if (current === request.current) {
+                setBusy(false);
+            }
         }
     };
 
@@ -105,7 +116,6 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
         setActing(true);
 
         if (await openChatWith(found.userId, { replace: true })) {
-            reset();
             onOpened?.();
         }
 
@@ -216,7 +226,7 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
     const cancelButton = (
         <Button
             variant="default"
-            onClick={ close }
+            onClick={ onCancel }
         >
             Cancel
         </Button>
@@ -243,6 +253,20 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
         return null;
     };
 
+    return (
+        <>
+            { form }
+            { card }
+            <div className={ actionsClassName }>{ renderActions() }</div>
+        </>
+    );
+};
+
+// Артборди AddContact, AddContactNotFound, AddContactExists (діалог 420 на десктопі) і MobileAddContact
+// (екран на телефоні: «назад», заголовок 32, кнопки внизу)
+const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened, backLabel = 'Back to contacts' }) => {
+    const isDesktop = useIsDesktop();
+
     if (isDesktop) {
         return (
             <Modal
@@ -250,11 +274,13 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
                 title={ TITLE }
                 classNames={ { body: classes.body } }
                 centered
-                onClose={ close }
+                onClose={ onClose }
             >
-                { form }
-                { card }
-                { renderActions() }
+                <AddContactForm
+                    isDesktop
+                    onCancel={ onClose }
+                    onOpened={ onOpened }
+                />
             </Modal>
         );
     }
@@ -263,16 +289,16 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
         <Modal.Root
             opened={ opened }
             fullScreen
-            onClose={ close }
+            onClose={ onClose }
         >
             <Modal.Content aria-label={ TITLE }>
                 <Modal.Body className={ classes.screen }>
                     <div className={ classes.back }>
                         <ActionIcon
                             variant="subtle"
-                            aria-label="Back to contacts"
+                            aria-label={ backLabel }
                             style={ ACCENT_ICON }
-                            onClick={ close }
+                            onClick={ onClose }
                         >
                             <IconArrowLeft
                                 size={ 22 }
@@ -290,9 +316,12 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }
                             </Title>
                             <Text c="dimmed">Find people by the email they signed up with.</Text>
                         </div>
-                        { form }
-                        { card }
-                        <div className={ classes.bottom }>{ renderActions() }</div>
+                        <AddContactForm
+                            isDesktop={ false }
+                            actionsClassName={ classes.bottom }
+                            onCancel={ onClose }
+                            onOpened={ onOpened }
+                        />
                     </div>
                 </Modal.Body>
             </Modal.Content>

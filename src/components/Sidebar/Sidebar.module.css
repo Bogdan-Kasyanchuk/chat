@@ -10,11 +10,6 @@
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-
-    /* Останній чат не ховається під кнопкою «New chat» */
-    &[data-fab] {
-        padding-bottom: rem(70px);
-    }
 }
 
 /* «New chat» на десктопі: кругла кнопка 50 над списком праворуч унизу */

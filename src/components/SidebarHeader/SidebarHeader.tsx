@@ -1,6 +1,6 @@
 import { TextInput, Title } from '@mantine/core';
 import { IconSearch } from '@tabler/icons-react';
-import type { FC, ReactNode } from 'react';
+import type { FC, ReactNode, Ref } from 'react';
 
 import classes from './SidebarHeader.module.css';
 
@@ -13,14 +13,16 @@ type SidebarHeaderProps = {
     end?: ReactNode,
     searchLabel: string,
     search: string,
-    onSearch: (value: string) => void
+    onSearch: (value: string) => void,
+    searchRef?: Ref<HTMLInputElement>
 };
 
 // Шапка бічної панелі (Chats, Contacts, MobileChats, MobileContacts): кнопка й пошук у рядок на десктопі,
 // заголовок над пошуком на телефоні. Пошук — поле field з радіусом 25
-const SidebarHeader: FC<SidebarHeaderProps> = ({ title, start, end, searchLabel, search, onSearch }) => {
+const SidebarHeader: FC<SidebarHeaderProps> = ({ title, start, end, searchLabel, search, onSearch, searchRef }) => {
     const input = (
         <TextInput
+            ref={ searchRef }
             type="search"
             variant="filled"
             radius={ 25 }
