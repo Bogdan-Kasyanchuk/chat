@@ -25,9 +25,13 @@ const EmptyState: FC<EmptyStateProps> = ({ icon, title, text, action, headingOrd
                 { title }
             </Title>
             { text !== undefined && (
+                // Довге слово (пошта в пошуку) переноситься, а не розпирає панель; ширина 260, як на канвасі
                 <Text
                     size="sm"
                     c="dimmed"
+                    maw={ 260 }
+                    mx="auto"
+                    style={ { overflowWrap: 'anywhere' } }
                 >
                     { text }
                 </Text>

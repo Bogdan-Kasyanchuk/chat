@@ -1,0 +1,12 @@
+/* Відкрите меню лишає кнопку на тлі field */
+.target[data-expanded] {
+    background-color: var(--chat-field);
+}
+
+.item {
+    color: var(--chat-text);
+
+    &[aria-current='page'] {
+        background-color: var(--chat-field);
+    }
+}

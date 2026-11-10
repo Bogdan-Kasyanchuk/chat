@@ -1,42 +1,92 @@
+/* Рядок чату з артборду Chats: радіус 12, відступ 10; відкритий чат — на тлі active, текст і позначки світлі */
 .item {
+    --presence-ring: var(--chat-sidebar-bg);
+
     display: flex;
     align-items: center;
-    gap: var(--mantine-spacing-sm);
-    padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
-    color: inherit;
+    gap: rem(8px);
+    padding: rem(10px);
+    border-radius: rem(12px);
+    color: var(--chat-text);
     text-decoration: none;
-    border-bottom: 1px solid var(--mantine-color-gray-2);
 
-    &:hover {
-        background-color: var(--mantine-color-gray-0);
+    /* На сенсорних екранах :hover липне після дотику */
+    @media (hover: hover) {
+        &:hover {
+            background-color: var(--chat-hover);
+        }
+    }
+
+    &:active {
+        background-color: var(--chat-pressed);
     }
 
     &[data-active] {
-        background-color: var(--mantine-color-gray-2);
+        --presence-ring: var(--chat-active);
+
+        background-color: var(--chat-active);
+        color: var(--chat-active-text);
     }
 }
 
 .body {
+    display: flex;
     flex: 1;
+    flex-direction: column;
+    gap: rem(2px);
     min-width: 0;
 }
 
 .row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--mantine-spacing-xs);
+    gap: rem(8px);
 }
 
 .name {
+    flex: 1;
     min-width: 0;
     font-weight: 600;
 }
 
 .preview {
+    flex: 1;
     min-width: 0;
 }
 
-.time {
+.time,
+.meta {
     flex-shrink: 0;
+}
+
+.time,
+.preview,
+.meta {
+    color: var(--chat-muted);
+
+    .item[data-active] & {
+        color: var(--chat-active-muted);
+    }
+}
+
+.read {
+    flex-shrink: 0;
+    color: var(--chat-tick-read);
+
+    .item[data-active] & {
+        color: var(--chat-active-text);
+    }
+}
+
+/* На відкритому чаті лічильник інверсний: тло active text, цифри active. Mantine ставить --badge-bg
+   інлайн-стилем з токена, тож тут перевизначаються самі токени */
+.badge {
+    flex-shrink: 0;
+
+    .item[data-active] & {
+        --chat-badge: var(--chat-active-text);
+        --chat-badge-text: var(--chat-active);
+        --chat-badge-muted: var(--chat-active-text);
+        --chat-badge-muted-text: var(--chat-active);
+    }
 }

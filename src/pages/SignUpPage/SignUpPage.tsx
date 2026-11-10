@@ -111,6 +111,7 @@ const SignUpPage: FC = () => {
                     />
                     <PasswordField
                         label="Confirm password"
+                        toggleLabel="Show confirm password"
                         autoComplete="new-password"
                         size="lg"
                         { ...form.getInputProps('confirmPassword') }

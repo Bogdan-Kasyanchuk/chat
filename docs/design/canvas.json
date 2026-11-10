@@ -373,6 +373,37 @@
       "w": 390,
       "x": 940,
       "y": 1220
+    },
+    "SearchContacts.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Search: chats and contacts",
+      "w": 1280,
+      "x": 10880,
+      "y": 8968
+    },
+    "ContactsEmpty.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Contacts: none yet",
+      "w": 1280,
+      "x": 12240,
+      "y": 8968
+    },
+    "ContactsSearchEmpty.dc.html": {
+      "expand": "fill",
+      "h": 880,
+      "title": "Contacts search: no results",
+      "w": 1280,
+      "x": 13600,
+      "y": 8968
+    },
+    "MobileContactsEmpty.dc.html": {
+      "h": 844,
+      "title": "Contacts: none yet",
+      "w": 390,
+      "x": 3760,
+      "y": 10268
     }
   },
   "createdOnFiles": {
@@ -462,7 +493,7 @@
     },
     "rowMoreDesktop": {
       "kind": "title1",
-      "maxW": 8000,
+      "maxW": 14880,
       "text": "More states · desktop",
       "w": 240,
       "x": 0,
@@ -470,7 +501,7 @@
     },
     "rowMorePhone": {
       "kind": "title1",
-      "maxW": 3680,
+      "maxW": 4150,
       "text": "More states · phone",
       "w": 240,
       "x": 0,
@@ -518,6 +549,9 @@
     "ToastDeleted.dc.html",
     "SearchEmpty.dc.html",
     "Loading.dc.html",
+    "SearchContacts.dc.html",
+    "ContactsEmpty.dc.html",
+    "ContactsSearchEmpty.dc.html",
     "MobileAddContact.dc.html",
     "MobileReply.dc.html",
     "MobileEdit.dc.html",
@@ -526,6 +560,7 @@
     "MobileChatsEmpty.dc.html",
     "MobileChatsDark.dc.html",
     "MobileConversationDark.dc.html",
+    "MobileContactsEmpty.dc.html",
     "Components.dc.html"
   ],
   "pages": [],

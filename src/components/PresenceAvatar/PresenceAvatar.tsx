@@ -1,9 +1,11 @@
-import { Avatar, Indicator } from '@mantine/core';
+import { Avatar } from '@mantine/core';
 import { IconUser } from '@tabler/icons-react';
-import type { FC } from 'react';
+import type { CSSProperties, FC } from 'react';
 
 import avatarColor from '@/lib/avatarColor';
 import initials from '@/lib/initials';
+
+import classes from './PresenceAvatar.module.css';
 
 type PresenceAvatarProps = {
     // null — видалений акаунт: нейтральне тло й іконка замість ініціалів
@@ -14,15 +16,12 @@ type PresenceAvatarProps = {
     size: number
 };
 
-// Крапка «онлайн» обведена кольором тла (withBorder бере --mantine-color-body)
+// Крапка «онлайн» 14 на аватарі 44 (Components → presence), на інших розмірах — та сама пропорція.
+// Рамка — колір тла під аватаром: --presence-ring, за замовчуванням тло бічної панелі
 const PresenceAvatar: FC<PresenceAvatarProps> = ({ userId, name, avatar, online = false, size }) => (
-    <Indicator
-        color="var(--chat-online)"
-        size={ Math.max(8, Math.round(size / 4)) }
-        offset={ Math.round(size / 8) }
-        position="bottom-end"
-        disabled={ !online }
-        withBorder
+    <span
+        className={ classes.root }
+        style={ { width: size, height: size } }
     >
         <Avatar
             src={ avatar }
@@ -41,7 +40,14 @@ const PresenceAvatar: FC<PresenceAvatarProps> = ({ userId, name, avatar, online 
                 )
                 : initials(name) }
         </Avatar>
-    </Indicator>
+        { online && (
+            <span
+                className={ classes.dot }
+                data-testid="online-dot"
+                style={ { '--presence-dot': `${ Math.max(8, Math.round(size * 14 / 44)) }px` } as CSSProperties }
+            />
+        ) }
+    </span>
 );
 
 export default PresenceAvatar;

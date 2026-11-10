@@ -1,0 +1,47 @@
+.row {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: rem(8px);
+    padding: rem(10px);
+}
+
+.screen {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    gap: rem(16px);
+    padding: rem(20px) rem(20px) rem(10px);
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: rem(8px);
+}
+
+.title {
+    font-size: rem(32px);
+    line-height: 1.2;
+}
+
+.search {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Пошук без рамки: тло field, під курсором темніше, у фокусі — кільце ring */
+.input {
+    border: 0;
+    color: var(--chat-text);
+    font-size: var(--mantine-font-size-md);
+
+    &:hover:not(:focus) {
+        background-color: var(--chat-pressed);
+    }
+
+    &:focus {
+        box-shadow: 0 0 0 2px var(--chat-ring);
+    }
+}

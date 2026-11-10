@@ -61,3 +61,19 @@ test('by default the heading is an h3', () => {
 
     expect(screen.getByRole('heading', { level: 3, name: 'No chats yet' })).toBeTruthy();
 });
+
+// Review Focus 3: довгий запит без пробілів (пошта в пошуку) не розпирає панель; ширина тексту — 260, як на канвасі
+test('a long word in the text wraps inside 260px', () => {
+    renderWithProviders(
+        <EmptyState
+            icon={ <svg /> }
+            title="No results"
+            text="No chats or contacts match “averylongname.surname@some-company-example.com”."
+        />
+    );
+
+    const text = screen.getByText(/averylongname/);
+
+    expect(text.style.overflowWrap).toBe('anywhere');
+    expect(text.style.maxWidth).toContain('16.25rem');
+});

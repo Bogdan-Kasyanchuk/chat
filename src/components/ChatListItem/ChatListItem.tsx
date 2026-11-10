@@ -31,7 +31,7 @@ const ChatListItem: FC<ChatListItemProps> = ({ chat, active, now }) => {
                 userId={ partner.userId }
                 name={ partner.name }
                 avatar={ partner.avatar }
-                size={ 48 }
+                size={ 44 }
                 online={ partner.online }
             />
             <div className={ classes.body }>
@@ -42,11 +42,32 @@ const ChatListItem: FC<ChatListItemProps> = ({ chat, active, now }) => {
                     >
                         { partner.name }
                     </Text>
+                    { muted && (
+                        <IconVolumeOff
+                            className={ classes.meta }
+                            size={ 15 }
+                            aria-label="Muted"
+                        />
+                    ) }
+                    { lastMessage?.authorIsMe && (lastMessage.read
+                        ? (
+                            <IconChecks
+                                className={ classes.read }
+                                size={ 17 }
+                                aria-label="Read"
+                            />
+                        )
+                        : (
+                            <IconCheck
+                                className={ classes.meta }
+                                size={ 17 }
+                                aria-label="Sent"
+                            />
+                        )) }
                     { lastMessage && (
                         <Text
-                            size="xs"
+                            size="sm"
                             className={ classes.time }
-                            c="dimmed"
                         >
                             { formatListTime(lastMessage.createdAt, now) }
                         </Text>
@@ -56,43 +77,21 @@ const ChatListItem: FC<ChatListItemProps> = ({ chat, active, now }) => {
                     <Text
                         className={ classes.preview }
                         size="sm"
-                        c="dimmed"
                         truncate
                     >
                         { lastMessage
                             ? `${ lastMessage.authorIsMe ? 'You: ' : '' }${ lastMessage.body }`
                             : 'No messages yet' }
                     </Text>
-                    <div className={ classes.row }>
-                        { lastMessage?.authorIsMe && (lastMessage.read
-                            ? (
-                                <IconChecks
-                                    size={ 16 }
-                                    aria-label="Read"
-                                />
-                            )
-                            : (
-                                <IconCheck
-                                    size={ 16 }
-                                    aria-label="Sent"
-                                />
-                            )) }
-                        { muted && (
-                            <IconVolumeOff
-                                size={ 16 }
-                                aria-label="Muted"
-                            />
-                        ) }
-                        { unread > 0 && (
-                            <Badge
-                                circle={ unread < 10 }
-                                color={ muted ? 'gray' : 'dark' }
-                                data-muted={ muted || undefined }
-                            >
-                                { unread > MAX_BADGE ? `${ MAX_BADGE }+` : unread }
-                            </Badge>
-                        ) }
-                    </div>
+                    { unread > 0 && (
+                        <Badge
+                            className={ classes.badge }
+                            color={ muted ? 'gray' : undefined }
+                            data-muted={ muted || undefined }
+                        >
+                            { unread > MAX_BADGE ? `${ MAX_BADGE }+` : unread }
+                        </Badge>
+                    ) }
                 </div>
             </div>
         </NavLink>

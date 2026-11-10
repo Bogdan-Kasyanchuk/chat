@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Button, Checkbox, DEFAULT_THEME, Divider, Notification, PasswordInput, Radio, TextInput, Textarea, mergeMantineTheme, rem } from '@mantine/core';
+import { ActionIcon, Avatar, Badge, Button, Checkbox, DEFAULT_THEME, Divider, Notification, PasswordInput, Radio, TextInput, Textarea, mergeMantineTheme, rem } from '@mantine/core';
 import { screen } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
@@ -359,6 +359,18 @@ describe('button variants', () => {
         expect(unread.style.getPropertyValue('--badge-color')).toBe('var(--chat-badge-text)');
         expect(muted.style.getPropertyValue('--badge-bg')).toBe('var(--chat-badge-muted)');
         expect(muted.style.getPropertyValue('--badge-color')).toBe('var(--chat-badge-muted-text)');
+    });
+});
+
+// Components → avatars: ініціали 16 / 600 на аватарі 44 (і пропорційно на інших розмірах)
+describe('avatar', () => {
+    test('initials are 600 and 16px on a 44px avatar', () => {
+        renderWithProviders(<Avatar size={ 44 }>MS</Avatar>);
+
+        const placeholder = screen.getByText('MS');
+
+        expect(placeholder.style.fontSize).toBe('calc(var(--avatar-size) * 0.364)');
+        expect(placeholder.style.fontWeight).toBe('600');
     });
 });
 

@@ -30,3 +30,10 @@ test('white initials keep 4.5:1 on every avatar colour', () => {
         expect(contrastRatio('#FFFFFF', color), color).toBeGreaterThanOrEqual(4.5);
     }
 });
+
+// Закріплені значення: зміна порядку кольорів чи хешу непомітно перефарбувала б усіх людей
+test('avatarColor keeps the colours of known ids', () => {
+    expect(avatarColor('k17abc')).toBe('#1F7F7C');
+    expect(avatarColor('u2')).toBe('#9C6A0E');
+    expect(avatarColor('j57a2b')).toBe('#2F74B5');
+});

@@ -1,0 +1,17 @@
+.root {
+    position: relative;
+    display: inline-flex;
+    flex: none;
+}
+
+.dot {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+    width: var(--presence-dot);
+    height: var(--presence-dot);
+    border: 2.5px solid var(--presence-ring, var(--chat-sidebar-bg));
+    border-radius: 50%;
+    background-color: var(--chat-online);
+    box-sizing: border-box;
+}

@@ -1,48 +1,186 @@
-import { SegmentedControl, TextInput } from '@mantine/core';
-import { IconSearch } from '@tabler/icons-react';
-import { type FC, useState } from 'react';
+import { ActionIcon } from '@mantine/core';
+import { IconArrowLeft, IconPencil } from '@tabler/icons-react';
+import { useQuery } from 'convex/react';
+import { type CSSProperties, type FC, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
+import AddContactModal from '@/components/AddContactModal';
+import BottomTabs from '@/components/BottomTabs';
 import ChatList from '@/components/ChatList';
 import ContactsPanel from '@/components/ContactsPanel';
-import UserMenu from '@/components/UserMenu';
+import MainMenu from '@/components/MainMenu';
+import SettingsModal from '@/components/SettingsModal';
+import SidebarHeader from '@/components/SidebarHeader';
+import useIsDesktop from '@/hooks/useIsDesktop';
+import type { SidebarView } from '@/types/sidebar';
+import { api } from '@convex/_generated/api';
 
 import classes from './Sidebar.module.css';
 
-type Tab = 'chats' | 'contacts';
+const TITLES = { chats: 'Chats', contacts: 'Contacts', settings: 'Settings' } as const;
 
+// Mantine ставить --ai-color інлайн-стилем з varsResolver; style застосовується після нього
+const ACCENT_ICON = { '--ai-color': 'var(--chat-accent-text)' } as CSSProperties;
+
+// Відкритий Add contact — запис в історії (?add=contact): системний «назад» закриває діалог чи екран телефона
+const ADD_PARAM = 'add';
+
+// Бічна панель: на десктопі розділи перемикає меню ☰ (контакти — зі стрілкою «назад»),
+// на телефоні — нижні вкладки й заголовок екрана. Settings поки відкриває SettingsModal (етап 4 — панель)
 const Sidebar: FC = () => {
-    const [ tab, setTab ] = useState<Tab>('chats');
+    const isDesktop = useIsDesktop();
+    // Той самий запит, що й у ChatList: Convex-клієнт зводить однакові підписки в одну
+    const chats = useQuery(api.chats.list);
+    const [ view, setView ] = useState<Exclude<SidebarView, 'settings'>>('chats');
     const [ search, setSearch ] = useState('');
+    const [ settingsOpened, setSettingsOpened ] = useState(false);
+    const [ params, setParams ] = useSearchParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const adding = params.get(ADD_PARAM) === 'contact';
+    const searchRef = useRef<HTMLInputElement>(null);
+    // Кнопка, що перемкнула розділ (☰, «назад», «New chat»), зникає: фокус переходить у пошук нового розділу
+    const focusSearch = useRef(false);
+
+    useEffect(() => {
+        if (focusSearch.current) {
+            focusSearch.current = false;
+            searchRef.current?.focus();
+        }
+    }, [ view ]);
+
+    const unread = chats?.reduce((sum, chat) => chat.muted ? sum : sum + chat.unread, 0) ?? 0;
+
+    // focus — перемкнули кнопкою, що зникає; на телефоні фокус у пошуку відкрив би клавіатуру, тож лише десктоп
+    const select = (next: SidebarView, focus = false) => {
+        if (next === 'settings') {
+            setSettingsOpened(true);
+
+            return;
+        }
+
+        focusSearch.current = focus && isDesktop;
+        setView(next);
+        setSearch('');
+    };
+
+    const addContact = () => {
+        setParams(current => {
+            current.set(ADD_PARAM, 'contact');
+
+            return current;
+        }, { state: { addContact: true } });
+    };
+
+    // Відкрили кнопкою — повертаємось на запис назад; прийшли за посиланням з ?add — просто прибираємо параметр
+    const closeAddContact = () => {
+        if ((location.state as { addContact?: boolean } | null)?.addContact) {
+            void navigate(-1);
+
+            return;
+        }
+
+        setParams(current => {
+            current.delete(ADD_PARAM);
+
+            return current;
+        }, { replace: true });
+    };
+
+    const newChat = (
+        <ActionIcon
+            variant={ isDesktop ? 'filled' : 'subtle' }
+            size={ isDesktop ? 50 : undefined }
+            aria-label="New chat"
+            className={ isDesktop ? classes.fab : classes.newChat }
+            style={ isDesktop ? undefined : ACCENT_ICON }
+            onClick={ () => {
+                select('contacts', true);
+            } }
+        >
+            <IconPencil
+                size={ isDesktop ? 24 : 22 }
+                aria-hidden
+            />
+        </ActionIcon>
+    );
+
+    const desktopStart = view === 'chats'
+        ? (
+            <MainMenu
+                view={ view }
+                onSelect={ next => {
+                    select(next, true);
+                } }
+            />
+        )
+        : (
+            <ActionIcon
+                variant="subtle"
+                color="gray"
+                aria-label="Back to chats"
+                onClick={ () => {
+                    select('chats', true);
+                } }
+            >
+                <IconArrowLeft
+                    size={ 22 }
+                    aria-hidden
+                />
+            </ActionIcon>
+        );
 
     return (
         <aside className={ classes.sidebar }>
-            <div className={ classes.header }>
-                <UserMenu />
-                <SegmentedControl
-                    value={ tab }
-                    data={ [ { value: 'chats', label: 'Chats' }, { value: 'contacts', label: 'Contacts' } ] }
-                    fullWidth
-                    onChange={ value => {
-                        setTab(value as Tab);
-                        setSearch('');
-                    } }
-                />
-                <TextInput
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                    leftSection={ <IconSearch size={ 16 } /> }
-                    value={ search }
-                    onChange={ e => {
-                        setSearch(e.currentTarget.value);
-                    } }
-                />
-            </div>
+            <SidebarHeader
+                title={ isDesktop ? undefined : TITLES[ view ] }
+                start={ desktopStart }
+                end={ view === 'chats' ? newChat : undefined }
+                searchLabel={ view === 'chats' ? 'Search' : 'Search contacts' }
+                search={ search }
+                searchRef={ searchRef }
+                onSearch={ setSearch }
+            />
             <div className={ classes.list }>
-                { tab === 'chats'
-                    ? <ChatList search={ search } />
-                    : <ContactsPanel search={ search } /> }
+                { view === 'chats'
+                    ? (
+                        <ChatList
+                            search={ search }
+                            footer={ isDesktop ? newChat : undefined }
+                            onAddContact={ addContact }
+                        />
+                    )
+                    : (
+                        <ContactsPanel
+                            search={ search }
+                            onAddContact={ addContact }
+                            onOpened={ () => {
+                                select('chats');
+                            } }
+                        />
+                    ) }
             </div>
+            { !isDesktop && (
+                <BottomTabs
+                    view={ view }
+                    unread={ unread }
+                    onSelect={ select }
+                />
+            ) }
+            <AddContactModal
+                opened={ adding }
+                backLabel={ view === 'chats' ? 'Back to chats' : 'Back to contacts' }
+                onClose={ closeAddContact }
+                onOpened={ () => {
+                    select('chats');
+                } }
+            />
+            <SettingsModal
+                opened={ settingsOpened }
+                onClose={ () => {
+                    setSettingsOpened(false);
+                } }
+            />
         </aside>
     );
 };

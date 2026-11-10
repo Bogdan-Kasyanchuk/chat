@@ -1,0 +1,16 @@
+.root {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.chip {
+    margin: 0;
+    padding: rem(4px) rem(10px);
+    border-radius: rem(12px);
+    background-color: var(--chat-date-chip);
+    color: var(--chat-date-chip-text);
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 600;
+}
