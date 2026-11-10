@@ -119,3 +119,11 @@ test('editing a field clears the server error', async () => {
 
     expect(screen.queryByRole('alert')).toBeNull();
 });
+
+// Канвас SignUp: у двох полів різні підписи кнопки з оком, щоб читач екрана їх розрізняв
+test('the two eye buttons have different names', () => {
+    renderSignUp();
+
+    expect(screen.getByRole('button', { name: 'Show password' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Show confirm password' })).toBeTruthy();
+});
