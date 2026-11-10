@@ -1,0 +1,43 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4px);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: rem(8px);
+    min-height: rem(44px);
+    padding-left: rem(10px);
+    border-radius: rem(12px);
+
+    &[data-checked] {
+        background-color: var(--chat-field);
+    }
+}
+
+/* Підпис тягнеться на весь рядок: клік будь-де ліворуч від Play вибирає звук */
+.radio {
+    flex: 1;
+    min-width: 0;
+    align-self: stretch;
+}
+
+.body {
+    height: 100%;
+    align-items: center;
+}
+
+.labelWrapper {
+    flex: 1;
+    align-self: stretch;
+}
+
+.label {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding-left: rem(8px);
+    cursor: pointer;
+}

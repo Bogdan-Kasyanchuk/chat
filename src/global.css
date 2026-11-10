@@ -42,6 +42,15 @@ fieldset:disabled .chat-active:active {
     border: 2px solid var(--chat-muted);
 }
 
+/* Радіо на прозорому тлі, вибране — кільце 2px акценту (колір і крапку дає variant outline) */
+.mantine-Radio-radio:not(:disabled, [data-error]) {
+    background-color: transparent;
+}
+
+.mantine-Radio-radio:checked:not(:disabled, [data-error]) {
+    border-width: 2px;
+}
+
 /* Скелетони — колір поля, як рядки-заглушки на канвасі */
 .mantine-Skeleton-root[data-visible]::after {
     background-color: var(--chat-field);

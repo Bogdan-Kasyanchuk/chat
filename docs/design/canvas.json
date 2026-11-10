@@ -404,6 +404,20 @@
       "w": 390,
       "x": 3760,
       "y": 10268
+    },
+    "MobileLogout.dc.html": {
+      "h": 844,
+      "title": "Settings: log out",
+      "w": 390,
+      "x": 4230,
+      "y": 10268
+    },
+    "MobileDeleteAccount.dc.html": {
+      "h": 844,
+      "title": "Settings: delete account",
+      "w": 390,
+      "x": 4700,
+      "y": 10268
     }
   },
   "createdOnFiles": {
@@ -501,7 +515,7 @@
     },
     "rowMorePhone": {
       "kind": "title1",
-      "maxW": 4150,
+      "maxW": 5090,
       "text": "More states · phone",
       "w": 240,
       "x": 0,
@@ -561,7 +575,9 @@
     "MobileChatsDark.dc.html",
     "MobileConversationDark.dc.html",
     "MobileContactsEmpty.dc.html",
-    "Components.dc.html"
+    "Components.dc.html",
+    "MobileLogout.dc.html",
+    "MobileDeleteAccount.dc.html"
   ],
   "pages": [],
   "title": "Chat redesign"

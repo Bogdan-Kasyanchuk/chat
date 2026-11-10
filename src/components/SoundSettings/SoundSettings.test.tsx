@@ -42,3 +42,14 @@ test('the Play button previews without saving', async () => {
     expect(playSound).toHaveBeenCalledWith('chime');
     expect(setSound).not.toHaveBeenCalled();
 });
+
+// Артборд Settings → Notifications and sounds: заголовок розділу — підпис групи, «None» без кнопки програвання
+test('the sound list is the Notifications and sounds group, None has no Play button', () => {
+    renderWithProviders(<SoundSettings sound="classic" />);
+
+    expect(screen.getByRole('heading', { name: 'Notifications and sounds' })).toBeTruthy();
+    expect(screen.getByRole('radiogroup', { name: 'Notifications and sounds' })).toBeTruthy();
+    expect(screen.getAllByRole('radio')).toHaveLength(5);
+    expect(screen.getByRole('button', { name: 'Play Classic' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Play None' })).toBeNull();
+});

@@ -1,20 +1,61 @@
 import { useAuthActions } from '@convex-dev/auth/react';
-import { Button, Stack } from '@mantine/core';
+import { Button, Text, UnstyledButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { IconLogout, IconTrash } from '@tabler/icons-react';
 import { useMutation } from 'convex/react';
-import { type FC, useState } from 'react';
+import { type FC, type ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import ConfirmModal from '@/components/ConfirmModal';
+import ResponsiveDialog, { DialogActions } from '@/components/ResponsiveDialog';
+import SettingsSection from '@/components/SettingsSection';
 import useLogout from '@/hooks/useLogout';
 import errorMessage from '@/lib/errorMessage';
 import { api } from '@convex/_generated/api';
 
-type AccountSettingsProps = {
-    onDeleted: () => void
+import classes from './AccountSettings.module.css';
+
+type ConfirmProps = {
+    opened: boolean,
+    title: string,
+    text: string,
+    action: ReactNode,
+    busy: boolean,
+    onClose: () => void
 };
 
-const AccountSettings: FC<AccountSettingsProps> = ({ onDeleted }) => {
+// Діалоги LogoutDialog і DeleteAccountDialog (на телефоні — нижні панелі): текст, «Cancel» і дія.
+// Фокус спершу на «Cancel»: на телефоні хрестика немає, і першою кнопкою була б сама дія
+const Confirm: FC<ConfirmProps> = ({ opened, title, text, action, busy, onClose }) => (
+    <ResponsiveDialog
+        opened={ opened }
+        title={ title }
+        busy={ busy }
+        onClose={ onClose }
+    >
+        <Text
+            size="md"
+            c="var(--chat-muted)"
+        >
+            { text }
+        </Text>
+        <DialogActions
+            cancel={ (
+                <Button
+                    variant="default"
+                    disabled={ busy }
+                    data-autofocus
+                    onClick={ onClose }
+                >
+                    Cancel
+                </Button>
+            ) }
+            confirm={ action }
+        />
+    </ResponsiveDialog>
+);
+
+// Артборд Settings → Account: рядки «Log out» і червоний «Delete account», кожен — з підтвердженням
+const AccountSettings: FC = () => {
     const { signOut } = useAuthActions();
     const deleteAccount = useMutation(api.users.deleteAccount);
     const navigate = useNavigate();
@@ -37,59 +78,78 @@ const AccountSettings: FC<AccountSettingsProps> = ({ onDeleted }) => {
 
         // Сесії вже немає: помилку виходу ігноруємо. Виходимо одразу, щоб живі запити не сипали NOT_SIGNED_IN
         await signOut().catch(() => {});
-        onDeleted();
         await navigate('/login', { replace: true });
     };
 
     return (
-        <Stack>
-            <Button
-                variant="default"
+        <SettingsSection title="Account">
+            <UnstyledButton
+                className={ classes.row }
                 onClick={ () => {
                     setConfirmingLogout(true);
                 } }
             >
+                <IconLogout
+                    size={ 20 }
+                    stroke={ 1.8 }
+                    aria-hidden
+                />
                 Log out
-            </Button>
-            <Button
-                color="red"
-                variant="light"
+            </UnstyledButton>
+            <UnstyledButton
+                className={ classes.row }
+                mod={ { danger: true } }
                 onClick={ () => {
                     setConfirming(true);
                 } }
             >
+                <IconTrash
+                    size={ 20 }
+                    stroke={ 1.8 }
+                    aria-hidden
+                />
                 Delete account
-            </Button>
-            <ConfirmModal
+            </UnstyledButton>
+            <Confirm
                 opened={ confirmingLogout }
                 title="Log out?"
-                confirmLabel="Log out"
-                loading={ loggingOut }
-                onConfirm={ () => {
-                    void logout();
-                } }
+                text="You will need to sign in again to read your messages."
+                busy={ loggingOut }
+                action={ (
+                    <Button
+                        loading={ loggingOut }
+                        onClick={ () => {
+                            void logout();
+                        } }
+                    >
+                        Log out
+                    </Button>
+                ) }
                 onClose={ () => {
                     setConfirmingLogout(false);
                 } }
-            >
-                You will need to sign in again to read your messages.
-            </ConfirmModal>
-            <ConfirmModal
+            />
+            <Confirm
                 opened={ confirming }
                 title="Delete account?"
-                confirmLabel="Delete account"
-                loading={ deleting }
-                danger
-                onConfirm={ () => {
-                    void remove();
-                } }
+                text="Your profile, contacts and chats are deleted for good. People you talked to will see “Deleted account”."
+                busy={ deleting }
+                action={ (
+                    <Button
+                        color="red"
+                        loading={ deleting }
+                        onClick={ () => {
+                            void remove();
+                        } }
+                    >
+                        Delete account
+                    </Button>
+                ) }
                 onClose={ () => {
                     setConfirming(false);
                 } }
-            >
-                Your profile, contacts and chats will be deleted. Your messages stay visible to other people as Deleted account. This cannot be undone.
-            </ConfirmModal>
-        </Stack>
+            />
+        </SettingsSection>
     );
 };
 

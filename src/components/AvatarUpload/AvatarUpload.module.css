@@ -1,0 +1,25 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: rem(4px);
+}
+
+.photo {
+    position: relative;
+    display: block;
+}
+
+.change,
+.remove {
+    position: absolute;
+    right: rem(-2px);
+}
+
+.change {
+    bottom: rem(-2px);
+}
+
+.remove {
+    top: rem(-2px);
+}

@@ -267,9 +267,20 @@ describe('control sizes', () => {
         expect(checkbox.style.getPropertyValue('--checkbox-radius')).toBe(rem(6));
         expect(radio.style.getPropertyValue('--radio-size')).toBe(rem(20));
         expect(radio.style.getPropertyValue('--radio-icon-size')).toBe(rem(10));
-        // Галочка й крапка на акценті: у темній темі акцент світлий, тож вони мають колір on-accent, а не білий
+        // Галочка на акценті: у темній темі акцент світлий, тож вона має колір on-accent, а не білий
         expect(checkbox.style.getPropertyValue('--checkbox-icon-color')).toBe('var(--chat-on-accent)');
-        expect(radio.style.getPropertyValue('--radio-icon-color')).toBe('var(--chat-on-accent)');
+    });
+
+    // Components → «Radio option», артборд Settings: вибране радіо — кільце й крапка акценту на прозорому тлі
+    test('a radio is an accent ring with an accent dot, not a filled disc', () => {
+        renderWithProviders(<Radio label="Chime" />);
+
+        const radio = screen.getByLabelText('Chime').closest('.mantine-Radio-root') as HTMLElement;
+
+        expect(radio.getAttribute('data-variant')).toBe('outline');
+        // Outline Mantine бере brand-outline (у темній — інший відтінок), тож колір — токен акценту
+        expect(radio.style.getPropertyValue('--radio-color')).toBe('var(--chat-accent)');
+        expect(radio.style.getPropertyValue('--radio-icon-color')).toBe('');
     });
 });
 
@@ -369,7 +380,8 @@ describe('avatar', () => {
 
         const placeholder = screen.getByText('MS');
 
-        expect(placeholder.style.fontSize).toBe('calc(var(--avatar-size) * 0.364)');
+        // --avatar-initials-fz — для розмірів, де канвас відходить від пропорції (фото профілю 104 → 36)
+        expect(placeholder.style.fontSize).toBe('var(--avatar-initials-fz, calc(var(--avatar-size) * 0.364))');
         expect(placeholder.style.fontWeight).toBe('600');
     });
 });

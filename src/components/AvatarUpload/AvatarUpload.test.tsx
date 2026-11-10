@@ -1,3 +1,4 @@
+import { rem } from '@mantine/core';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
@@ -105,5 +106,67 @@ test('AvatarUpload lets the same file be picked twice', async () => {
     await user.upload(input, file);
     await waitFor(() => {
         expect(setAvatar).toHaveBeenCalledTimes(2);
+    });
+});
+
+// Артборд Settings → Profile: фото 104, кругла кнопка «Change photo» знизу праворуч, «Remove photo» — зверху праворуч
+test('the profile photo is 104px with Change photo and Remove photo buttons', () => {
+    renderWithProviders(
+        <AvatarUpload
+            userId="k17me"
+            name="Alice"
+            avatar="https://img.test/a.png"
+        />
+    );
+
+    const avatar = screen.getByRole('img', { name: 'Alice' }).closest('.mantine-Avatar-root') as HTMLElement;
+
+    expect(avatar.style.getPropertyValue('--avatar-size')).toContain('6.5rem');
+    // Ініціали на фото профілю — 36, як на канвасі (за пропорцією аватара 44 вийшло б 38)
+    expect((avatar.closest('[style*="--avatar-initials-fz"]') as HTMLElement).style.getPropertyValue('--avatar-initials-fz')).toBe(rem(36));
+    expect(screen.getByRole('button', { name: 'Change photo' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Remove photo' })).toBeTruthy();
+});
+
+// Без фото прибирати нічого: кнопки «Remove photo» немає, а не вимкнена
+test('without a photo there is no Remove photo button', () => {
+    renderWithProviders(
+        <AvatarUpload
+            userId="k17me"
+            name="Alice"
+            avatar={ null }
+        />
+    );
+
+    expect(screen.getByRole('button', { name: 'Change photo' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Remove photo' })).toBeNull();
+});
+
+// Кнопка «Remove photo» зникає разом з фото: фокус переходить на «Change photo», а не на початок сторінки
+test('after removing the photo the focus moves to Change photo', async () => {
+    setAvatar.mockResolvedValue(null);
+
+    const props = { userId: 'k17me', name: 'Alice' };
+    const { rerender } = renderWithProviders(
+        <AvatarUpload
+            { ...props }
+            avatar="https://img.test/a.png"
+        />
+    );
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Remove photo' }));
+    await waitFor(() => {
+        expect(setAvatar).toHaveBeenCalledWith({ storageId: null });
+    });
+
+    rerender(
+        <AvatarUpload
+            { ...props }
+            avatar={ null }
+        />
+    );
+
+    await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Change photo' }));
     });
 });
