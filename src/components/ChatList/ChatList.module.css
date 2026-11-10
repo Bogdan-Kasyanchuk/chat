@@ -1,0 +1,10 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4px);
+    padding: rem(6px) rem(10px) rem(10px);
+}
+
+.heading {
+    margin: rem(12px) rem(10px) rem(4px);
+}

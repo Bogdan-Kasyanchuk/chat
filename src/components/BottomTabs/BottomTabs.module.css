@@ -1,0 +1,54 @@
+.tabs {
+    display: grid;
+    flex: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    height: rem(78px);
+    padding: rem(6px) rem(20px) rem(20px);
+    padding-bottom: max(rem(20px), env(safe-area-inset-bottom));
+    border-top: 1px solid var(--chat-line);
+    background-color: var(--chat-sidebar-bg);
+    box-sizing: border-box;
+}
+
+.tab {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: rem(4px);
+    border-radius: rem(12px);
+    color: var(--chat-muted);
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 600;
+
+    &:hover {
+        background-color: var(--chat-hover);
+    }
+
+    &:active {
+        background-color: var(--chat-pressed);
+    }
+
+    &[aria-current='page'] {
+        color: var(--chat-accent-text);
+    }
+}
+
+.badge {
+    position: absolute;
+    top: 0;
+    left: 52%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: rem(20px);
+    height: rem(20px);
+    padding: 0 rem(6px);
+    border-radius: rem(10px);
+    background-color: var(--chat-badge);
+    color: var(--chat-badge-text);
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 700;
+    box-sizing: border-box;
+}

@@ -1,5 +1,6 @@
 import {
     ActionIcon,
+    Avatar,
     Badge,
     Button,
     Checkbox,
@@ -368,6 +369,10 @@ const theme = createTheme({
         Divider: Divider.extend({
             defaultProps: { color: 'var(--chat-line)' },
             styles: { label: { fontSize: 'var(--mantine-font-size-sm)', color: 'var(--chat-muted)' } }
+        }),
+        // Ініціали 16 / 600 на аватарі 44 (Components → avatars); на інших розмірах — та сама пропорція
+        Avatar: Avatar.extend({
+            styles: { placeholder: { fontSize: 'calc(var(--avatar-size) * 0.364)', fontWeight: 600 } }
         }),
         // Лічильник непрочитаних 20 / радіус 10, текст 12 / 700; сірий — лічильник замʼюченого чату
         Badge: Badge.extend({

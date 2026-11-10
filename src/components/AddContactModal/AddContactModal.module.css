@@ -1,0 +1,94 @@
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: rem(24px);
+}
+
+.close {
+    margin: rem(-6px) rem(-12px) rem(-6px) 0;
+}
+
+/* Поле й «Find» в один рядок, підказка чи помилка — під обома */
+.field {
+    display: flex;
+    gap: rem(8px);
+}
+
+.input {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Знайдена людина: картка з тінню і лінією line */
+.card {
+    display: flex;
+    align-items: center;
+    gap: rem(8px);
+    padding: rem(10px);
+    border-radius: rem(12px);
+    background-color: var(--chat-sidebar-bg);
+    box-shadow: var(--chat-bubble-shadow), 0 0 0 1px var(--chat-line);
+}
+
+.person {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: rem(2px);
+    min-width: 0;
+}
+
+.actions {
+    display: flex;
+    gap: rem(8px);
+
+    & > * {
+        flex: 1;
+        min-width: 0;
+    }
+
+    @mixin smaller-than $mantine-breakpoint-md {
+        flex-direction: column;
+    }
+}
+
+/* Телефон: екран на всю висоту, кнопки внизу */
+.screen {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    padding: 0;
+    background-color: var(--chat-sidebar-bg);
+}
+
+.back {
+    display: flex;
+    padding: rem(10px) rem(20px) 0 rem(10px);
+}
+
+.backButton {
+    --ai-color: var(--chat-accent-text);
+}
+
+.screenBody {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: rem(24px);
+    padding: rem(10px) rem(20px) rem(20px);
+}
+
+.heading {
+    display: flex;
+    flex-direction: column;
+    gap: rem(8px);
+}
+
+.title {
+    font-size: rem(32px);
+    line-height: 1.2;
+}
+
+.bottom {
+    margin-top: auto;
+}

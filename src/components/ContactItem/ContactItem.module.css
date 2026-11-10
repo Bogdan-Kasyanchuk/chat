@@ -1,18 +1,27 @@
+/* Рядок контакту: аватар 44, ім'я 16 / 600, статус 14; радіус 12, як у списку чатів */
 .item {
     display: flex;
     align-items: center;
-    gap: var(--mantine-spacing-sm);
+    gap: rem(8px);
     width: 100%;
-    padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
-    border-bottom: 1px solid var(--mantine-color-gray-2);
+    padding: rem(10px);
+    border-radius: rem(12px);
+    color: var(--chat-text);
 
     &:hover {
-        background-color: var(--mantine-color-gray-0);
+        background-color: var(--chat-hover);
+    }
+
+    &:active {
+        background-color: var(--chat-pressed);
     }
 }
 
 .body {
+    display: flex;
     flex: 1;
+    flex-direction: column;
+    gap: rem(2px);
     min-width: 0;
     text-align: left;
 }

@@ -1,0 +1,39 @@
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4px);
+    padding: rem(6px) rem(10px) rem(10px);
+}
+
+.add {
+    display: flex;
+    align-items: center;
+    gap: rem(8px);
+    padding: rem(10px);
+    border-radius: rem(12px);
+    color: var(--chat-accent-text);
+    font-weight: 600;
+
+    &:hover {
+        background-color: var(--chat-hover);
+    }
+
+    &:active {
+        background-color: var(--chat-pressed);
+    }
+}
+
+.addIcon {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: rem(44px);
+    height: rem(44px);
+    border-radius: 50%;
+    background-color: var(--chat-field);
+}
+
+.count {
+    margin: rem(12px) rem(10px);
+}

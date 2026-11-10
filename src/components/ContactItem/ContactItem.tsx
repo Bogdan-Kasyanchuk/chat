@@ -24,7 +24,7 @@ const ContactItem: FC<ContactItemProps> = ({ contact, now, onOpen }) => (
             userId={ contact.userId }
             name={ contact.name }
             avatar={ contact.avatar }
-            size={ 48 }
+            size={ 44 }
             online={ contact.online }
         />
         <div className={ classes.body }>

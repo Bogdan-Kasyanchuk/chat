@@ -77,7 +77,7 @@ test('ChatListItem greys the badge of a muted chat', () => {
     expect(screen.getByLabelText('Muted')).toBeTruthy();
 });
 
-test('ChatListItem keeps the badge of an unmuted chat dark', () => {
+test('ChatListItem keeps the badge of an unmuted chat in the accent colour', () => {
     renderWithProviders(
         <ChatListItem
             chat={ makeChat({ unread: 3 }) }
@@ -88,4 +88,50 @@ test('ChatListItem keeps the badge of an unmuted chat dark', () => {
 
     expect(screen.getByText('3').closest('.mantine-Badge-root')?.hasAttribute('data-muted')).toBe(false);
     expect(screen.queryByLabelText('Muted')).toBeNull();
+});
+
+// Артборд Chats: ім'я, галочки й час — у верхньому рядку, превʼю й лічильник — у нижньому
+test('ticks and time sit on the name row and the badge on the preview row', () => {
+    renderWithProviders(
+        <ChatListItem
+            chat={ makeChat({ unread: 3 }) }
+            active={ false }
+            now={ now }
+        />
+    );
+
+    const nameRow = screen.getByText('Bob').parentElement!;
+    const previewRow = screen.getByText('You: See you').parentElement!;
+
+    expect(nameRow.contains(screen.getByLabelText('Read'))).toBe(true);
+    expect(nameRow.contains(screen.getByText('14:02'))).toBe(true);
+    expect(previewRow.contains(screen.getByText('3'))).toBe(true);
+});
+
+test('the unread badge takes the badge token instead of a Mantine colour', () => {
+    renderWithProviders(
+        <ChatListItem
+            chat={ makeChat({ unread: 3 }) }
+            active={ false }
+            now={ now }
+        />
+    );
+
+    const badge = screen.getByText('3').closest('.mantine-Badge-root') as HTMLElement;
+
+    expect(badge.style.getPropertyValue('--badge-bg')).toBe('var(--chat-badge)');
+});
+
+test('the avatar in the chat list is 44px', () => {
+    renderWithProviders(
+        <ChatListItem
+            chat={ makeChat() }
+            active={ false }
+            now={ now }
+        />
+    );
+
+    const avatar = screen.getByText('B').closest('.mantine-Avatar-root') as HTMLElement;
+
+    expect(avatar.style.getPropertyValue('--avatar-size')).toContain('2.75rem');
 });

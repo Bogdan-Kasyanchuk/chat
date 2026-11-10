@@ -3,23 +3,25 @@
     height: 100%;
 }
 
+/* Бічна панель фіксованої ширини (на канвасі 375–380), лінія line праворуч */
 .sidebar {
     flex-shrink: 0;
+    width: rem(380px);
     height: 100%;
-    width: 35%;
-    min-width: 340px;
-    border-right: 1px solid var(--mantine-color-gray-3);
+    border-right: 1px solid var(--chat-line);
 
     @mixin smaller-than $mantine-breakpoint-md {
         width: 100%;
-        min-width: 0;
         border-right: 0;
     }
 }
 
+/* Тло розмови з крапковим візерунком, як на канвасі */
 .main {
     flex: 1;
     min-width: 0;
     height: 100%;
-    background-color: var(--mantine-color-gray-0);
+    background-color: var(--chat-bg);
+    background-image: radial-gradient(circle at 1px 1px, var(--chat-pattern) 1px, transparent 0);
+    background-size: rem(22px) rem(22px);
 }

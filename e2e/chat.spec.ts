@@ -1,6 +1,6 @@
 import { type Locator, expect, test } from '@playwright/test';
 
-import { addContact, chatItem, isPhone, leaveChat, message, messageMenu, newUserPage, openChat, openContact, openMessageMenu, sendMessage, signUp } from './helpers';
+import { addContact, chatItem, isPhone, leaveChat, logOut, message, messageMenu, newUserPage, openChat, openContact, openMessageMenu, sendMessage, signUp, testEmail } from './helpers';
 
 test('two people add each other, talk, reply, edit, forward and delete', async ({ page, browser }) => {
     const bob = await newUserPage(browser);
@@ -168,10 +168,7 @@ test('status shows online and switches to last seen after logout', async ({ page
 
     await expect(status).toHaveText('online');
 
-    await bob.getByRole('button', { name: 'Account menu' }).click();
-    await bob.getByRole('menuitem', { name: 'Logout' }).click();
-    await bob.getByRole('dialog', { name: 'Log out?' }).getByRole('button', { name: 'Log out' }).click();
-    await expect(bob).toHaveURL(/\/login$/);
+    await logOut(bob);
     await expect(bob.getByRole('heading', { name: 'Sign in' })).toBeVisible();
 
     await expect(status).toHaveText('last seen just now');
@@ -223,4 +220,21 @@ test('on a touch screen the menu item under the finger is not highlighted', asyn
     expect(await background(items.first())).toBe(await background(items.nth(1)));
 
     await bob.context().close();
+});
+
+// Артборди ChatsEmpty і AddContactNotFound: новий акаунт без чатів, пошта, якої ніхто не реєстрував
+test('a new account sees No chats yet and Add contact explains an unknown email', async ({ page }) => {
+    await signUp(page, 'Alice');
+
+    await expect(page.getByRole('heading', { name: 'No chats yet' })).toBeVisible();
+    await page.getByRole('button', { name: 'Add contact' }).click();
+
+    const dialog = page.getByRole('dialog', { name: 'Add contact' });
+
+    await dialog.getByLabel('Email').fill(testEmail('nobody'));
+    await dialog.getByRole('button', { name: 'Find' }).click();
+    await expect(dialog.getByRole('alert')).toHaveText('No one has signed up with this email. Check the spelling.');
+    await expect(dialog.getByRole('button', { name: 'Add to contacts' })).toBeDisabled();
+    await dialog.getByRole('button', { name: isPhone() ? 'Back to contacts' : 'Cancel' }).click();
+    await expect(dialog).toHaveCount(0);
 });
