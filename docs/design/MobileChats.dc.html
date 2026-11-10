@@ -120,6 +120,7 @@ body{margin:0}
 <span style="width: 44px; height: 44px; flex: none; border-radius: 22px; background: {{c.field}}; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="9" cy="7" r="4"></circle><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M16 11h6M19 8v6"></path></svg></span>
 Add contact
 </a>
+<sc-if value="{{listFull}}" hint-placeholder-val="{{ true }}">
 <p style="margin: 12px 10px; font-size: 14px; font-weight: 600; color: {{c.muted}}">6 contacts</p>
 <sc-for list="{{contacts}}" as="item" hint-placeholder-count="6">
 <a class="row" href="MobileConversation.dc.html" style="display: flex; align-items: center; gap: 8px; padding: 10px; border-radius: 12px; color: {{c.text}}; text-decoration: none">
@@ -130,6 +131,13 @@ Add contact
 </span>
 </a>
 </sc-for>
+</sc-if>
+<sc-if value="{{listEmpty}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 40px 20px; text-align: center">
+<span style="width: 80px; height: 80px; border-radius: 40px; background: {{c.field}}; color: {{c.accentText}}; display: flex; align-items: center; justify-content: center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M16 3.13a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.85"></path></svg></span>
+<h3 style="margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2">No contacts yet</h3>
+</div>
+</sc-if>
 </div>
 </sc-if>
 
@@ -305,11 +313,11 @@ Add contact
 <sc-if value="{{showTabs}}" hint-placeholder-val="{{ true }}">
 <nav aria-label="Sections" style="height: 78px; flex: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 6px 20px 20px; background: {{c.bg}}; border-top: 1px solid {{c.line}}; box-sizing: border-box">
 <sc-for list="{{tabs}}" as="t" hint-placeholder-count="3">
-<a class="tab" href="{{t.href}}" aria-current="{{t.current}}" style="position: relative; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: {{t.color}}; font-size: 12px; font-weight: 600; text-decoration: none">
+<button class="tab" type="button" onClick="{{ t.pick }}" aria-current="{{t.current}}" style="position: relative; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: {{t.color}}; font-size: 12px; font-weight: 600; border: 0; background: transparent; font-family: inherit; cursor: pointer">
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.icon}}"></path></svg>
 {{t.label}}
 <sc-if value="{{t.hasBadge}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; top: 0; left: 52%; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: {{c.badge}}; color: {{c.badgeText}}; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box">{{t.badge}}</span><span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap">, {{t.badge}} unread</span></sc-if>
-</a>
+</button>
 </sc-for>
 </nav>
 </sc-if>
@@ -394,7 +402,8 @@ renderVals() {
 const L = { bg: '#FFFFFF', chatBg: '#E6EEEB', pattern: 'rgba(11, 122, 117, 0.10)', text: '#16201F', muted: '#5A6B68', line: '#E2E9E7', field: '#F1F5F4', border: '#D5DEDB', inBg: '#FFFFFF', inText: '#16201F', outBg: '#D3F0EB', outText: '#0E2725', meta: '#4D6662', tickRead: '#0B7A75', badge: '#0B7A75', badgeText: '#FFFFFF', badgeMuted: '#6A7A77', badgeMutedText: '#FFFFFF', online: '#1F9D55', chip: '#D5E1DD', chipText: '#2C3B39', accent: '#0B7A75', accentText: '#0B7A75', onAccent: '#FFFFFF', popover: '#FFFFFF', shadow: '0 10px 30px rgba(16, 32, 30, 0.16)', bubbleShadow: '0 1px 1.5px rgba(16, 32, 30, 0.10)', danger: '#C2372C', dangerSolid: '#C2372C', onDanger: '#FFFFFF', dangerSoft: '#FBEAE8', overlay: 'rgba(14, 24, 23, 0.45)', selectRow: 'rgba(11, 122, 117, 0.12)', quoteIn: 'rgba(11, 122, 117, 0.08)', quoteOut: 'rgba(11, 122, 117, 0.12)', segOn: '#FFFFFF', hover: '#F1F5F4', pressed: '#E6ECEA', fieldHover: '#E6ECEA', fieldPressed: '#DCE4E1', accentHover: '#08625E', accentPressed: '#06504D', dangerHover: '#A82F25', dangerPressed: '#8F271F', dangerSoftHover: '#F7DAD6', dangerRing: 'rgba(194, 55, 44, 0.18)', disabledBg: '#E2E9E7', disabledText: '#7A8986', ring: '#0B7A75', ringSoft: 'rgba(11, 122, 117, 0.18)', borderHover: '#B9C6C2' };
 const D = { bg: '#151C1D', chatBg: '#0E1415', pattern: 'rgba(60, 196, 184, 0.07)', text: '#E6EDEC', muted: '#93A4A1', line: '#243032', field: '#1B2425', border: '#2C3A3B', inBg: '#1E2829', inText: '#E6EDEC', outBg: '#1D4945', outText: '#E4F4F1', meta: '#9DB5B1', tickRead: '#5FD9CC', badge: '#3CC4B8', badgeText: '#062220', badgeMuted: '#3E4C4A', badgeMutedText: '#DCE5E3', online: '#3DD07A', chip: '#1C2728', chipText: '#C3D2CF', accent: '#3CC4B8', accentText: '#4FD1C5', onAccent: '#062220', popover: '#1E2829', shadow: '0 14px 36px rgba(0, 0, 0, 0.5)', bubbleShadow: '0 1px 1.5px rgba(0, 0, 0, 0.35)', danger: '#FF8A7A', dangerSolid: '#E5574A', onDanger: '#1A0806', dangerSoft: '#3A1F1C', overlay: 'rgba(0, 0, 0, 0.6)', selectRow: 'rgba(60, 196, 184, 0.14)', quoteIn: 'rgba(79, 209, 197, 0.10)', quoteOut: 'rgba(255, 255, 255, 0.08)', segOn: '#2C3A3B', hover: '#1B2425', pressed: '#243032', fieldHover: '#243032', fieldPressed: '#2C3A3B', accentHover: '#52D0C5', accentPressed: '#2FA99E', dangerHover: '#EE6A5E', dangerPressed: '#CC4A3E', dangerSoftHover: '#4A2622', dangerRing: 'rgba(255, 138, 122, 0.25)', disabledBg: '#243032', disabledText: '#6E7F7C', ring: '#4FD1C5', ringSoft: 'rgba(79, 209, 197, 0.25)', borderHover: '#3B4B4C' };
 const c = this.props.dark ? D : L;
-const screen = this.props.screen ?? 'chats';
+// Вкладки перемикають екран у Play: вибір живе в state артборду, без переходу на інший
+const screen = (this.state && this.state.screen) || this.props.screen || 'chats';
 const overlay = this.props.overlay ?? 'none';
 const selecting = overlay === 'selection';
 const empty = !!this.props.empty;
@@ -501,7 +510,7 @@ const tabs = [
   { key: 'chats', label: 'Chats', href: 'MobileChats.dc.html', icon: ICON.chats, badge: '3' },
   { key: 'contacts', label: 'Contacts', href: 'MobileContacts.dc.html', icon: ICON.contacts },
   { key: 'settings', label: 'Settings', href: 'MobileSettings.dc.html', icon: ICON.settings }
-].map((t) => ({ ...t, hasBadge: !!t.badge, badge: t.badge ?? '', current: t.key === screen ? 'page' : 'false', color: t.key === screen ? c.accentText : c.muted }));
+].map((t) => ({ ...t, hasBadge: !!t.badge, badge: t.badge ?? '', current: t.key === screen ? 'page' : 'false', color: t.key === screen ? c.accentText : c.muted, pick: () => this.setState({ screen: t.key }) }));
 
 const settingsRows = [
   { label: 'Name', value: 'Olena Kovalenko', icon: ICON.user },
