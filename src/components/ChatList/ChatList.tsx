@@ -55,18 +55,20 @@ const ChatList: FC<ChatListProps> = ({ search, onAddContact, footer }) => {
 
     if (chats.length === 0 && !query) {
         return (
-            <EmptyState
-                icon={
-                    <IconMessageCircle
-                        size={ 36 }
-                        stroke={ 1.6 }
-                        aria-hidden
-                    />
-                }
-                title="No chats yet"
-                text="Add people by email to start a conversation."
-                action={ addContact }
-            />
+            <div className={ classes.center }>
+                <EmptyState
+                    icon={
+                        <IconMessageCircle
+                            size={ 36 }
+                            stroke={ 1.6 }
+                            aria-hidden
+                        />
+                    }
+                    title="No chats yet"
+                    text="Add people by email to start a conversation."
+                    action={ addContact }
+                />
+            </div>
         );
     }
 
@@ -78,18 +80,21 @@ const ChatList: FC<ChatListProps> = ({ search, onAddContact, footer }) => {
 
     if (visible.length === 0 && people.length === 0) {
         return (
-            <EmptyState
-                icon={
-                    <IconSearch
-                        size={ 36 }
-                        stroke={ 1.8 }
-                        aria-hidden
-                    />
-                }
-                title="No results"
-                text={ `No chats or contacts match “${ query }”. To start a chat with someone new, add them by email.` }
-                action={ addContact }
-            />
+            <div className={ classes.center }>
+                <EmptyState
+                    icon={
+                        <IconSearch
+                            size={ 36 }
+                            stroke={ 1.8 }
+                            color="var(--chat-muted)"
+                            aria-hidden
+                        />
+                    }
+                    title="No results"
+                    text={ `No chats or contacts match “${ query }”. To start a chat with someone new, add them by email.` }
+                    action={ addContact }
+                />
+            </div>
         );
     }
 

@@ -57,6 +57,7 @@ const ContactsPanel: FC<ContactsPanelProps> = ({ search, onAddContact, onOpened 
                         <IconSearch
                             size={ 36 }
                             stroke={ 1.8 }
+                            color="var(--chat-muted)"
                             aria-hidden
                         />
                     }

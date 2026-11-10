@@ -4,10 +4,6 @@
     gap: rem(24px);
 }
 
-.close {
-    margin: rem(-6px) rem(-12px) rem(-6px) 0;
-}
-
 /* Поле й «Find» в один рядок, підказка чи помилка — під обома */
 .field {
     display: flex;

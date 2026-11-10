@@ -10,8 +10,11 @@
     color: var(--chat-text);
     text-decoration: none;
 
-    &:hover {
-        background-color: var(--chat-hover);
+    /* На сенсорних екранах :hover липне після дотику */
+    @media (hover: hover) {
+        &:hover {
+            background-color: var(--chat-hover);
+        }
     }
 
     &:active {

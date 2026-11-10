@@ -8,8 +8,11 @@
     border-radius: rem(12px);
     color: var(--chat-text);
 
-    &:hover {
-        background-color: var(--chat-hover);
+    /* На сенсорних екранах :hover липне після дотику */
+    @media (hover: hover) {
+        &:hover {
+            background-color: var(--chat-hover);
+        }
     }
 
     &:active {

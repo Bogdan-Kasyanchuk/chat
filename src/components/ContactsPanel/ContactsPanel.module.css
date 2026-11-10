@@ -14,8 +14,11 @@
     color: var(--chat-accent-text);
     font-weight: 600;
 
-    &:hover {
-        background-color: var(--chat-hover);
+    /* На сенсорних екранах :hover липне після дотику */
+    @media (hover: hover) {
+        &:hover {
+            background-color: var(--chat-hover);
+        }
     }
 
     &:active {

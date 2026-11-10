@@ -12,11 +12,12 @@ import Sidebar from './Sidebar';
 
 const queries: Record<string, unknown> = {};
 const openChat = vi.fn();
+const findByEmail = vi.fn();
 
 vi.mock('convex/react', () => ({
     useQuery: (ref: FunctionReference<'query'>) => queries[ getFunctionName(ref) ],
     useMutation: () => openChat,
-    useConvex: () => ({ query: vi.fn() })
+    useConvex: () => ({ query: findByEmail })
 }));
 
 vi.mock('@convex-dev/auth/react', () => ({ useAuthActions: () => ({ signOut: vi.fn() }) }));
@@ -113,6 +114,24 @@ test('opening a contact returns the sidebar to chats', async () => {
 
     await user.click(screen.getByRole('button', { name: 'New chat' }));
     await user.click(screen.getByRole('button', { name: /Erin/ }));
+
+    expect(await screen.findByRole('searchbox', { name: 'Search' })).toBeTruthy();
+});
+
+test('a chat opened from Add contact also returns the sidebar to chats', async () => {
+    mockViewport(true);
+    findByEmail.mockResolvedValue({ userId: 'u-Erin', name: 'Erin', avatar: null, isContact: true });
+    openChat.mockResolvedValue('c-Erin');
+
+    const user = userEvent.setup();
+
+    renderSidebar();
+
+    await user.click(screen.getByRole('button', { name: 'New chat' }));
+    await user.click(screen.getByRole('button', { name: 'Add contact' }));
+    await user.type(screen.getByLabelText('Email'), 'erin@example.com');
+    await user.click(screen.getByRole('button', { name: 'Find' }));
+    await user.click(await screen.findByRole('button', { name: 'Open chat' }));
 
     expect(await screen.findByRole('searchbox', { name: 'Search' })).toBeTruthy();
 });

@@ -1,4 +1,4 @@
-import { ActionIcon, Button, CloseButton, Input, Modal, Text, Title } from '@mantine/core';
+import { ActionIcon, Button, Input, Modal, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconArrowLeft } from '@tabler/icons-react';
 import { useConvex, useMutation } from 'convex/react';
@@ -15,7 +15,9 @@ import classes from './AddContactModal.module.css';
 
 type AddContactModalProps = {
     opened: boolean,
-    onClose: () => void
+    onClose: () => void,
+    // Чат з людиною відкрито («Message» чи «Open chat»)
+    onOpened?: () => void
 };
 
 type Found = NonNullable<FunctionReturnType<typeof api.users.findByEmail>>;
@@ -26,7 +28,7 @@ const NOT_FOUND = 'No one has signed up with this email. Check the spelling.';
 
 // Артборди AddContact, AddContactNotFound, AddContactExists (діалог 420 на десктопі) і MobileAddContact
 // (екран на телефоні: «назад», заголовок 32, кнопки внизу)
-const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
+const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose, onOpened }) => {
     const convex = useConvex();
     const addContact = useMutation(api.contacts.add);
     const openChatWith = useOpenChatWith();
@@ -97,6 +99,7 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
 
         if (await openChatWith(found.userId)) {
             close();
+            onOpened?.();
         }
 
         setActing(false);
@@ -235,28 +238,17 @@ const AddContactModal: FC<AddContactModalProps> = ({ opened, onClose }) => {
 
     if (isDesktop) {
         return (
-            <Modal.Root
+            <Modal
                 opened={ opened }
+                title={ TITLE }
+                classNames={ { body: classes.body } }
                 centered
                 onClose={ close }
             >
-                <Modal.Overlay />
-                <Modal.Content>
-                    <Modal.Header>
-                        <Modal.Title>{ TITLE }</Modal.Title>
-                        <CloseButton
-                            aria-label="Close"
-                            className={ classes.close }
-                            onClick={ close }
-                        />
-                    </Modal.Header>
-                    <Modal.Body className={ classes.body }>
-                        { form }
-                        { card }
-                        { renderActions() }
-                    </Modal.Body>
-                </Modal.Content>
-            </Modal.Root>
+                { form }
+                { card }
+                { renderActions() }
+            </Modal>
         );
     }
 

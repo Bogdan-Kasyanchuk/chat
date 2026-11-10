@@ -8,3 +8,13 @@
 .heading {
     margin: rem(12px) rem(10px) rem(4px);
 }
+
+/* Порожній список і порожній пошук — посередині панелі, трохи вище центру (відступ знизу 96, як на канвасі) */
+.center {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+    padding-bottom: rem(96px);
+    box-sizing: border-box;
+}

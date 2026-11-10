@@ -22,8 +22,11 @@
     font-size: var(--mantine-font-size-xs);
     font-weight: 600;
 
-    &:hover {
-        background-color: var(--chat-hover);
+    /* На сенсорних екранах :hover липне після дотику */
+    @media (hover: hover) {
+        &:hover {
+            background-color: var(--chat-hover);
+        }
     }
 
     &:active {

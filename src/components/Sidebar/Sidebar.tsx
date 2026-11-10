@@ -130,6 +130,9 @@ const Sidebar: FC = () => {
                 onClose={ () => {
                     setAdding(false);
                 } }
+                onOpened={ () => {
+                    select('chats');
+                } }
             />
             <SettingsModal
                 opened={ settingsOpened }
