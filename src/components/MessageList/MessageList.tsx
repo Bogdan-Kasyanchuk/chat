@@ -5,6 +5,7 @@ import DaySeparator from '@/components/DaySeparator';
 import MessageBubble from '@/components/MessageBubble';
 import MessageMenu from '@/components/MessageMenu';
 import type { MessageAction } from '@/components/MessageMenu/messageActions';
+import MessagesSkeleton from '@/components/MessagesSkeleton';
 import ScrollDownButton from '@/components/ScrollDownButton';
 import UnreadDivider from '@/components/UnreadDivider';
 import useMarkRead from '@/hooks/useMarkRead';
@@ -13,7 +14,7 @@ import useNow from '@/hooks/useNow';
 import type { MessageView } from '@/types/chat';
 import type { Id } from '@convex/_generated/dataModel';
 
-import buildRows, { firstUnreadId } from './buildRows';
+import buildRows, { firstUnreadId, toSections } from './buildRows';
 import classes from './MessageList.module.css';
 
 type MessageListProps = {
@@ -71,7 +72,7 @@ const MessageList: FC<MessageListProps> = ({ chatId, history, partnerName, canSe
     }
 
     const positioned = unreadId !== undefined;
-    const rows = useMemo(() => buildRows(messages, unreadId ?? null, now), [ messages, unreadId, now ]);
+    const sections = useMemo(() => toSections(buildRows(messages, unreadId ?? null, now)), [ messages, unreadId, now ]);
     const unread = messages.filter(message => !message.authorIsMe && message.createdAt > lastReadAt).length;
 
     useMarkRead(chatId, { atBottom: positioned && atBottom, hasUnread: unread > 0 });
@@ -200,6 +201,7 @@ const MessageList: FC<MessageListProps> = ({ chatId, history, partnerName, canSe
             <div
                 ref={ scrollRef }
                 className={ classes.scroll }
+                data-feed
                 onScroll={ () => {
                     measure();
                     loadOlderIfNearTop();
@@ -219,60 +221,67 @@ const MessageList: FC<MessageListProps> = ({ chatId, history, partnerName, canSe
                             No messages here yet
                         </Text>
                     ) }
-                    { rows.map(row => {
-                        if (row.kind === 'day') {
-                            return (
-                                <DaySeparator
-                                    key={ row.key }
-                                    label={ row.label }
-                                />
-                            );
-                        }
+                    { sections.map(section => (
+                        <div
+                            key={ section.key }
+                            className={ classes.day }
+                        >
+                            { section.label && <DaySeparator label={ section.label } /> }
+                            { section.rows.map(row => {
+                                if (row.kind === 'unread') {
+                                    return (
+                                        <UnreadDivider
+                                            key={ row.key }
+                                            ref={ dividerRef }
+                                        />
+                                    );
+                                }
 
-                        if (row.kind === 'unread') {
-                            return (
-                                <UnreadDivider
-                                    key={ row.key }
-                                    ref={ dividerRef }
-                                />
-                            );
-                        }
+                                const { message } = row;
 
-                        const { message } = row;
-
-                        return (
-                            <MessageMenu
-                                key={ row.key }
-                                message={ message }
-                                canSend={ canSend }
-                                disabled={ selecting }
-                                onAction={ action => {
-                                    onAction(action, message);
-                                } }
-                            >
-                                <MessageBubble
-                                    message={ message }
-                                    partnerName={ partnerName }
-                                    selected={ selected.has(message.id) }
-                                    onQuoteClick={ scrollToMessage }
-                                    onClick={ selecting
-                                        ? () => {
-                                            onAction('select', message);
-                                        }
-                                        : undefined }
-                                    onDoubleClick={ canSend && !selecting
-                                        ? () => {
-                                            onAction('reply', message);
-                                        }
-                                        : undefined }
-                                />
-                            </MessageMenu>
-                        );
-                    }) }
+                                return (
+                                    <MessageMenu
+                                        key={ row.key }
+                                        message={ message }
+                                        canSend={ canSend }
+                                        disabled={ selecting }
+                                        onAction={ action => {
+                                            onAction(action, message);
+                                        } }
+                                    >
+                                        <MessageBubble
+                                            message={ message }
+                                            partnerName={ partnerName }
+                                            selected={ selected.has(message.id) }
+                                            first={ row.first }
+                                            last={ row.last }
+                                            onQuoteClick={ scrollToMessage }
+                                            onClick={ selecting
+                                                ? () => {
+                                                    onAction('select', message);
+                                                }
+                                                : undefined }
+                                            onDoubleClick={ canSend && !selecting
+                                                ? () => {
+                                                    onAction('reply', message);
+                                                }
+                                                : undefined }
+                                        />
+                                    </MessageMenu>
+                                );
+                            }) }
+                        </div>
+                    )) }
                 </div>
             </div>
-            { (!positioned || status === 'LoadingMore') && (
-                <Center className={ positioned ? classes.topLoader : classes.loader }>
+            { /* Поки стрічка прихована (перша сторінка, догрузка до непрочитаного) — бульбашки-заглушки */ }
+            { !positioned && (
+                <div className={ classes.loader }>
+                    <MessagesSkeleton />
+                </div>
+            ) }
+            { positioned && status === 'LoadingMore' && (
+                <Center className={ classes.topLoader }>
                     <Loader size="sm" />
                 </Center>
             ) }

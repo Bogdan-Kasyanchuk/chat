@@ -140,7 +140,8 @@ export const message = (page: Page, text: string) => page.getByRole('article').f
 
 export const sendMessage = async (page: Page, text: string) => {
     await page.getByLabel('Message', { exact: true }).fill(text);
-    await page.getByRole('button', { name: 'Send' }).click();
+    // Під час редагування кнопка надсилання — «Save changes»
+    await page.getByRole('button', { name: /^(Send|Save changes)$/ }).click();
     await expect(message(page, text).last()).toBeVisible();
 };
 

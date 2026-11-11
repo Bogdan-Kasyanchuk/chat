@@ -16,12 +16,19 @@
     }
 }
 
-/* Тло розмови з крапковим візерунком, як на канвасі */
 .main {
     flex: 1;
-    min-width: 0;
+}
+
+.phone {
+    position: relative;
     height: 100%;
-    background-color: var(--chat-bg);
-    background-image: radial-gradient(circle at 1px 1px, var(--chat-pattern) 1px, transparent 0);
-    background-size: rem(22px) rem(22px);
+    overflow: hidden;
+}
+
+/* Розмова на телефоні — поверх списку на весь екран */
+.overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
 }

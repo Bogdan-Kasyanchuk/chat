@@ -12,6 +12,7 @@ import MainMenu from '@/components/MainMenu';
 import SettingsPanel from '@/components/SettingsPanel';
 import SidebarHeader from '@/components/SidebarHeader';
 import useIsDesktop from '@/hooks/useIsDesktop';
+import { unreadTotal } from '@/lib/unread';
 import type { SidebarView } from '@/types/sidebar';
 import { api } from '@convex/_generated/api';
 
@@ -50,7 +51,7 @@ const Sidebar: FC = () => {
         }
     }, [ view ]);
 
-    const unread = chats?.reduce((sum, chat) => chat.muted ? sum : sum + chat.unread, 0) ?? 0;
+    const unread = unreadTotal(chats);
 
     // focus — перемкнули кнопкою, що зникає; на телефоні фокус у пошуку відкрив би клавіатуру, тож лише десктоп
     const select = (next: SidebarView, focus = false) => {

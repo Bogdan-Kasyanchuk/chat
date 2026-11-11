@@ -1,10 +1,16 @@
+/* Артборд ChatStranger: смуга під шапкою на тлі бічної панелі */
 .banner {
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    justify-content: space-between;
-    gap: var(--mantine-spacing-sm);
-    padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
-    border-bottom: 1px solid var(--mantine-color-gray-3);
-    background-color: var(--mantine-color-gray-1);
+    gap: 12px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--chat-line);
+    background-color: var(--chat-sidebar-bg);
+}
+
+.text {
+    flex: 1;
+    min-width: 0;
+    color: var(--chat-muted);
 }

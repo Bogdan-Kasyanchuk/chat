@@ -1,4 +1,3 @@
-import { Text } from '@mantine/core';
 import type { FC, Ref } from 'react';
 
 import classes from './UnreadDivider.module.css';
@@ -13,12 +12,7 @@ const UnreadDivider: FC<UnreadDividerProps> = ({ ref }) => (
         ref={ ref }
         className={ classes.divider }
     >
-        <Text
-            size="sm"
-            fw={ 500 }
-        >
-            Unread messages
-        </Text>
+        Unread messages
     </div>
 );
 

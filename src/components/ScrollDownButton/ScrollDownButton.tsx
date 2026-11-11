@@ -1,6 +1,8 @@
-import { ActionIcon, Badge } from '@mantine/core';
+import { UnstyledButton } from '@mantine/core';
 import { IconChevronDown } from '@tabler/icons-react';
 import type { FC } from 'react';
+
+import { badgeText } from '@/lib/unread';
 
 import classes from './ScrollDownButton.module.css';
 
@@ -10,35 +12,31 @@ type ScrollDownButtonProps = {
     onClick: () => void
 };
 
-const MAX_BADGE = 99;
-
+// Артборд ScrollDown: кругла кнопка 50 над композером, бейдж непрочитаних у правому верхньому куті
 const ScrollDownButton: FC<ScrollDownButtonProps> = ({ visible, unread, onClick }) => {
     if (!visible) {
         return null;
     }
 
     return (
-        <div className={ classes.wrapper }>
-            <ActionIcon
-                className={ classes.button }
-                variant="default"
-                size={ 44 }
-                aria-label="Scroll to the latest messages"
-                onClick={ onClick }
-            >
-                <IconChevronDown size={ 22 } />
-            </ActionIcon>
+        <UnstyledButton
+            className={ classes.button }
+            aria-label={ unread > 0 ? `Scroll to the newest message, ${ unread } unread` : 'Scroll to the newest message' }
+            onClick={ onClick }
+        >
+            <IconChevronDown
+                size={ 22 }
+                aria-hidden
+            />
             { unread > 0 && (
-                <Badge
+                <span
                     className={ classes.badge }
-                    circle={ unread < 10 }
-                    color="dark"
-                    size="sm"
+                    aria-hidden
                 >
-                    { unread > MAX_BADGE ? `${ MAX_BADGE }+` : unread }
-                </Badge>
+                    { badgeText(unread) }
+                </span>
             ) }
-        </div>
+        </UnstyledButton>
     );
 };
 
