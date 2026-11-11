@@ -49,14 +49,24 @@ test('Composer sends on Enter and adds a newline on Shift+Enter', async () => {
     expect(onSubmit).toHaveBeenLastCalledWith('Again');
 });
 
-test('Composer does not send whitespace', async () => {
+test('the send button stays disabled for whitespace', async () => {
     const onSubmit = renderComposer();
     const user = userEvent.setup();
+    const send = () => screen.getByRole('button', { name: 'Send' });
+    const field = screen.getByRole('textbox', { name: 'Message' });
 
-    await user.type(screen.getByRole('textbox', { name: 'Message' }), '   {Shift>}{Enter}{/Shift}  {Enter}');
-    await user.click(screen.getByRole('button', { name: 'Send' }));
+    // Плейсхолдер — з канвасу
+    expect(field.getAttribute('placeholder')).toBe('Message');
+    expect(send().hasAttribute('disabled')).toBe(true);
 
+    await user.type(field, '   {Shift>}{Enter}{/Shift}  {Enter}');
+
+    expect(send().hasAttribute('disabled')).toBe(true);
     expect(onSubmit).not.toHaveBeenCalled();
+
+    await user.type(field, 'a');
+
+    expect(send().hasAttribute('disabled')).toBe(false);
 });
 
 test('Composer gives the text back when sending fails', async () => {
@@ -102,6 +112,9 @@ test('Composer fills the field with the message being edited', () => {
 
     expect(screen.getByText('Edit message')).toBeTruthy();
     expect(screen.getByRole<HTMLTextAreaElement>('textbox', { name: 'Message' }).value).toBe('Old text');
+    // Артборд ChatEdit: кнопка надсилання стає «Save changes» з галочкою
+    expect(screen.getByRole('button', { name: 'Save changes' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
 });
 
 test('Composer replaces the field with a notice when disabled', () => {
@@ -115,7 +128,7 @@ test('Composer replaces the field with a notice when disabled', () => {
         />
     );
 
-    expect(screen.getByText('You can\'t message a deleted account')).toBeTruthy();
+    expect(screen.getByText('You can’t message a deleted account')).toBeTruthy();
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
 });

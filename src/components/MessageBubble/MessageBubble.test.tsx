@@ -168,3 +168,58 @@ test('text, long emoji runs and quoted emoji keep the bubble', () => {
 
     expect(screen.getByRole('article').hasAttribute('data-emoji-only')).toBe(false);
 });
+
+test('MessageBubble marks only the last of a group for the tail', () => {
+    const { rerender } = renderWithProviders(
+        <MessageBubble
+            message={ makeMessage() }
+            partnerName="Bob"
+            last={ false }
+            first
+        />
+    );
+    const bubble = () => screen.getByRole('article');
+
+    expect(bubble().hasAttribute('data-first')).toBe(true);
+    expect(bubble().hasAttribute('data-last')).toBe(false);
+
+    rerender(
+        <MessageBubble
+            message={ makeMessage() }
+            partnerName="Bob"
+            first={ false }
+            last
+        />
+    );
+
+    expect(bubble().hasAttribute('data-first')).toBe(false);
+    expect(bubble().hasAttribute('data-last')).toBe(true);
+});
+
+// Components → Conversation states: 1–3 емодзі 44px без бульбашки, час і галочки на плашці під ними
+test('an emoji-only message keeps the time chip without a bubble', () => {
+    const { rerender } = renderWithProviders(
+        <MessageBubble
+            message={ makeMessage({ body: '👍', read: true }) }
+            partnerName="Bob"
+            first
+            last
+        />
+    );
+
+    const chip = screen.getByText('09:05').closest('[data-chip]');
+
+    expect(chip).toBeTruthy();
+    expect(chip?.contains(screen.getByLabelText('Read'))).toBe(true);
+
+    rerender(
+        <MessageBubble
+            message={ makeMessage({ body: 'ok', read: true }) }
+            partnerName="Bob"
+            first
+            last
+        />
+    );
+
+    expect(screen.getByText('09:05').closest('[data-chip]')).toBeNull();
+});

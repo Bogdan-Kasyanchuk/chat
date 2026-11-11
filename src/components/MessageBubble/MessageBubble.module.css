@@ -1,7 +1,14 @@
+/* Рядок стрічки: між групами 12, усередині групи 4 (канвас: margin бульбашки 12px / 4px) */
 .row {
     display: flex;
     justify-content: flex-start;
-    padding: 2px var(--mantine-spacing-md);
+    margin-top: 4px;
+    padding-inline: 20px;
+    border-radius: var(--mantine-radius-md);
+
+    &[data-first] {
+        margin-top: 12px;
+    }
 
     &[data-mine] {
         justify-content: flex-end;
@@ -14,103 +21,151 @@
     }
 
     &[data-selected] {
-        background-color: var(--mantine-color-gray-3);
+        background-color: var(--chat-select-row);
     }
 
     &[data-flash] {
         animation: flash 1.2s ease-out;
     }
-
-    @mixin smaller-than $mantine-breakpoint-md {
-        padding-inline: var(--mantine-spacing-xs);
-    }
 }
 
+/* Бульбашка: текст і час в одному рядку, якщо влазять, інакше час переноситься вниз праворуч */
 .bubble {
-    max-width: min(75%, 560px);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    column-gap: 12px;
+    row-gap: 2px;
+    max-width: 70%;
     min-width: 0;
-    padding: 6px 10px;
-    color: var(--mantine-color-dark-7);
-    background-color: var(--mantine-color-gray-2);
+    padding: 6px 12px;
+    font-size: var(--mantine-font-size-md);
+    line-height: 1.35;
+    color: var(--chat-bubble-in-text);
+    border-radius: var(--mantine-radius-md);
+    background-color: var(--chat-bubble-in);
+    box-shadow: var(--chat-bubble-shadow);
+
+    /* «Хвостик» — лише в останньої бульбашки групи: кут з боку автора 4 */
+    &[data-last] {
+        border-bottom-left-radius: 4px;
+    }
 
     &[data-mine] {
-        color: var(--mantine-color-white);
-        background-color: var(--mantine-color-dark-5);
+        color: var(--chat-bubble-out-text);
+        background-color: var(--chat-bubble-out);
+
+        &[data-last] {
+            border-bottom-right-radius: 4px;
+            border-bottom-left-radius: var(--mantine-radius-md);
+        }
     }
 
     &[data-emoji-only] {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
         padding: 0;
-        color: inherit;
+        color: var(--chat-text);
+        border-radius: 0;
         background-color: transparent;
         box-shadow: none;
+
+        &[data-mine] {
+            align-items: flex-end;
+        }
     }
 
     @mixin smaller-than $mantine-breakpoint-md {
-        max-width: 85%;
+        max-width: 82%;
     }
 }
 
 .forwarded {
-    margin-bottom: 4px;
-    font-style: italic;
-    opacity: 0.75;
+    flex-basis: 100%;
+    color: var(--chat-accent-text);
 }
 
+/* Цитата: лінія акценту 3 ліворуч, тло quote-in / quote-out */
 .quote {
+    position: relative;
     display: block;
-    width: 100%;
-    margin-bottom: 4px;
-    padding: 2px 8px;
+    flex-basis: 100%;
+    min-width: 0;
+    margin-block: 4px;
+    padding: 6px 8px 6px 11px;
     color: inherit;
-    border-left: 3px solid currentcolor;
-    background-color: var(--mantine-color-gray-3);
+    text-align: start;
+    border-radius: var(--mantine-radius-sm);
+    background-color: var(--chat-quote-in);
+    overflow: hidden;
+
+    &::before {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 3px;
+        border-radius: 2px;
+        background-color: var(--chat-accent-text);
+        content: '';
+    }
 
     .bubble[data-mine] & {
-        background-color: var(--mantine-color-dark-4);
+        background-color: var(--chat-quote-out);
     }
 }
 
 .quoteAuthor {
     font-weight: 600;
+    color: var(--chat-accent-text);
+}
+
+.quoteBody {
+    opacity: 0.85;
 }
 
 .body {
+    flex: 0 1 auto;
+    min-width: 0;
+    font-size: inherit;
+    line-height: inherit;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
 }
 
 .meta {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: flex-end;
     gap: 4px;
-    margin-top: 2px;
+    margin-left: auto;
     font-size: var(--mantine-font-size-xs);
-    color: var(--mantine-color-gray-6);
+    line-height: 1.35;
+    color: var(--chat-bubble-meta);
+    white-space: nowrap;
 
-    .bubble[data-mine] & {
-        color: var(--mantine-color-gray-4);
+    /* Плашка часу під емодзі без бульбашки */
+    &[data-chip] {
+        margin-left: 0;
+        padding: 2px 8px;
+        color: var(--chat-date-chip-text);
+        border-radius: 10px;
+        background-color: var(--chat-date-chip);
     }
+}
+
+.read {
+    color: var(--chat-tick-read);
 }
 
 .bubble[data-emoji-only] .body {
     font-size: 44px;
-    line-height: 1.15;
-}
-
-.bubble[data-emoji-only] .meta {
-    width: fit-content;
-    margin-top: 2px;
-    margin-left: auto;
-    padding: 0 8px;
-    color: var(--mantine-color-dark-7);
-    border-radius: var(--mantine-radius-xl);
-    background-color: var(--mantine-color-gray-2);
+    line-height: 1.1;
 }
 
 @keyframes flash {
     from {
-        background-color: var(--mantine-color-yellow-2);
+        background-color: var(--chat-select-row);
     }
 
     to {

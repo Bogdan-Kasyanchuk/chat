@@ -64,17 +64,24 @@ test('an emoji from the picker lands at the caret and arrives large', async ({ p
     await field.fill('See you');
     await field.press('End');
     await page.getByRole('button', { name: 'Emoji' }).click();
-    await page.getByLabel('Search emoji').fill('raising hands');
-    await page.getByRole('gridcell', { name: 'raising hands' }).first().click();
-    await expect(field).toHaveValue('See you🙌');
+
+    // На телефоні панель без пошуку (MobileEmoji): емодзі — з першої категорії
+    const [ name, emoji ] = isPhone() ? [ 'grinning face', '😀' ] : [ 'raising hands', '🙌' ];
+
+    if (!isPhone()) {
+        await page.getByLabel('Search emoji').fill(name);
+    }
+
+    await page.getByRole('gridcell', { name }).first().click();
+    await expect(field).toHaveValue(`See you${ emoji }`);
 
     await page.getByRole('button', { name: 'Send' }).click();
-    await expect(message(page, 'See you🙌')).toBeVisible();
+    await expect(message(page, `See you${ emoji }`)).toBeVisible();
     await sendMessage(page, '🎉');
 
     await openChat(bob, 'Alice');
     await expect(message(bob, '🎉')).toHaveAttribute('data-emoji-only');
-    await expect(message(bob, 'See you🙌')).not.toHaveAttribute('data-emoji-only');
+    await expect(message(bob, `See you${ emoji }`)).not.toHaveAttribute('data-emoji-only');
 
     await bob.context().close();
 });
@@ -237,4 +244,132 @@ test('a new account sees No chats yet and Add contact explains an unknown email'
     await expect(dialog.getByRole('button', { name: 'Add to contacts' })).toBeDisabled();
     await dialog.getByRole('button', { name: isPhone() ? 'Back to chats' : 'Cancel' }).click();
     await expect(dialog).toHaveCount(0);
+});
+
+// Review Focus 3: слово без пробілів не розпирає бульбашку й не дає горизонтальної прокрутки
+test('a 300-character word wraps inside the bubble without horizontal scroll', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await bob.context().close();
+    await addContact(page, bobEmail);
+
+    const word = 'w'.repeat(300);
+
+    await sendMessage(page, word);
+
+    const bubble = await message(page, word).boundingBox();
+    const main = await page.getByRole('main').boundingBox();
+
+    expect(bubble && main).toBeTruthy();
+    expect(bubble!.x).toBeGreaterThanOrEqual(main!.x);
+    expect(bubble!.x + bubble!.width).toBeLessThanOrEqual(main!.x + main!.width);
+    // Ні сторінка, ні стрічка не прокручуються вбік
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    expect(await message(page, word).evaluate(element => {
+        const feed = element.closest('[data-feed]') as HTMLElement;
+
+        return feed.scrollWidth <= feed.clientWidth;
+    })).toBe(true);
+});
+
+// Плашка дати липне до верху стрічки, поки видно її день
+test('the date chip sticks to the top of the feed while scrolling its day', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await bob.context().close();
+    await addContact(page, bobEmail);
+
+    // Три високі повідомлення — стрічка довша за екран
+    for (const n of [ 1, 2, 3 ]) {
+        await page.getByLabel('Message', { exact: true }).fill(Array.from({ length: 14 }, (_, i) => `${ n }.${ i }`).join('\n'));
+        await page.getByRole('button', { name: 'Send' }).click();
+    }
+
+    await expect(page.getByRole('article')).toHaveCount(3);
+
+    const feed = page.locator('[data-feed]');
+
+    await feed.evaluate(element => {
+        element.scrollTop = element.scrollHeight / 2;
+    });
+
+    const chip = page.getByText('Today', { exact: true });
+    const [ chipBox, feedBox ] = [ await chip.boundingBox(), await feed.boundingBox() ];
+
+    expect(chipBox && feedBox).toBeTruthy();
+    expect(Math.abs(chipBox!.y - (feedBox!.y + 8))).toBeLessThanOrEqual(2);
+
+    // Стрічка справді прокручена: верх дня вже за краєм
+    expect(await feed.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+});
+
+// Рев'ю етапу 5: чат відкривається на «Unread messages», і липка плашка дати його не накриває
+test('the sticky date chip leaves the unread divider visible when a chat opens', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+
+    const sendTall = async (n: number) => {
+        await page.getByLabel('Message', { exact: true }).fill(Array.from({ length: 14 }, (_, i) => `${ n }.${ i }`).join('\n'));
+        await page.getByRole('button', { name: 'Send' }).click();
+        await expect(page.getByRole('article')).toHaveCount(n);
+    };
+
+    for (const n of [ 1, 2, 3 ]) {
+        await sendTall(n);
+    }
+
+    // Bob читає все, виходить, і приходить ще стрічка — розділювач опиняється вгорі екрана
+    await openChat(bob, 'Alice');
+    await expect(bob.getByRole('article')).toHaveCount(3);
+    await leaveChat(bob);
+
+    for (const n of [ 4, 5, 6 ]) {
+        await sendTall(n);
+    }
+
+    await openChat(bob, 'Alice');
+
+    const divider = bob.getByText('Unread messages', { exact: true });
+
+    await expect(divider).toBeInViewport();
+
+    const [ dividerBox, chipBox ] = [ await divider.boundingBox(), await bob.getByText('Today', { exact: true }).boundingBox() ];
+
+    expect(dividerBox && chipBox).toBeTruthy();
+    expect(chipBox!.y + chipBox!.height).toBeLessThanOrEqual(dividerBox!.y);
+
+    await bob.context().close();
+});
+
+// Рев'ю етапу 5: вкладки категорій спираються на DOM frimousse — перевіряємо зі справжньою бібліотекою
+test('an emoji category tab scrolls the picker to its category', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await bob.context().close();
+    await addContact(page, bobEmail);
+    await page.getByRole('button', { name: 'Emoji' }).click();
+
+    const flags = page.getByRole('button', { name: 'Flags' });
+
+    await expect(page.getByRole('gridcell').first()).toBeVisible();
+    await flags.click();
+    await expect(flags).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('gridcell', { name: /flag/i }).first()).toBeInViewport();
 });

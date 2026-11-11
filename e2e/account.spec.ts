@@ -62,7 +62,7 @@ test('deleting an account leaves the partner a read-only Deleted account chat', 
     const main = bob.getByRole('main');
 
     await expect(main.getByText('Deleted account', { exact: true })).toBeVisible();
-    await expect(main.getByText('You can\'t message a deleted account')).toBeVisible();
+    await expect(main.getByText('You can’t message a deleted account')).toBeVisible();
     await expect(bob.getByLabel('Message', { exact: true })).toHaveCount(0);
     await expect(message(bob, 'Bye')).toBeVisible();
 

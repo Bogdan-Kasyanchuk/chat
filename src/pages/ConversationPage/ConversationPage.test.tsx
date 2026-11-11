@@ -8,6 +8,7 @@ import { Route, Routes } from 'react-router';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
+import { mockViewport } from '@/test/viewport';
 import type { ChatView, MessageView } from '@/types/chat';
 
 import ConversationPage from './ConversationPage';
@@ -16,6 +17,8 @@ let chat: ChatView | null | undefined;
 let chatError: Error | null = null;
 let messagesError: Error | null = null;
 let messages: MessageView[] = [];
+let messagesStatus: 'LoadingFirstPage' | 'Exhausted' = 'Exhausted';
+let chatList: unknown[] = [];
 const send = vi.fn();
 const markRead = vi.fn();
 const edit = vi.fn();
@@ -35,6 +38,7 @@ const setChat = (next: ChatView | null) => {
 };
 const setMessages = (next: MessageView[]) => {
     messages = next;
+    messagesStatus = 'Exhausted';
     notify();
 };
 const subscribe = (listener: () => void) => {
@@ -57,7 +61,11 @@ vi.mock('frimousse', async () => (await import('@/test/frimousseMock')).frimouss
 
 vi.mock('convex/react', () => ({
     useQuery: (ref: FunctionReference<'query'>) => {
-        if ([ 'chats:list', 'contacts:list' ].includes(getFunctionName(ref))) {
+        if (getFunctionName(ref) === 'chats:list') {
+            return chatList;
+        }
+
+        if (getFunctionName(ref) === 'contacts:list') {
             return [];
         }
 
@@ -76,12 +84,13 @@ vi.mock('convex/react', () => ({
     },
     usePaginatedQuery: () => {
         const current = useSyncExternalStore(subscribe, () => messages);
+        const status = useSyncExternalStore(subscribe, () => messagesStatus);
 
         if (messagesError) {
             throw messagesError;
         }
 
-        return { results: [ ...current ].reverse(), status: 'Exhausted', isLoading: false, loadMore: vi.fn() };
+        return { results: [ ...current ].reverse(), status, isLoading: status === 'LoadingFirstPage', loadMore: vi.fn() };
     },
     useMutation: (ref: FunctionReference<'mutation'>) => mutations[ getFunctionName(ref) ] ?? vi.fn()
 }));
@@ -122,6 +131,8 @@ const renderPage = () => renderWithProviders(
 
 beforeEach(() => {
     messages = [];
+    messagesStatus = 'Exhausted';
+    chatList = [];
     chatError = null;
     messagesError = null;
     send.mockResolvedValue('m9');
@@ -155,7 +166,7 @@ test('ConversationPage disables the composer for a deleted account', () => {
     renderPage();
 
     expect(screen.getByText('Deleted account')).toBeTruthy();
-    expect(screen.getByText('You can\'t message a deleted account')).toBeTruthy();
+    expect(screen.getByText('You can’t message a deleted account')).toBeTruthy();
     expect(screen.queryByRole('textbox', { name: 'Message' })).toBeNull();
     // Ні статусу, ні пропозиції додати в контакти
     expect(screen.queryByText(/last seen/)).toBeNull();
@@ -176,8 +187,11 @@ test('ConversationPage offers to add a stranger to contacts', () => {
     chat = makeChat({ partner: { ...makeChat().partner, isContact: false } });
     renderPage();
 
-    expect(screen.getByText('Bob is not in your contacts')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Add to contacts' })).toBeTruthy();
+    // Артборд ChatStranger: смуга під шапкою з текстом канвасу
+    const banner = screen.getByRole('region', { name: 'Not in your contacts' });
+
+    expect(within(banner).getByText('Bob is not in your contacts. Only you can see this.')).toBeTruthy();
+    expect(within(banner).getByRole('button', { name: 'Add to contacts' })).toBeTruthy();
 });
 
 test('ConversationPage cancels a reply on Escape and then closes the chat', async () => {
@@ -523,4 +537,60 @@ test('Escape with the emoji panel open closes only the panel; the next one cance
 
     expect(screen.queryByText('Reply to Bob')).toBeNull();
     expect(screen.queryByText('home page')).toBeNull();
+});
+
+test('the feed shows a skeleton until the first page arrives', () => {
+    chat = makeChat();
+    messagesStatus = 'LoadingFirstPage';
+    renderPage();
+
+    expect(screen.getByLabelText('Loading messages')).toBeTruthy();
+    expect(screen.getByRole('textbox', { name: 'Message' })).toBeTruthy();
+
+    act(() => {
+        setMessages([ message('m1', 'Hi') ]);
+    });
+
+    expect(screen.queryByLabelText('Loading messages')).toBeNull();
+    expect(screen.getByText('Hi')).toBeTruthy();
+});
+
+test('the whole conversation is a skeleton until the chat arrives', () => {
+    chat = undefined;
+    renderPage();
+
+    expect(screen.getByLabelText('Loading chat')).toBeTruthy();
+
+    act(() => {
+        setChat(makeChat());
+    });
+
+    expect(screen.queryByLabelText('Loading chat')).toBeNull();
+    expect(screen.getByText('Bob')).toBeTruthy();
+});
+
+// Components → Headers · Phone · conversation: «назад» несе лічильник непрочитаних в інших чатах
+test('on a phone Back to chats carries the unread count of the other chats', () => {
+    mockViewport(false);
+    chat = makeChat();
+    chatList = [
+        { chatId: 'c1', unread: 4, muted: false },
+        { chatId: 'c2', unread: 2, muted: false },
+        { chatId: 'c3', unread: 1, muted: false },
+        { chatId: 'c4', unread: 7, muted: true }
+    ];
+    renderPage();
+
+    const back = screen.getByRole('link', { name: 'Back to chats, 3 unread' });
+
+    expect(within(back).getByText('3')).toBeTruthy();
+});
+
+test('on a phone Back to chats has no count when the other chats are read', () => {
+    mockViewport(false);
+    chat = makeChat();
+    chatList = [ { chatId: 'c1', unread: 4, muted: false } ];
+    renderPage();
+
+    expect(screen.getByRole('link', { name: 'Back to chats' })).toBeTruthy();
 });

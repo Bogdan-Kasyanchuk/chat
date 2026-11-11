@@ -298,7 +298,6 @@ Add contact
 <sc-if value="{{isStranger}}" hint-placeholder-val="{{ false }}">
 <div role="region" aria-label="Not in your contacts" style="display: flex; align-items: center; gap: 12px; padding: 10px 20px; background: {{c.bg}}; border-bottom: 1px solid {{c.line}}">
 <span style="flex: 1; min-width: 0; font-size: 14px; color: {{c.muted}}">Ostap Savchenko is not in your contacts. Only you can see this.</span>
-<button class="btn-danger-soft" type="button" style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 12px; background: {{c.dangerSoft}}; color: {{c.danger}}; font: 600 18px 'Onest', sans-serif; cursor: pointer">Block</button>
 <button class="btn-primary" type="button" style="height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border: 0; border-radius: 12px; background: {{c.accent}}; color: {{c.onAccent}}; font: 600 18px 'Onest', sans-serif; cursor: pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"></circle><path d="M3 21v-1a6 6 0 0 1 6-6h0a6 6 0 0 1 6 6v1M19 8v6M16 11h6"></path></svg>Add to contacts</button>
 </div>
 </sc-if>
@@ -347,7 +346,7 @@ Add contact
 </div>
 
 <sc-if value="{{showBar}}" hint-placeholder-val="{{ true }}">
-<div style="display: flex; align-items: center; gap: 12px; margin: 0 20px; padding: 8px 8px 8px 14px; border-radius: 16px 16px 0 0; background: {{c.bg}}">
+<div style="display: flex; align-items: center; gap: 12px; margin: 0 82px 0 20px; padding: 8px 8px 8px 14px; border-radius: 16px 16px 0 0; background: {{c.bg}}">
 <sc-if value="{{isEditing}}" hint-placeholder-val="{{ false }}"><span style="display: flex; color: {{c.accentText}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L18.5 9.5a2.83 2.83 0 0 0-4-4L4 16v4M13.5 6.5l4 4"></path></svg></span></sc-if><sc-if value="{{notEditing}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{c.accentText}}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 5 10l4-4"></path><path d="M5 10h11a4 4 0 1 1 0 8h-1"></path></svg></sc-if>
 <span style="width: 3px; align-self: stretch; border-radius: 2px; background: {{c.accentText}}"></span>
 <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 14px; font-weight: 600; color: {{c.accentText}}">{{barTitle}}</span><span style="font-size: 14px; color: {{c.muted}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{barBody}}</span></span>
@@ -363,7 +362,7 @@ Add contact
 <button class="ib" type="button" aria-label="Emoji" aria-expanded="{{ovEmoji}}" style="width: 44px; height: 44px; flex: none; border: 0; border-radius: 22px; background: {{emojiBtnBg}}; color: {{emojiBtnColor}}; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M9 10h.01M15 10h.01M9 15a4 4 0 0 0 6 0"></path></svg></button>
 <textarea aria-label="Message" rows="1" placeholder="Message" style="flex: 1; resize: none; border: 0; background: transparent; color: {{c.text}}; font: 400 16px/1.35 'Onest', sans-serif; outline: none" defaultValue="{{draft}}"></textarea>
 </div>
-<button class="fab" type="submit" aria-label="{{sendLabel}}" style="width: 50px; height: 50px; flex: none; border: 0; border-radius: 25px; background: {{sendBg}}; color: {{sendColor}}; display: flex; align-items: center; justify-content: center; cursor: pointer"><sc-if value="{{isEditing}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12l5 5 10-10"></path></svg></sc-if><sc-if value="{{notEditing}}" hint-placeholder-val="{{ true }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14 21 3"></path><path d="m21 3-6.5 18a.55.55 0 0 1-1 0L10 14l-7-3.5a.55.55 0 0 1 0-1L21 3"></path></svg></sc-if></button>
+<button class="fab" type="submit" aria-label="{{sendLabel}}" disabled="{{sendDisabled}}" style="width: 50px; height: 50px; flex: none; border: 0; border-radius: 25px; background: {{sendBg}}; color: {{sendColor}}; display: flex; align-items: center; justify-content: center; cursor: pointer"><sc-if value="{{isEditing}}" hint-placeholder-val="{{ false }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12l5 5 10-10"></path></svg></sc-if><sc-if value="{{notEditing}}" hint-placeholder-val="{{ true }}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14 21 3"></path><path d="m21 3-6.5 18a.55.55 0 0 1-1 0L10 14l-7-3.5a.55.55 0 0 1 0-1L21 3"></path></svg></sc-if></button>
 </form>
 </sc-if>
 
@@ -608,7 +607,7 @@ const MSGS = [
 ];
 const MSGS_STRANGER = [
   { day: 'Today' },
-  { in: true, body: 'Hi! We met at the meetup, is this Olena?', time: '12:20', last: true },
+  { in: true, body: 'Hi! We met at the meetup, is this Olena?', time: '12:20' },
   { in: true, body: 'You mentioned you test mobile apps, I have a quick question', time: '12:20', last: true }
 ];
 const MSGS_DELETED = [
@@ -738,6 +737,7 @@ const emojiTabs = [
   { e: '🕘', label: 'Recently used' }, { e: '😀', label: 'Smileys and people', active: true }, { e: '🐻', label: 'Animals and nature' }, { e: '🍔', label: 'Food and drink' },
   { e: '⚽', label: 'Activities' }, { e: '🚗', label: 'Travel and places' }, { e: '💡', label: 'Objects' }, { e: '🏳️', label: 'Flags' }
 ].map((t) => ({ ...t, active: !!t.active, line: t.active ? c.accent : 'transparent', opacity: t.active ? '1' : '0.7' }));
+const draft = editing ? 'Thanks, I’ll be there at 10:30' : (replying ? 'Sure, I’ll test it on my iPhone' : (emojiOpen ? 'See you at 10:30 🙌' : ''));
 return {
   burgerOpen: burgerIsOpen,
   burgerBg: burgerIsOpen ? c.field : 'transparent',
@@ -797,10 +797,11 @@ return {
   contactsSearchEmpty: searchMode === 'empty' && !empty,
   menuBtnBg: overlay === 'chatMenu' ? c.field : 'transparent',
   showReply: replying,
-  draft: editing ? 'Thanks, I’ll be there at 10:30' : (replying ? 'Sure, I’ll test it on my iPhone' : (emojiOpen ? 'See you at 10:30 🙌' : '')),
+  draft,
   composerRadius: (replying || editing) ? '0 0 16px 16px' : '16px',
-  sendBg: c.accent,
-  sendColor: c.onAccent,
+  sendDisabled: !draft,
+  sendBg: draft ? c.accent : c.field,
+  sendColor: draft ? c.onAccent : c.muted,
   themeSystem: !dark,
   themeLight: false,
   themeDark: dark,

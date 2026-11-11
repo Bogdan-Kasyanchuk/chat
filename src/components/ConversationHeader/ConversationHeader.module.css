@@ -1,19 +1,56 @@
+/* Шапка розмови: 44 + 10 зверху й знизу, тло бічної панелі, лінія line знизу */
 .header {
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    gap: var(--mantine-spacing-sm);
-    min-height: 64px;
-    padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
-    border-bottom: 1px solid var(--mantine-color-gray-3);
-    background-color: var(--mantine-color-white);
-
-    @mixin smaller-than $mantine-breakpoint-md {
-        padding-inline: var(--mantine-spacing-xs);
-    }
+    gap: 8px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--chat-line);
+    background-color: var(--chat-sidebar-bg);
 }
 
 .body {
+    display: flex;
     flex: 1;
+    flex-direction: column;
+    gap: 2px;
     min-width: 0;
+}
+
+.name {
+    font-size: var(--mantine-font-size-md);
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+/* «Назад» на телефоні: шеврон 24 і бейдж кольору акценту */
+.back {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    height: 44px;
+    min-width: 44px;
+    padding: 0 6px;
+    color: var(--chat-accent-text);
+    border-radius: 22px;
+
+    &:hover {
+        background-color: var(--chat-hover);
+    }
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    font-size: var(--mantine-font-size-xs);
+    font-weight: 700;
+    color: var(--chat-badge-text);
+    border-radius: 10px;
+    background-color: var(--chat-badge);
 }
