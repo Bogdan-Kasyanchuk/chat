@@ -1,4 +1,4 @@
-import { Checkbox, Stack, Text } from '@mantine/core';
+import { Checkbox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useMutation } from 'convex/react';
 import { type FC, useState } from 'react';
@@ -19,10 +19,25 @@ type ChatActionModalProps = {
     onLeave?: () => void
 };
 
-const COPY = {
-    clear: { title: 'Clear history?', text: 'All messages in this chat will be deleted.', confirm: 'Clear' },
-    delete: { title: 'Delete chat?', text: 'The chat and all its messages will be deleted.', confirm: 'Delete' }
-} satisfies Record<ChatActionKind, { title: string, text: string, confirm: string }>;
+type Copy = { title: string, text: string, confirm: string, also: (name: string) => string };
+
+// Delete chat — тексти MobileDelete; для Clear history канвас діалогу не має, тож він у тому ж тоні
+const COPY: Record<ChatActionKind, (partner: string | null) => Copy> = {
+    clear: () => ({
+        title: 'Clear history?',
+        text: 'All messages in this chat will be deleted. This can\'t be undone.',
+        confirm: 'Clear',
+        also: name => `Also clear for ${ name }`
+    }),
+    delete: partner => ({
+        title: 'Delete chat?',
+        text: partner === null
+            ? 'The chat and its history will be removed from your list.'
+            : `The chat with ${ partner } and its history will be removed from your list.`,
+        confirm: 'Delete chat',
+        also: name => `Also delete for ${ name }`
+    })
+};
 
 const ChatActionModal: FC<ChatActionModalProps> = ({ kind, chat, onDone, onLeave }) => {
     const clearHistory = useMutation(api.chats.clearHistory);
@@ -33,7 +48,7 @@ const ChatActionModal: FC<ChatActionModalProps> = ({ kind, chat, onDone, onLeave
     const { chatId, partner } = chat;
     // У видаленого акаунта немає копії чату, яку можна прибрати
     const canForEveryone = partner.userId !== null;
-    const copy = COPY[ kind ];
+    const copy = COPY[ kind ](canForEveryone ? partner.name : null);
 
     const confirm = async () => {
         const args = { chatId, forEveryone: canForEveryone && forEveryone };
@@ -61,6 +76,7 @@ const ChatActionModal: FC<ChatActionModalProps> = ({ kind, chat, onDone, onLeave
     return (
         <ConfirmModal
             title={ copy.title }
+            text={ copy.text }
             confirmLabel={ copy.confirm }
             loading={ loading }
             opened
@@ -70,20 +86,15 @@ const ChatActionModal: FC<ChatActionModalProps> = ({ kind, chat, onDone, onLeave
             } }
             onClose={ onDone }
         >
-            <Stack>
-                <Text size="sm">
-                    { copy.text } You can&apos;t undo this.
-                </Text>
-                { canForEveryone && (
-                    <Checkbox
-                        label={ `Also for ${ partner.name }` }
-                        checked={ forEveryone }
-                        onChange={ event => {
-                            setForEveryone(event.currentTarget.checked);
-                        } }
-                    />
-                ) }
-            </Stack>
+            { canForEveryone && (
+                <Checkbox
+                    label={ copy.also(partner.name) }
+                    checked={ forEveryone }
+                    onChange={ event => {
+                        setForEveryone(event.currentTarget.checked);
+                    } }
+                />
+            ) }
         </ConfirmModal>
     );
 };

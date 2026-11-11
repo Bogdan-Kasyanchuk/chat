@@ -1,6 +1,6 @@
-import { Drawer, UnstyledButton } from '@mantine/core';
 import type { FC } from 'react';
 
+import ActionSheet from '@/components/ActionSheet';
 import ACTION_ITEMS from '@/components/MessageMenu/actionItems';
 import { type MessageAction, availableActions } from '@/components/MessageMenu/messageActions';
 import { formatClock } from '@/lib/formatTime';
@@ -18,61 +18,43 @@ type MessageActionsSheetProps = {
     onExited?: () => void
 };
 
-// Висота за вмістом: Mantine задає --drawer-height інлайн, тож перебиваємо теж інлайн (як у ResponsiveDialog).
-// Тло й тінь має аркуш з пунктами, а не вся панель (тема дає content тло popover)
-const STYLES = { content: { height: 'auto', maxHeight: '100dvh', backgroundColor: 'transparent', boxShadow: 'none' } };
-
-// Артборд MobileActions: прев'ю повідомлення на затемненні над панеллю, під ним — пункти 44 з іконками 22.
+// Артборд MobileActions: прев'ю повідомлення на затемненні над панеллю, під ним — пункти меню повідомлення.
 // Панель замінює контекстне меню на телефоні
 const MessageActionsSheet: FC<MessageActionsSheetProps> = ({ message, opened, canSend, onAction, onClose, onExited }) => (
-    <Drawer
+    <ActionSheet
         opened={ opened }
-        position="bottom"
         title="Message actions"
-        withCloseButton={ false }
-        classNames={ { header: classes.header, body: classes.body } }
-        styles={ STYLES }
-        onClose={ onClose }
-        onExitTransitionEnd={ onExited }
-    >
-        { /* Дотик повз прев'ю — те саме, що дотик по затемненню */ }
-        <div
-            className={ classes.previewRow }
-            data-mine={ message.authorIsMe || undefined }
-            onClick={ onClose }
-        >
+        items={ availableActions(message, canSend).map(action => ({
+            key: action,
+            label: ACTION_ITEMS[ action ].title,
+            icon: ACTION_ITEMS[ action ].icon,
+            danger: ACTION_ITEMS[ action ].danger,
+            onClick: () => {
+                onAction(action);
+            }
+        })) }
+        above={ (
+            // Дотик повз прев'ю — те саме, що дотик по затемненню
             <div
-                className={ classes.preview }
+                className={ classes.previewRow }
                 data-mine={ message.authorIsMe || undefined }
+                onClick={ onClose }
             >
-                <span className={ classes.text }>{ message.body }</span>
-                <span className={ classes.meta }>
-                    { message.editedAt !== null && <span>edited</span> }
-                    <time dateTime={ new Date(message.createdAt).toISOString() }>{ formatClock(message.createdAt) }</time>
-                </span>
-            </div>
-        </div>
-        <div className={ classes.sheet }>
-            <span
-                className={ classes.handle }
-                aria-hidden
-            />
-            { availableActions(message, canSend).map(action => (
-                <UnstyledButton
-                    key={ action }
-                    className={ classes.item }
-                    mod={ { danger: ACTION_ITEMS[ action ].danger } }
-                    onClick={ () => {
-                        onClose();
-                        onAction(action);
-                    } }
+                <div
+                    className={ classes.preview }
+                    data-mine={ message.authorIsMe || undefined }
                 >
-                    { ACTION_ITEMS[ action ].icon }
-                    { ACTION_ITEMS[ action ].title }
-                </UnstyledButton>
-            )) }
-        </div>
-    </Drawer>
+                    <span className={ classes.text }>{ message.body }</span>
+                    <span className={ classes.meta }>
+                        { message.editedAt !== null && <span>edited</span> }
+                        <time dateTime={ new Date(message.createdAt).toISOString() }>{ formatClock(message.createdAt) }</time>
+                    </span>
+                </div>
+            </div>
+        ) }
+        onClose={ onClose }
+        onExited={ onExited }
+    />
 );
 
 export default MessageActionsSheet;

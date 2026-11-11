@@ -1,15 +1,62 @@
+/* Між заголовком, пошуком і списком — 24 на десктопі, 20 у нижній панелі */
+.search {
+    margin-top: rem(16px);
+
+    @mixin smaller-than $mantine-breakpoint-md {
+        margin-top: rem(12px);
+    }
+}
+
+/* Рядки виходять на 10 за поля діалогу, щоб аватар стояв на одній лінії з пошуком */
+.list {
+    margin: rem(24px) rem(-10px) 0;
+
+    @mixin smaller-than $mantine-breakpoint-md {
+        margin-top: rem(20px);
+    }
+}
+
+.section + .section {
+    margin-top: rem(16px);
+}
+
+/* Заголовок розділу 14 / 700 великими літерами, акцент (як у SettingsSection) */
+.heading {
+    margin: 0 rem(10px) rem(4px);
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--chat-accent-text);
+}
+
 .item {
     display: flex;
     align-items: center;
-    gap: var(--mantine-spacing-sm);
+    gap: rem(8px);
     width: 100%;
-    padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
-
-    &:hover:not(:disabled) {
-        background-color: var(--mantine-color-gray-0);
-    }
+    padding: rem(10px);
+    border-radius: rem(12px);
 
     &:disabled {
         opacity: 0.6;
     }
+
+    &:active:not(:disabled) {
+        background-color: var(--chat-pressed);
+    }
+
+    @media (hover: hover) {
+        &:hover:not(:disabled) {
+            background-color: var(--chat-hover);
+        }
+    }
+}
+
+.text {
+    display: flex;
+    flex-direction: column;
+    gap: rem(2px);
+    min-width: 0;
 }

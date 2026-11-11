@@ -1,10 +1,12 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
 import { Route, Routes } from 'react-router';
 import { afterEach, expect, test, vi } from 'vitest';
 
+import lastSeenText from '@/lib/lastSeen';
 import { renderWithProviders } from '@/test/render';
+import { mockViewport } from '@/test/viewport';
 import type { ChatSummary, ContactView } from '@/types/chat';
 
 import ForwardModal from './ForwardModal';
@@ -21,7 +23,7 @@ const person = (userId: string | null, name: string) => ({
 });
 
 const chats: ChatSummary[] = [
-    { chatId: 'c1' as never, partner: { ...person('u2', 'Bob'), isContact: true }, lastMessage: null, unread: 0, muted: false, lastMessageAt: 2 },
+    { chatId: 'c1' as never, partner: { ...person('u2', 'Bob'), online: true, isContact: true }, lastMessage: null, unread: 0, muted: false, lastMessageAt: 2 },
     { chatId: 'c2' as never, partner: { ...person(null, 'Deleted account'), isContact: false }, lastMessage: null, unread: 0, muted: false, lastMessageAt: 1 }
 ];
 
@@ -98,4 +100,28 @@ test('Forward to an existing chat does not open it again', async () => {
 
     expect(openChat).not.toHaveBeenCalled();
     expect(forward).toHaveBeenCalledWith({ messageIds: [ 'm1', 'm2' ], toChatId: 'c1' });
+});
+
+test('ForwardModal groups targets under Chats and Contacts with their status', async () => {
+    mockViewport(true);
+    renderModal();
+
+    const dialog = screen.getByRole('dialog', { name: 'Forward to' });
+    const headings = within(dialog).getAllByRole('heading', { level: 3 }).map(heading => heading.textContent);
+
+    expect(headings).toEqual([ 'Chats', 'Contacts' ]);
+    expect(within(screen.getByRole('button', { name: /Bob/ })).getByText('online')).toBeTruthy();
+    expect(within(screen.getByRole('button', { name: /Carol/ })).getByText(lastSeenText({ online: false, lastSeenAt: null }, Date.now()))).toBeTruthy();
+
+    // Пошук, що знайшов лише контакт, ховає порожній розділ «Chats»
+    await userEvent.setup().type(within(dialog).getByRole('textbox', { name: 'Search' }), 'car');
+
+    expect(within(dialog).getAllByRole('heading', { level: 3 }).map(heading => heading.textContent)).toEqual([ 'Contacts' ]);
+});
+
+test('on a phone ForwardModal is a bottom sheet', () => {
+    renderModal();
+
+    expect(screen.getByRole('dialog', { name: 'Forward to' })).toBeTruthy();
+    expect(screen.getByTestId('sheet-handle')).toBeTruthy();
 });

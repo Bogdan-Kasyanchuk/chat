@@ -1,0 +1,64 @@
+/* Заголовок лише називає діалог для читача екрана: на канвасі його немає */
+.header {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.body {
+    padding: 0;
+}
+
+/* Аркуш: радіус 16 зверху, відступи 20 / 8, ручка 40×4 на 8 від верху */
+.sheet {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 8px calc(20px + env(safe-area-inset-bottom));
+    border-radius: 16px 16px 0 0;
+    background-color: var(--chat-popover);
+}
+
+.handle {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 40px;
+    height: 4px;
+    margin-left: -20px;
+    border-radius: 2px;
+    background-color: var(--chat-border);
+}
+
+.divider {
+    height: 1px;
+    margin: 4px 12px;
+    background-color: var(--chat-line);
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: var(--mantine-font-size-md);
+    font-weight: 600;
+    color: var(--chat-text);
+    border-radius: 12px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+
+    &:active {
+        background-color: var(--chat-hover);
+    }
+
+    &[data-danger] {
+        color: var(--chat-danger);
+    }
+}

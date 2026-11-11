@@ -11,6 +11,8 @@ type ResponsiveDialogProps = {
     children: ReactNode,
     // Дія виконується: діалог не закривається ні хрестиком, ні Escape, ні кліком повз
     busy?: boolean,
+    // Хрестик і в нижній панелі (MobileForward); підтвердження обходяться без нього
+    sheetCloseButton?: boolean,
     onClose: () => void
 };
 
@@ -20,7 +22,7 @@ const SHEET_STYLES = { content: { height: 'auto', maxHeight: 'calc(100dvh - 2.5r
 
 // Артборди LogoutDialog і DeleteAccountDialog: діалог 420 посередині на десктопі;
 // MobileDelete: нижня панель з ручкою на телефоні
-const ResponsiveDialog: FC<ResponsiveDialogProps> = ({ opened, title, children, busy = false, onClose }) => {
+const ResponsiveDialog: FC<ResponsiveDialogProps> = ({ opened, title, children, busy = false, sheetCloseButton = false, onClose }) => {
     const isDesktop = useIsDesktop();
 
     if (isDesktop) {
@@ -45,7 +47,7 @@ const ResponsiveDialog: FC<ResponsiveDialogProps> = ({ opened, title, children, 
             opened={ opened }
             title={ title }
             position="bottom"
-            withCloseButton={ false }
+            withCloseButton={ sheetCloseButton && !busy }
             closeOnClickOutside={ !busy }
             closeOnEscape={ !busy }
             classNames={ { content: classes.sheet, header: classes.sheetHeader, body: classes.sheetBody } }

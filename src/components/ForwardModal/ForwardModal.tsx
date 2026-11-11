@@ -1,4 +1,4 @@
-import { Center, Loader, Modal, ScrollArea, Text, TextInput, UnstyledButton } from '@mantine/core';
+import { Center, Loader, ScrollArea, Text, TextInput, UnstyledButton } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconSearch } from '@tabler/icons-react';
 import { useMutation, useQuery } from 'convex/react';
@@ -6,6 +6,10 @@ import { type FC, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import PresenceAvatar from '@/components/PresenceAvatar';
+import ResponsiveDialog from '@/components/ResponsiveDialog';
+import StatusText from '@/components/StatusText';
+import useIsDesktop from '@/hooks/useIsDesktop';
+import useNow from '@/hooks/useNow';
 import errorMessage from '@/lib/errorMessage';
 import { api } from '@convex/_generated/api';
 import type { Id } from '@convex/_generated/dataModel';
@@ -25,40 +29,49 @@ type Target = {
     userId: Id<'users'>,
     name: string,
     avatar: string | null,
-    online: boolean
+    online: boolean,
+    lastSeenAt: number | null
 };
 
+// Артборди ForwardDialog і MobileForward: пошук, розділи «Chats» і «Contacts», рядки з аватаром 44 і статусом
 const ForwardModal: FC<ForwardModalProps> = ({ messageIds, onDone }) => {
     const chats = useQuery(api.chats.list);
     const contacts = useQuery(api.contacts.list);
     const openChat = useMutation(api.chats.open);
     const forward = useMutation(api.messages.forward);
     const navigate = useNavigate();
+    const isDesktop = useIsDesktop();
+    const now = useNow();
     const [ search, setSearch ] = useState('');
     const [ busy, setBusy ] = useState(false);
 
     const loading = chats === undefined || contacts === undefined;
-    const targets: Target[] = [];
+    const chatTargets: Target[] = [];
+    const contactTargets: Target[] = [];
 
     if (!loading) {
         // Видаленому акаунту не написати; контакт, з яким уже є чат, показуємо раз — як чат
         for (const { chatId, partner } of chats) {
             if (partner.userId !== null) {
-                targets.push({ key: chatId, chatId, userId: partner.userId, name: partner.name, avatar: partner.avatar, online: partner.online });
+                chatTargets.push({ key: chatId, chatId, ...partner, userId: partner.userId });
             }
         }
 
-        const inChats = new Set(targets.map(target => target.userId));
+        const inChats = new Set(chatTargets.map(target => target.userId));
 
         for (const contact of contacts) {
             if (!inChats.has(contact.userId)) {
-                targets.push({ key: contact.userId, chatId: null, userId: contact.userId, name: contact.name, avatar: contact.avatar, online: contact.online });
+                contactTargets.push({ key: contact.userId, ...contact, chatId: null });
             }
         }
     }
 
     const query = search.trim().toLowerCase();
-    const visible = targets.filter(target => target.name.toLowerCase().includes(query));
+    const matches = (target: Target) => target.name.toLowerCase().includes(query);
+    const sections = [
+        { title: 'Chats', targets: chatTargets.filter(matches) },
+        { title: 'Contacts', targets: contactTargets.filter(matches) }
+    ].filter(section => section.targets.length > 0);
 
     const send = async (target: Target) => {
         if (busy) {
@@ -80,37 +93,39 @@ const ForwardModal: FC<ForwardModalProps> = ({ messageIds, onDone }) => {
     };
 
     return (
-        <Modal
+        <ResponsiveDialog
             title="Forward to"
-            closeOnClickOutside={ !busy }
-            closeOnEscape={ !busy }
-            withCloseButton={ !busy }
+            busy={ busy }
             opened
-            centered
+            sheetCloseButton
             onClose={ () => {
                 onDone(false);
             } }
         >
+            { /* На телефоні без автофокуса: клавіатура закрила б панель */ }
             <TextInput
+                className={ classes.search }
+                variant="filled"
+                radius="md"
                 aria-label="Search"
                 placeholder="Search"
-                leftSection={ <IconSearch size={ 16 } /> }
+                leftSection={ <IconSearch size={ 18 } /> }
                 value={ search }
-                data-autofocus
+                data-autofocus={ isDesktop || undefined }
                 onChange={ event => {
                     setSearch(event.currentTarget.value);
                 } }
             />
             <ScrollArea.Autosize
-                mah={ 360 }
-                mt="sm"
+                className={ classes.list }
+                mah="min(400px, 50dvh)"
             >
                 { loading && (
                     <Center p="md">
                         <Loader size="sm" />
                     </Center>
                 ) }
-                { !loading && visible.length === 0 && (
+                { !loading && sections.length === 0 && (
                     <Text
                         c="dimmed"
                         ta="center"
@@ -119,32 +134,47 @@ const ForwardModal: FC<ForwardModalProps> = ({ messageIds, onDone }) => {
                         { query ? 'Nothing found' : 'No chats or contacts yet' }
                     </Text>
                 ) }
-                { visible.map(target => (
-                    <UnstyledButton
-                        key={ target.key }
-                        className={ classes.item }
-                        disabled={ busy }
-                        onClick={ () => {
-                            void send(target);
-                        } }
+                { sections.map(section => (
+                    <section
+                        key={ section.title }
+                        className={ classes.section }
                     >
-                        <PresenceAvatar
-                            userId={ target.userId }
-                            name={ target.name }
-                            avatar={ target.avatar }
-                            size={ 40 }
-                            online={ target.online }
-                        />
-                        <Text
-                            fw={ 600 }
-                            truncate
-                        >
-                            { target.name }
-                        </Text>
-                    </UnstyledButton>
+                        <h3 className={ classes.heading }>{ section.title }</h3>
+                        { section.targets.map(target => (
+                            <UnstyledButton
+                                key={ target.key }
+                                className={ classes.item }
+                                disabled={ busy }
+                                onClick={ () => {
+                                    void send(target);
+                                } }
+                            >
+                                <PresenceAvatar
+                                    userId={ target.userId }
+                                    name={ target.name }
+                                    avatar={ target.avatar }
+                                    size={ 44 }
+                                    online={ target.online }
+                                />
+                                <span className={ classes.text }>
+                                    <Text
+                                        fw={ 600 }
+                                        truncate
+                                    >
+                                        { target.name }
+                                    </Text>
+                                    <StatusText
+                                        lastSeenAt={ target.lastSeenAt }
+                                        now={ now }
+                                        online={ target.online }
+                                    />
+                                </span>
+                            </UnstyledButton>
+                        )) }
+                    </section>
                 )) }
             </ScrollArea.Autosize>
-        </Modal>
+        </ResponsiveDialog>
     );
 };
 

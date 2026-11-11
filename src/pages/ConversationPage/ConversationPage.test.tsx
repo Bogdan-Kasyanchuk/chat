@@ -407,7 +407,7 @@ test('Delete chat goes home without the Chat not found toast', async () => {
 
     await user.click(screen.getByRole('button', { name: 'Chat settings' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Delete chat' }));
-    await user.click(within(screen.getByRole('dialog', { name: 'Delete chat?' })).getByRole('button', { name: 'Delete' }));
+    await user.click(within(screen.getByRole('dialog', { name: 'Delete chat?' })).getByRole('button', { name: 'Delete chat' }));
 
     expect(removeChat).toHaveBeenCalledWith({ chatId: 'c1', forEveryone: false });
     expect(await screen.findByText('home page')).toBeTruthy();
