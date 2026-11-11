@@ -245,6 +245,12 @@ test('a new account sees No chats yet and Add contact explains an unknown email'
     await dialog.getByRole('button', { name: 'Find' }).click();
     await expect(dialog.getByRole('alert')).toHaveText('No one has signed up with this email. Check the spelling.');
     await expect(dialog.getByRole('button', { name: 'Add to contacts' })).toBeDisabled();
+
+    // На телефоні кнопки стовпчиком: кожна 44, а не стиснута до тексту (flex-basis 0 у стовпчику)
+    for (const name of [ 'Add to contacts', 'Cancel' ]) {
+        expect((await dialog.getByRole('button', { name, exact: true }).boundingBox())?.height, name).toBeCloseTo(44, 0);
+    }
+
     await dialog.getByRole('button', { name: isPhone() ? 'Back to chats' : 'Cancel' }).click();
     await expect(dialog).toHaveCount(0);
 });
