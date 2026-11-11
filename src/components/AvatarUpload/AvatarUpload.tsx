@@ -1,11 +1,11 @@
 import { ActionIcon, FileButton, Text, rem } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import { IconCamera, IconTrash } from '@tabler/icons-react';
 import { useAction, useMutation } from 'convex/react';
 import { type CSSProperties, type FC, useEffect, useRef, useState } from 'react';
 
 import PresenceAvatar from '@/components/PresenceAvatar';
 import errorMessage from '@/lib/errorMessage';
+import { showSuccess } from '@/lib/toast';
 import { api } from '@convex/_generated/api';
 import type { Id } from '@convex/_generated/dataModel';
 import { AVATAR_TOO_BIG, AVATAR_TYPE, AVATAR_TYPES, MAX_AVATAR_BYTES } from '@convex/chatRules';
@@ -95,7 +95,7 @@ const AvatarUpload: FC<AvatarUploadProps> = ({ userId, name, avatar }) => {
             const { storageId } = await response.json() as { storageId: Id<'_storage'> };
 
             await setAvatar({ storageId });
-            notifications.show({ message: 'Photo updated' });
+            showSuccess('Photo updated');
         } catch (e) {
             setError(errorMessage(e));
         } finally {

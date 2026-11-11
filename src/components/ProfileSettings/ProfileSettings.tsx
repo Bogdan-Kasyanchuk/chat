@@ -1,9 +1,9 @@
 import { Button, Input } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import { useMutation } from 'convex/react';
 import { type FC, type SubmitEvent, useId, useState } from 'react';
 
 import errorMessage from '@/lib/errorMessage';
+import { showSuccess } from '@/lib/toast';
 import { api } from '@convex/_generated/api';
 import { NAME_REQUIRED, NAME_TOO_LONG } from '@convex/authRules';
 import { MAX_NAME_LENGTH } from '@convex/chatRules';
@@ -48,7 +48,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({ name }) => {
 
         try {
             await updateName({ name: value.trim() });
-            notifications.show({ message: 'Profile updated' });
+            showSuccess('Profile updated');
         } catch (e) {
             setError(errorMessage(e));
         } finally {

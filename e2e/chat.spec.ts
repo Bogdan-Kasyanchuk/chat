@@ -389,12 +389,24 @@ test('on a phone scrolling the feed does not open the message actions, a long pr
 
     await addContact(page, bobEmail);
 
-    for (let i = 1; i <= 12; i += 1) {
+    // Стрічка має бути довшою за екран, щоб палець справді її гортав
+    for (let i = 1; i <= 30; i += 1) {
         await sendMessage(page, `Line ${ i }`);
     }
 
     const sheet = page.getByRole('dialog', { name: 'Message actions' });
-    const box = await message(page, 'Line 10').boundingBox();
+    // Прокрутка стрічки — найближчий предок бульбашки з overflow-y: auto
+    const feedScrollTop = () => message(page, 'Line 30').evaluate(element => {
+        let node = element.parentElement;
+
+        while (node && getComputedStyle(node).overflowY !== 'auto') {
+            node = node.parentElement;
+        }
+
+        return node?.scrollTop ?? -1;
+    });
+    const before = await feedScrollTop();
+    const box = await message(page, 'Line 28').boundingBox();
 
     if (!box) {
         throw new Error('Message is not visible');
@@ -415,10 +427,12 @@ test('on a phone scrolling the feed does not open the message actions, a long pr
     await page.waitForTimeout(600);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await cdp.detach();
+    // Стрічка справді прокрутилась до старіших, а панель не відкрилась
+    expect(await feedScrollTop()).toBeLessThan(before);
     await expect(sheet).toHaveCount(0);
 
-    await longPress(page, message(page, 'Line 12'), sheet);
-    await expect(sheet.getByText('Line 12')).toBeVisible();
+    await longPress(page, message(page, 'Line 20'), sheet);
+    await expect(sheet.getByText('Line 20')).toBeVisible();
     await sheet.getByRole('button', { name: 'Select' }).click();
     await expect(page.getByText('1 selected')).toBeVisible();
     await expect(page.getByRole('toolbar', { name: 'Selected messages' })).toBeVisible();
