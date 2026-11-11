@@ -223,3 +223,36 @@ test('an emoji-only message keeps the time chip without a bubble', () => {
 
     expect(screen.getByText('09:05').closest('[data-chip]')).toBeNull();
 });
+
+test('in select mode a message shows a round check, filled when selected', () => {
+    const { container, rerender } = renderWithProviders(
+        <MessageBubble
+            message={ makeMessage() }
+            partnerName="Bob"
+        />
+    );
+
+    // Поза режимом вибору кружечка немає
+    expect(container.querySelector('[data-check]')).toBeNull();
+
+    rerender(
+        <MessageBubble
+            message={ makeMessage() }
+            partnerName="Bob"
+            onClick={ vi.fn() }
+        />
+    );
+
+    expect(container.querySelector('[data-check]')?.hasAttribute('data-checked')).toBe(false);
+
+    rerender(
+        <MessageBubble
+            message={ makeMessage() }
+            partnerName="Bob"
+            selected
+            onClick={ vi.fn() }
+        />
+    );
+
+    expect(container.querySelector('[data-check]')?.hasAttribute('data-checked')).toBe(true);
+});

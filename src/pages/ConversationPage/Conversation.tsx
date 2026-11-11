@@ -11,9 +11,10 @@ import DeleteMessagesModal from '@/components/DeleteMessagesModal';
 import ForwardModal from '@/components/ForwardModal';
 import MessageList from '@/components/MessageList';
 import type { MessageAction } from '@/components/MessageMenu/messageActions';
-import SelectionBar from '@/components/SelectionBar';
+import SelectionBar, { SelectionActions } from '@/components/SelectionBar';
 import StrangerBanner from '@/components/StrangerBanner';
 import useCopyText from '@/hooks/useCopyText';
+import useIsDesktop from '@/hooks/useIsDesktop';
 import useMessageHistory from '@/hooks/useMessageHistory';
 import useNow from '@/hooks/useNow';
 import errorMessage from '@/lib/errorMessage';
@@ -46,6 +47,7 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
     const edit = useMutation(api.messages.edit);
     const history = useMessageHistory(chatId);
     const copyText = useCopyText();
+    const isDesktop = useIsDesktop();
     // Знімок на момент відкриття: розділювач «Unread messages» не стрибає, коли спрацьовує markRead
     const [ lastReadAtOnOpen ] = useState(chat.lastReadAt);
     // У стані лише id; самі повідомлення беруться з завантаженої історії. Те, що зникло (видалене співрозмовником
@@ -179,23 +181,29 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
         }
     };
 
+    const selectionHandlers = {
+        onForward: () => {
+            setForwarding(visibleSelection);
+        },
+        onCopy: () => {
+            copyText(selectedMessages.map(message => message.body).join('\n\n'));
+            clearSelection();
+        },
+        onDelete: () => {
+            setDeleting(visibleSelection);
+        }
+    };
+    // На телефоні дії вибору — панель унизу замість композера (MobileSelection)
+    const selectionBelow = selecting && !isDesktop;
+
     return (
         <div className={ classes.page }>
             { selecting
                 ? (
                     <SelectionBar
                         count={ selectedMessages.length }
-                        onForward={ () => {
-                            setForwarding(visibleSelection);
-                        } }
-                        onCopy={ () => {
-                            copyText(selectedMessages.map(message => message.body).join('\n\n'));
-                            clearSelection();
-                        } }
-                        onDelete={ () => {
-                            setDeleting(visibleSelection);
-                        } }
                         onCancel={ clearSelection }
+                        { ...selectionHandlers }
                     />
                 )
                 : (
@@ -221,13 +229,20 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
                 selected={ visibleSelection }
                 onAction={ onAction }
             />
-            <Composer
-                disabled={ !chat.canSend }
-                replyTo={ replyDraft }
-                editing={ editing }
-                onCancel={ cancel }
-                onSubmit={ submit }
-            />
+            { /* Прихований, а не демонтований: чернетка в композері переживає режим вибору */ }
+            <div
+                className={ classes.composer }
+                hidden={ selectionBelow }
+            >
+                <Composer
+                    disabled={ !chat.canSend }
+                    replyTo={ replyDraft }
+                    editing={ editing }
+                    onCancel={ cancel }
+                    onSubmit={ submit }
+                />
+            </div>
+            { selectionBelow && <SelectionActions { ...selectionHandlers } /> }
             { forwardMessages.length > 0 && (
                 <ForwardModal
                     messageIds={ forwardMessages.map(message => message.id) }

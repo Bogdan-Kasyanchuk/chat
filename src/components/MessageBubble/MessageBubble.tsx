@@ -65,6 +65,22 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
             data-message-id={ message.id }
             onClick={ onClick }
         >
+            { /* Режим вибору: кружечок 22 ліворуч, з галочкою — вибране (артборди Selection, MobileSelection) */ }
+            { onClick && (
+                <span
+                    className={ classes.check }
+                    data-checked={ selected || undefined }
+                    data-check
+                    aria-hidden
+                >
+                    { selected && (
+                        <IconCheck
+                            size={ 14 }
+                            stroke={ 3 }
+                        />
+                    ) }
+                </span>
+            ) }
             <div
                 className={ classes.bubble }
                 role="article"

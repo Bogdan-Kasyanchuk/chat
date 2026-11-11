@@ -1,22 +1,50 @@
-/* Та сама висота й межа, що й у шапки розмови: заміна не зсуває стрічку */
+/* Та сама висота, тло й лінія, що й у шапки розмови: заміна не зсуває стрічку */
 .bar {
     display: flex;
     flex-shrink: 0;
     align-items: center;
-    gap: var(--mantine-spacing-xs);
-    min-height: 64px;
-    padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
-    border-bottom: 1px solid var(--mantine-color-gray-3);
-    background-color: var(--mantine-color-white);
-
-    @mixin smaller-than $mantine-breakpoint-md {
-        padding-inline: var(--mantine-spacing-xs);
-    }
+    gap: 8px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--chat-line);
+    background-color: var(--chat-sidebar-bg);
 }
 
 .count {
     flex: 1;
     min-width: 0;
+    font-size: var(--mantine-font-size-md);
     white-space: nowrap;
 }
 
+/* Артборд MobileSelection: сітка з трьох, відступи 10 / 20 / 20, лінія зверху */
+.actions {
+    display: grid;
+    flex-shrink: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 10px 20px calc(20px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--chat-line);
+    background-color: var(--chat-sidebar-bg);
+}
+
+.action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 56px;
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 600;
+    color: var(--chat-text);
+    border-radius: 12px;
+    -webkit-tap-highlight-color: transparent;
+
+    &:active {
+        background-color: var(--chat-hover);
+    }
+
+    &[data-danger] {
+        color: var(--chat-danger);
+    }
+}
