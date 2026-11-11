@@ -1,6 +1,6 @@
-import { type Locator, expect, test } from '@playwright/test';
+import { type Locator, type Page, expect, test } from '@playwright/test';
 
-import { addContact, isPhone, newUserPage, signUp } from './helpers';
+import { addContact, isPhone, newUserPage, openSettings, signUp } from './helpers';
 
 // Стани полів і чекбоксів з артборду Components живуть у global.css, тож jsdom їх не бачить — перевіряємо в браузері
 const ACCENT = 'rgb(11, 122, 117)';
@@ -122,4 +122,45 @@ test('on a short desktop screen the sign-in form stays in the middle of the scre
     expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBeGreaterThan(768);
     expect(column).not.toBeNull();
     expect(Math.abs(column!.y + column!.height / 2 - 384)).toBeLessThanOrEqual(1);
+});
+
+// Review Focus 4: System іде за темою ОС одразу, ручний вибір переживає перезавантаження; смуга браузера — за темою застосунку
+test.describe('colour scheme', () => {
+    // Тло сторінки — --chat-bg (тло розмови)
+    const LIGHT_BG = 'rgb(230, 238, 235)';
+    const DARK_BG = 'rgb(14, 20, 21)';
+
+    const bodyBackground = (page: Page) => style(page.locator('body'), 'background-color');
+    const barColors = (page: Page) => page.locator('meta[name="theme-color"]').evaluateAll(metas => metas.map(meta => meta.getAttribute('content')));
+
+    test('a dark system gives the dark background and a dark browser bar', async ({ page }) => {
+        test.skip(isPhone(), 'same scheme logic on both projects');
+        await page.emulateMedia({ colorScheme: 'dark' });
+        await page.goto('/login');
+
+        await expect.poll(async () => bodyBackground(page)).toBe(DARK_BG);
+        await expect.poll(async () => barColors(page)).toEqual([ '#151C1D', '#151C1D' ]);
+    });
+
+    test('System follows the OS while the app is open, a manual Light survives a reload', async ({ page }) => {
+        test.skip(isPhone(), 'same scheme logic on both projects');
+        await signUp(page, 'Theme');
+
+        const settings = await openSettings(page);
+        const theme = settings.getByRole('radiogroup', { name: 'Theme' });
+
+        await expect(theme.getByRole('radio', { name: 'System' })).toBeChecked();
+
+        await page.emulateMedia({ colorScheme: 'dark' });
+        await expect.poll(async () => bodyBackground(page)).toBe(DARK_BG);
+        await expect.poll(async () => barColors(page)).toEqual([ '#151C1D', '#151C1D' ]);
+
+        await theme.getByText('Light', { exact: true }).click();
+        await expect.poll(async () => bodyBackground(page)).toBe(LIGHT_BG);
+
+        await page.reload();
+        await expect(page.getByRole('searchbox', { name: 'Search', exact: true })).toBeVisible();
+        await expect.poll(async () => bodyBackground(page)).toBe(LIGHT_BG);
+        await expect.poll(async () => barColors(page)).toEqual([ '#FFFFFF', '#FFFFFF' ]);
+    });
 });
