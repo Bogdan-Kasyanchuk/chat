@@ -7,7 +7,10 @@ type DaySeparatorProps = {
 };
 
 const DaySeparator: FC<DaySeparatorProps> = ({ label }) => (
-    <div className={ classes.separator }>
+    <div
+        className={ classes.separator }
+        data-day-chip
+    >
         <span className={ classes.label }>{ label }</span>
     </div>
 );

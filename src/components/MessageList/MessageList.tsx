@@ -40,6 +40,15 @@ const BOTTOM_PX = 40;
 const MAX_PRELOAD = 300;
 // Відступ над розділювачем при відкритті
 const DIVIDER_GAP = 8;
+// Липка плашка дати тримається на 8 від верху стрічки (DaySeparator.module.css)
+const CHIP_TOP = 8;
+
+// Розділювач стоїть під липкою плашкою свого дня, а не під нею: відступ — ще й на висоту плашки
+const dividerScrollTop = (divider: HTMLElement) => {
+    const chip = divider.parentElement?.querySelector<HTMLElement>(':scope > [data-day-chip]');
+
+    return divider.offsetTop - DIVIDER_GAP - (chip ? CHIP_TOP + chip.offsetHeight : 0);
+};
 
 const rowOf = (container: HTMLElement, id: string) => container.querySelector<HTMLElement>(`[data-message-id="${ id }"]`);
 
@@ -175,7 +184,7 @@ const MessageList: FC<MessageListProps> = ({ chatId, history, partnerName, canSe
         }
 
         positionedRef.current = true;
-        el.scrollTop = dividerRef.current ? dividerRef.current.offsetTop - DIVIDER_GAP : el.scrollHeight;
+        el.scrollTop = dividerRef.current ? dividerScrollTop(dividerRef.current) : el.scrollHeight;
     }, [ positioned ]);
 
     // Коротка стрічка не прокручується, тож підвантаження перевіряємо й після кожного рендеру

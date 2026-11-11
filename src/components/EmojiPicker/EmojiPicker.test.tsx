@@ -86,3 +86,22 @@ test('a category tab scrolls the list to its category and becomes pressed', asyn
     expect(screen.getByRole('button', { name: 'Animals and nature' }).getAttribute('aria-pressed')).toBe('true');
     expect(screen.getByRole('button', { name: 'Smileys and people' }).getAttribute('aria-pressed')).toBe('false');
 });
+
+// Канвас: Recently used — один рядок (8 на телефоні, 9 на десктопі); у пам'яті їх може бути більше
+test('Recently used shows one row, however many are remembered', () => {
+    const remembered = [ '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊' ];
+
+    localStorage.setItem('chat-recent-emoji', JSON.stringify(remembered));
+    mockViewport(false);
+
+    const { unmount } = renderWithProviders(<EmojiPicker onSelect={ vi.fn() } />);
+    const recentRow = () => screen.getByText('Recently used').nextElementSibling as HTMLElement;
+
+    expect(within(recentRow()).getAllByRole('button')).toHaveLength(8);
+
+    unmount();
+    mockViewport(true);
+    renderWithProviders(<EmojiPicker onSelect={ vi.fn() } />);
+
+    expect(within(recentRow()).getAllByRole('button')).toHaveLength(9);
+});

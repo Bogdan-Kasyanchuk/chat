@@ -63,6 +63,7 @@ const EmojiPicker: FC<EmojiPickerProps> = ({ onSelect }) => {
     const [ skinTone ] = useState(initialSkinTone);
     const [ activeTab, setActiveTab ] = useState<TabLabel>(TABS[ 0 ].label);
     const viewportRef = useRef<HTMLDivElement>(null);
+    const columns = isDesktop ? 9 : 8;
 
     const pick = (emoji: string) => {
         const next = pushRecent(recent, emoji);
@@ -136,7 +137,7 @@ const EmojiPicker: FC<EmojiPickerProps> = ({ onSelect }) => {
             data-desktop={ isDesktop || undefined }
             emojibaseUrl="/emojibase"
             locale="en"
-            columns={ isDesktop ? 9 : 8 }
+            columns={ columns }
             skinTone={ skinTone }
             onEmojiSelect={ ({ emoji }) => {
                 pick(emoji);
@@ -163,7 +164,8 @@ const EmojiPicker: FC<EmojiPickerProps> = ({ onSelect }) => {
                 <div className={ classes.recent }>
                     <p className={ classes.heading }>{ RECENT }</p>
                     <div className={ classes.grid }>
-                        { recent.map(emoji => (
+                        { /* Один рядок, як на канвасі: у пам'яті недавніх більше, але панель телефона лише 300 */ }
+                        { recent.slice(0, columns).map(emoji => (
                             <button
                                 key={ emoji }
                                 type="button"

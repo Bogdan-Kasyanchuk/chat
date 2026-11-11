@@ -310,3 +310,46 @@ test('the date chip sticks to the top of the feed while scrolling its day', asyn
     // Стрічка справді прокручена: верх дня вже за краєм
     expect(await feed.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
 });
+
+// Рев'ю етапу 5: чат відкривається на «Unread messages», і липка плашка дати його не накриває
+test('the sticky date chip leaves the unread divider visible when a chat opens', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+
+    const sendTall = async (n: number) => {
+        await page.getByLabel('Message', { exact: true }).fill(Array.from({ length: 14 }, (_, i) => `${ n }.${ i }`).join('\n'));
+        await page.getByRole('button', { name: 'Send' }).click();
+        await expect(page.getByRole('article')).toHaveCount(n);
+    };
+
+    for (const n of [ 1, 2, 3 ]) {
+        await sendTall(n);
+    }
+
+    // Bob читає все, виходить, і приходить ще стрічка — розділювач опиняється вгорі екрана
+    await openChat(bob, 'Alice');
+    await expect(bob.getByRole('article')).toHaveCount(3);
+    await leaveChat(bob);
+
+    for (const n of [ 4, 5, 6 ]) {
+        await sendTall(n);
+    }
+
+    await openChat(bob, 'Alice');
+
+    const divider = bob.getByText('Unread messages', { exact: true });
+
+    await expect(divider).toBeInViewport();
+
+    const [ dividerBox, chipBox ] = [ await divider.boundingBox(), await bob.getByText('Today', { exact: true }).boundingBox() ];
+
+    expect(dividerBox && chipBox).toBeTruthy();
+    expect(chipBox!.y + chipBox!.height).toBeLessThanOrEqual(dividerBox!.y);
+
+    await bob.context().close();
+});
