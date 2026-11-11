@@ -302,7 +302,8 @@ test('Copy text puts the message on the clipboard', async () => {
     await user.click(screen.getByRole('button', { name: 'Copy text' }));
 
     expect(await navigator.clipboard.readText()).toBe('Lunch?');
-    expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Copied' }));
+    // Артборд ToastCopied: «Text copied» з галочкою
+    expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Text copied', icon: expect.anything() }));
 });
 
 test('Select mode toggles messages and Delete removes them for me', async () => {

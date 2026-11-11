@@ -27,8 +27,18 @@ type ActionSheetProps = {
 };
 
 // Висота за вмістом: Mantine задає --drawer-height інлайн, тож перебиваємо теж інлайн (як у ResponsiveDialog).
-// Тло має аркуш з пунктами, а не вся панель: над ним може бути прев'ю на затемненні
-const STYLES = { content: { height: 'auto', maxHeight: '100dvh', backgroundColor: 'transparent', boxShadow: 'none' } };
+// Тло має аркуш з пунктами, а не вся панель: над ним може бути прев'ю на затемненні.
+// Панель відкривається під пальцем, тож текст у ній не виділяється (Android виділяв слово під пальцем)
+const STYLES = {
+    content: {
+        height: 'auto',
+        maxHeight: '100dvh',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+        userSelect: 'none',
+        WebkitTouchCallout: 'none'
+    }
+} as const;
 
 // Нижня панель дій на телефоні (Components → Bottom sheets): радіус 16 зверху, ручка, пункти 44 з іконками 22.
 // Пункт спершу закриває панель, потім виконує дію

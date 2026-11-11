@@ -1,3 +1,4 @@
+import { rem } from '@mantine/core';
 import { useDocumentVisibility } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from 'convex/react';
@@ -12,12 +13,20 @@ import { api } from '@convex/_generated/api';
 
 const TOAST_LIMIT = 120;
 
+// Components → Toasts · more: ім'я 15 / 600, один рядок повідомлення з трикрапкою; аватар 40 замість іконки
+const TOAST_STYLES = {
+    title: { fontSize: rem(15), fontWeight: 600 },
+    description: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }
+} as const;
+
 // Довге повідомлення в toast обрізаємо; за кодовими точками, щоб не розрізати емодзі навпіл
 const clip = (text: string): string => {
     const chars = Array.from(text);
 
     return chars.length > TOAST_LIMIT ? `${ chars.slice(0, TOAST_LIMIT).join('') }…` : text;
 };
+
+const toastId = (chatId: string) => `incoming-${ chatId }`;
 
 const useIncomingNotifications = (chats: ChatSummary[] | undefined, activeChatId: string | null): void => {
     const me = useQuery(api.users.me);
@@ -31,6 +40,13 @@ const useIncomingNotifications = (chats: ChatSummary[] | undefined, activeChatId
     useEffect(() => {
         latest.current = { sound: me?.sound, pageVisible: visibility === 'visible', activeChatId, navigate };
     });
+
+    // Відкритий чат свого toast-а більше не потребує: на телефоні той стоїть над композером і закривав би стрічку
+    useEffect(() => {
+        if (activeChatId !== null) {
+            notifications.hide(toastId(activeChatId));
+        }
+    }, [ activeChatId ]);
 
     useEffect(() => {
         if (!chats) {
@@ -51,14 +67,15 @@ const useIncomingNotifications = (chats: ChatSummary[] | undefined, activeChatId
         }
 
         incoming.forEach(chat => {
-            const id = `incoming-${ chat.chatId }`;
+            const id = toastId(chat.chatId);
 
             notifications.show({
                 id,
                 title: chat.partner.name,
                 message: clip(chat.lastMessage?.body ?? ''),
-                icon: createElement(PresenceAvatar, { userId: chat.partner.userId, name: chat.partner.name, avatar: chat.partner.avatar, size: 32 }),
+                icon: createElement(PresenceAvatar, { userId: chat.partner.userId, name: chat.partner.name, avatar: chat.partner.avatar, size: 40 }),
                 style: { cursor: 'pointer' },
+                styles: TOAST_STYLES,
                 onClick: () => {
                     notifications.hide(id);
                     void go(`/chat/${ chat.chatId }`);

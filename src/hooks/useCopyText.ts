@@ -1,14 +1,15 @@
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { useEffect } from 'react';
+import { IconCheck } from '@tabler/icons-react';
+import { createElement, useEffect } from 'react';
 
-// Копіює текст у буфер і показує toast «Copied» (або помилку, якщо браузер не дав доступу)
+// Копіює текст у буфер і показує toast «Text copied» (артборд ToastCopied) або помилку, якщо браузер не дав доступу
 const useCopyText = (): ((text: string) => void) => {
     const clipboard = useClipboard();
 
     useEffect(() => {
         if (clipboard.copied) {
-            notifications.show({ id: 'copied', message: 'Copied' });
+            notifications.show({ id: 'copied', icon: createElement(IconCheck, { size: 18 }), message: 'Text copied' });
         }
     }, [ clipboard.copied ]);
 

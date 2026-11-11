@@ -146,7 +146,7 @@ export const sendMessage = async (page: Page, text: string) => {
 };
 
 // Чесне довге натискання: палець тримається, доки не з'явиться меню, і лише тоді піднімається
-const longPress = async (page: Page, target: Locator, menu: Locator) => {
+export const longPress = async (page: Page, target: Locator, menu: Locator) => {
     await target.scrollIntoViewIfNeeded();
 
     const box = await target.boundingBox();
@@ -164,10 +164,11 @@ const longPress = async (page: Page, target: Locator, menu: Locator) => {
     await cdp.detach();
 };
 
-// Відкриває меню повідомлення: правий клік на десктопі, довге натискання на телефоні
+// Відкриває меню повідомлення: на десктопі — контекстне меню правим кліком, на телефоні — нижню панель
+// «Message actions» довгим натисканням
 export const openMessageMenu = async (page: Page, text: string) => {
     const target = message(page, text);
-    const menu = page.locator('.mantine-contextmenu');
+    const menu = isPhone() ? page.getByRole('dialog', { name: 'Message actions' }) : page.locator('.mantine-contextmenu');
 
     if (isPhone()) {
         await longPress(page, target, menu);

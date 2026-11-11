@@ -32,7 +32,7 @@ createRoot(document.getElementById('root')!).render(
                     <ContextMenuProvider>
                         <ModalsProvider>
                             <Notifications
-                                position="top-center"
+                                position="bottom-center"
                                 autoClose={ 4000 }
                             />
                             <App />

@@ -206,6 +206,8 @@ const isBase = (size: string | number | undefined) => size === undefined || size
 
 const overlay = { backgroundOpacity: 1, color: 'var(--chat-overlay)' };
 
+const TOAST_COLORS: Record<string, string> = { red: 'var(--chat-toast-danger)', gray: 'var(--chat-toast-text)' };
+
 const theme = createTheme({
     colors: { brand, gray, dark: darkColors, red },
     primaryColor: 'brand',
@@ -396,14 +398,16 @@ const theme = createTheme({
             },
             styles: { root: { textTransform: 'none', fontWeight: 700 } }
         }),
-        // Toast: інверсне тло, текст 16; колір (смужка чи іконка) — toast accent, для помилок — toast danger
+        // Toast: інверсне тло, текст 16; колір (смужка чи іконка) — toast accent, для помилок — toast danger,
+        // для нейтральних («2 messages deleted», color="gray») — колір тексту toast. Іконка без кружечка
         Notification: Notification.extend({
-            defaultProps: { radius: 'lg' },
+            defaultProps: { radius: 'lg', withCloseButton: false },
             vars: (_, { color }) => ({
-                root: { '--notification-color': color === 'red' ? 'var(--chat-toast-danger)' : 'var(--chat-toast-accent)' }
+                root: { '--notification-color': TOAST_COLORS[ color ?? '' ] ?? 'var(--chat-toast-accent)' }
             }),
             styles: {
                 root: { backgroundColor: 'var(--chat-toast-bg)', boxShadow: 'var(--chat-shadow)', minHeight: rem(44) },
+                icon: { width: 'auto', height: 'auto', backgroundColor: 'transparent', color: 'var(--notification-color)' },
                 title: { color: 'var(--chat-toast-text)', fontSize: 'var(--mantine-font-size-md)' },
                 description: { color: 'var(--chat-toast-text)', fontSize: 'var(--mantine-font-size-md)' },
                 closeButton: { color: 'var(--chat-toast-text)' }

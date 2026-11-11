@@ -1,6 +1,6 @@
 import { type Locator, expect, test } from '@playwright/test';
 
-import { addContact, chatItem, isPhone, leaveChat, logOut, message, messageMenu, newUserPage, openChat, openContact, openMessageMenu, sendMessage, signUp, testEmail } from './helpers';
+import { addContact, chatItem, isPhone, leaveChat, logOut, longPress, message, messageMenu, newUserPage, openChat, openContact, openMessageMenu, sendMessage, signUp, testEmail } from './helpers';
 
 test('two people add each other, talk, reply, edit, forward and delete', async ({ page, browser }) => {
     const bob = await newUserPage(browser);
@@ -44,6 +44,9 @@ test('two people add each other, talk, reply, edit, forward and delete', async (
 
     await confirm.getByLabel('Also delete for Bob').check();
     await confirm.getByRole('button', { name: 'Delete' }).click();
+    // Артборд ToastDeleted: без Undo
+    await expect(page.getByRole('alert').filter({ hasText: 'Message deleted' })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'Message deleted' }).getByRole('button')).toHaveCount(0);
     await expect(message(page, 'Hi Bob!')).toHaveCount(0);
     await expect(message(bob, 'Hi Bob!')).toHaveCount(0);
 
@@ -144,7 +147,7 @@ test('a chat deleted for me opens again from contacts, empty', async ({ page, br
 
     await page.getByRole('button', { name: 'Chat settings' }).click();
     await page.getByRole('menuitem', { name: 'Delete chat' }).click();
-    await page.getByRole('dialog', { name: 'Delete chat?' }).getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('dialog', { name: 'Delete chat?' }).getByRole('button', { name: 'Delete chat' }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(chatItem(page, 'Bob')).toHaveCount(0);
 
@@ -372,4 +375,87 @@ test('an emoji category tab scrolls the picker to its category', async ({ page, 
     await flags.click();
     await expect(flags).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('gridcell', { name: /flag/i }).first()).toBeInViewport();
+});
+
+// Review Focus 2: прокрутка стрічки пальцем не відкриває панель дій, довге натискання — відкриває
+test('on a phone scrolling the feed does not open the message actions, a long press does', async ({ page, browser }) => {
+    test.skip(!isPhone(), 'Long press is a phone gesture');
+
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+
+    for (let i = 1; i <= 12; i += 1) {
+        await sendMessage(page, `Line ${ i }`);
+    }
+
+    const sheet = page.getByRole('dialog', { name: 'Message actions' });
+    const box = await message(page, 'Line 10').boundingBox();
+
+    if (!box) {
+        throw new Error('Message is not visible');
+    }
+
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    const cdp = await page.context().newCDPSession(page);
+
+    // Палець веде стрічку вниз (до старіших) і тримається довше за поріг довгого натискання
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [ { x, y } ] });
+
+    for (let step = 1; step <= 10; step += 1) {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [ { x, y: y + step * 20 } ] });
+        await page.waitForTimeout(30);
+    }
+
+    await page.waitForTimeout(600);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await cdp.detach();
+    await expect(sheet).toHaveCount(0);
+
+    await longPress(page, message(page, 'Line 12'), sheet);
+    await expect(sheet.getByText('Line 12')).toBeVisible();
+    await sheet.getByRole('button', { name: 'Select' }).click();
+    await expect(page.getByText('1 selected')).toBeVisible();
+    await expect(page.getByRole('toolbar', { name: 'Selected messages' })).toBeVisible();
+
+    await bob.context().close();
+});
+
+// Артборд ToastCopied: «Text copied» на 90 над нижнім краєм, посередині над розмовою
+test('Copy text shows Text copied centred over the conversation', async ({ page, browser }) => {
+    await page.context().grantPermissions([ 'clipboard-read', 'clipboard-write' ]);
+
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+    await sendMessage(page, 'Copy me');
+    await messageMenu(page, 'Copy me', 'Copy text');
+
+    const toast = page.getByRole('alert').filter({ hasText: 'Text copied' });
+
+    await expect(toast).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Copy me');
+
+    const viewport = page.viewportSize()!;
+    // Розмова на десктопі — праворуч від бічної панелі 380
+    const centre = isPhone() ? viewport.width / 2 : 380 + (viewport.width - 380) / 2;
+    // Toast в'їжджає знизу: міряємо, коли анімація скінчилась
+    const offsets = async () => {
+        const box = (await toast.boundingBox())!;
+
+        return [ Math.round(box.x + box.width / 2 - centre), Math.round(viewport.height - (box.y + box.height) - 90) ];
+    };
+
+    await expect.poll(async () => (await offsets()).every(offset => Math.abs(offset) <= 4), { timeout: 2000 }).toBe(true);
+
+    await bob.context().close();
 });

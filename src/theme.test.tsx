@@ -412,3 +412,24 @@ test('notifications use the toast tokens for their colour', () => {
     expect((ok.closest('.mantine-Notification-root') as HTMLElement).style.getPropertyValue('--notification-color')).toBe('var(--chat-toast-accent)');
     expect((error.closest('.mantine-Notification-root') as HTMLElement).style.getPropertyValue('--notification-color')).toBe('var(--chat-toast-danger)');
 });
+
+// Components → Toasts: іконка без кружечка, кольором toast; «2 messages deleted» — кольором тексту toast
+test('a toast icon has no circle and a neutral toast uses the toast text colour', () => {
+    renderWithProviders(
+        <Notification
+            color="gray"
+            icon={ <svg data-testid="toast-icon" /> }
+        >
+            2 messages deleted
+        </Notification>
+    );
+
+    const root = screen.getByText('2 messages deleted').closest('.mantine-Notification-root') as HTMLElement;
+    const icon = screen.getByTestId('toast-icon').parentElement!;
+
+    expect(root.style.getPropertyValue('--notification-color')).toBe('var(--chat-toast-text)');
+    expect(icon.style.backgroundColor).toBe('transparent');
+    expect(icon.style.color).toBe('var(--notification-color)');
+    // На канвасі toast без хрестика: закривається сам
+    expect(screen.queryByRole('button')).toBeNull();
+});
