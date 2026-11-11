@@ -459,3 +459,32 @@ test('Copy text shows Text copied centred over the conversation', async ({ page,
 
     await bob.context().close();
 });
+
+// Escape закриває діалог, але не режим вибору: діалог зникає ще до того, як Escape дійде до розмови
+test('Escape that closes a dialog keeps the selection', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+    await sendMessage(page, 'Pick me');
+    await messageMenu(page, 'Pick me', 'Select');
+    await expect(page.getByText('1 selected')).toBeVisible();
+
+    // На телефоні дії — у нижній панелі вибору
+    const actions = isPhone() ? page.getByRole('toolbar', { name: 'Selected messages' }) : page.getByRole('main');
+
+    for (const [ button, dialog ] of [ [ 'Delete', 'Delete message?' ], [ 'Forward', 'Forward to' ] ]) {
+        await actions.getByRole('button', { name: button, exact: true }).click();
+        await expect(page.getByRole('dialog', { name: dialog })).toBeVisible();
+        // Фокус — на кнопці діалогу (Cancel чи хрестик), а не в полі
+        await page.getByRole('dialog', { name: dialog }).getByRole('button').first().focus();
+        await page.keyboard.press('Escape');
+        await expect(page.getByRole('dialog', { name: dialog })).toHaveCount(0);
+        await expect(page.getByText('1 selected')).toBeVisible();
+    }
+
+    await bob.context().close();
+});

@@ -29,8 +29,10 @@
         font-weight: 600;
     }
 
-    &:hover:not([disabled]) {
-        background-color: var(--chat-hover);
+    @media (hover: hover) {
+        &:hover:not([disabled]) {
+            background-color: var(--chat-hover);
+        }
     }
 
     &:active:not([disabled]) {

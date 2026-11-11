@@ -432,4 +432,8 @@ test('a toast icon has no circle and a neutral toast uses the toast text colour'
     expect(icon.style.color).toBe('var(--notification-color)');
     // На канвасі toast без хрестика: закривається сам
     expect(screen.queryByRole('button')).toBeNull();
+    // Відступи 16 по боках, іконка на 12 від тексту
+    expect(root.style.paddingInlineStart).toBe(rem(16));
+    expect(root.style.paddingInlineEnd).toBe(rem(16));
+    expect(icon.style.marginInlineEnd).toBe(rem(12));
 });

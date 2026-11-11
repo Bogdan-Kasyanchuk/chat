@@ -406,8 +406,20 @@ const theme = createTheme({
                 root: { '--notification-color': TOAST_COLORS[ color ?? '' ] ?? 'var(--chat-toast-accent)' }
             }),
             styles: {
-                root: { backgroundColor: 'var(--chat-toast-bg)', boxShadow: 'var(--chat-shadow)', minHeight: rem(44) },
-                icon: { width: 'auto', height: 'auto', backgroundColor: 'transparent', color: 'var(--notification-color)' },
+                root: {
+                    backgroundColor: 'var(--chat-toast-bg)',
+                    boxShadow: 'var(--chat-shadow)',
+                    minHeight: rem(44),
+                    paddingInlineStart: rem(16),
+                    paddingInlineEnd: rem(16)
+                },
+                icon: {
+                    width: 'auto',
+                    height: 'auto',
+                    marginInlineEnd: rem(12),
+                    backgroundColor: 'transparent',
+                    color: 'var(--notification-color)'
+                },
                 title: { color: 'var(--chat-toast-text)', fontSize: 'var(--mantine-font-size-md)' },
                 description: { color: 'var(--chat-toast-text)', fontSize: 'var(--mantine-font-size-md)' },
                 closeButton: { color: 'var(--chat-toast-text)' }

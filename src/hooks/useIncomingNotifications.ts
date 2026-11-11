@@ -13,8 +13,11 @@ import { api } from '@convex/_generated/api';
 
 const TOAST_LIMIT = 120;
 
-// Components → Toasts · more: ім'я 15 / 600, один рядок повідомлення з трикрапкою; аватар 40 замість іконки
+// Components → Toasts · more: аватар 40 замість іконки (відступи 8 / 16, до тексту 10), ім'я 15 / 600,
+// один рядок повідомлення з трикрапкою
 const TOAST_STYLES = {
+    root: { paddingBlock: rem(8), paddingInlineStart: rem(8) },
+    icon: { marginInlineEnd: rem(10) },
     title: { fontSize: rem(15), fontWeight: 600 },
     description: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }
 } as const;

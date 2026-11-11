@@ -32,6 +32,9 @@
 }
 
 .item {
+    /* Рамка крапки «онлайн» — кольору тла діалогу */
+    --presence-ring: var(--chat-popover);
+
     display: flex;
     align-items: center;
     gap: rem(8px);

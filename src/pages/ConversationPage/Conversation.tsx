@@ -31,8 +31,12 @@ type ConversationProps = {
     onLeave: () => void
 };
 
-// Escape не чіпає розмову, поки відкрите модальне вікно чи меню: воно закривається само
-const overlayOpen = () => document.querySelector('[role="dialog"], [role="menu"], .mantine-contextmenu') !== null;
+const OVERLAY = '[role="dialog"], [role="menu"], .mantine-contextmenu';
+
+// Escape не чіпає розмову, поки відкрите модальне вікно чи меню: воно закривається само. Escape зсередини
+// діалогу теж його: Mantine закриває діалог раніше, і в браузері той зникає ще до цього обробника
+const overlayOpen = (event: KeyboardEvent) => document.querySelector(OVERLAY) !== null
+    || (event.target instanceof Element && event.target.closest(OVERLAY) !== null);
 
 const NONE: ReadonlySet<Id<'messages'>> = new Set();
 
@@ -108,8 +112,8 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
     };
 
     // INPUT ігноруємо (пошук у боковій панелі), TEXTAREA — ні: Escape у композері скасовує відповідь
-    useHotkeys([ [ 'Escape', () => {
-        if (overlayOpen()) {
+    useHotkeys([ [ 'Escape', event => {
+        if (overlayOpen(event)) {
             return;
         }
 
