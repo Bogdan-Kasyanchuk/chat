@@ -1,0 +1,113 @@
+/* Заголовок лише називає діалог для читача екрана: на канвасі його немає */
+.header {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.body {
+    padding: 0;
+}
+
+/* Прев'ю — справа для свого повідомлення, зліва для чужого, на 12 над аркушем */
+.previewRow {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0 20px 12px;
+
+    &[data-mine] {
+        justify-content: flex-end;
+    }
+}
+
+.preview {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    column-gap: 12px;
+    max-width: 82%;
+    min-width: 0;
+    padding: 6px 12px;
+    font-size: var(--mantine-font-size-md);
+    line-height: 1.35;
+    color: var(--chat-bubble-in-text);
+    border-radius: var(--mantine-radius-md);
+    border-bottom-left-radius: 4px;
+    background-color: var(--chat-bubble-in);
+    box-shadow: var(--chat-shadow);
+
+    &[data-mine] {
+        color: var(--chat-bubble-out-text);
+        border-bottom-right-radius: 4px;
+        border-bottom-left-radius: var(--mantine-radius-md);
+        background-color: var(--chat-bubble-out);
+    }
+}
+
+/* Довге повідомлення — до шести рядків, щоб пункти лишались на екрані */
+.text {
+    display: -webkit-box;
+    min-width: 0;
+    white-space: pre-wrap;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+}
+
+.meta {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: auto;
+    font-size: var(--mantine-font-size-xs);
+    color: var(--chat-bubble-meta);
+    white-space: nowrap;
+}
+
+/* Аркуш: радіус 16 зверху, відступи 20 / 8, ручка 40×4 на 8 від верху (Components → Bottom sheets) */
+.sheet {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 8px calc(20px + env(safe-area-inset-bottom));
+    border-radius: 16px 16px 0 0;
+    background-color: var(--chat-popover);
+}
+
+.handle {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    width: 40px;
+    height: 4px;
+    margin-left: -20px;
+    border-radius: 2px;
+    background-color: var(--chat-border);
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 12px;
+    font-size: var(--mantine-font-size-md);
+    font-weight: 600;
+    color: var(--chat-text);
+    border-radius: 12px;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+
+    &:active {
+        background-color: var(--chat-hover);
+    }
+
+    &[data-danger] {
+        color: var(--chat-danger);
+    }
+}

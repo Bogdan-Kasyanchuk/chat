@@ -12,4 +12,10 @@ const messageActions = (message: MessageView): MessageAction[] => [
     'delete'
 ];
 
+const SEND_ACTIONS: MessageAction[] = [ 'reply', 'edit' ];
+
+// Те, що показують меню й нижня панель: у чат, куди не можна писати (видалений акаунт), — без «Reply» і «Edit»
+export const availableActions = (message: MessageView, canSend: boolean): MessageAction[] => messageActions(message)
+    .filter(action => canSend || !SEND_ACTIONS.includes(action));
+
 export default messageActions;
