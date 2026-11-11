@@ -1,4 +1,4 @@
-import { dayLabel, daysBetween } from '@/lib/formatTime';
+import { dayLabel, daysBetween, startOfDay } from '@/lib/formatTime';
 import type { MessageView } from '@/types/chat';
 
 // Група — послідовні повідомлення одного автора з проміжком не більше 5 хвилин у межах дня
@@ -36,7 +36,8 @@ const buildRows = (messages: MessageView[], unreadId: MessageView[ 'id' ] | null
         }
 
         if (newDay) {
-            rows.push({ kind: 'day', key: `day-${ message.id }`, label: dayLabel(message.createdAt, now) });
+            // Ключ — календарний день, а не перше повідомлення: догружені старіші того ж дня не перемонтовують секцію
+            rows.push({ kind: 'day', key: `day-${ startOfDay(message.createdAt) }`, label: dayLabel(message.createdAt, now) });
         }
 
         if (previous && newGroup) {

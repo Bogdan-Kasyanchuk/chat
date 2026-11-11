@@ -9,8 +9,18 @@ import { mockViewport } from '@/test/viewport';
 
 import ChatLayout from './ChatLayout';
 
+let chats: unknown[] = [];
+
 vi.mock('convex/react', () => ({
-    useQuery: (ref: FunctionReference<'query'>) => ([ 'chats:list', 'contacts:list' ].includes(getFunctionName(ref)) ? [] : null),
+    useQuery: (ref: FunctionReference<'query'>) => {
+        const name = getFunctionName(ref);
+
+        if (name === 'chats:list') {
+            return chats;
+        }
+
+        return name === 'contacts:list' ? [] : null;
+    },
     useMutation: () => vi.fn(),
     useAction: () => vi.fn(),
     useConvex: () => ({ query: vi.fn() })
@@ -60,4 +70,25 @@ test('on a desktop the list and the conversation sit side by side', () => {
     renderLayout('/');
 
     expect(screen.getByRole('main').textContent).toBe('Select a chat to start messaging');
+});
+
+// Рев'ю етапу 5: після «назад» на телефоні фокус — на рядку щойно закритого чату, а не на body
+test('on a phone leaving a chat puts the focus on its row in the list', async () => {
+    mockViewport(false);
+    chats = [ {
+        chatId: 'c1',
+        partner: { userId: 'u2', name: 'Bob', avatar: null, online: false, lastSeenAt: null, isContact: true },
+        lastMessage: null,
+        unread: 0,
+        muted: false,
+        lastMessageAt: 1
+    } ];
+    renderLayout('/chat/c1');
+
+    await userEvent.setup().click(screen.getByRole('link', { name: 'conversation' }));
+
+    await waitFor(() => {
+        expect(document.activeElement).toBe(screen.getByRole('link', { name: /Bob/ }));
+    });
+    chats = [];
 });

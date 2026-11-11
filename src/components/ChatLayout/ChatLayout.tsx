@@ -1,6 +1,6 @@
 import { Transition } from '@mantine/core';
 import { useQuery } from 'convex/react';
-import { type FC, type ReactNode, useState } from 'react';
+import { type FC, type ReactNode, useEffect, useRef, useState } from 'react';
 import { useMatch, useOutlet } from 'react-router';
 
 import ChatWallpaper from '@/components/ChatWallpaper';
@@ -34,6 +34,21 @@ const ChatLayout: FC = () => {
 
     useIncomingNotifications(chats, chatId);
 
+    const listRef = useRef<HTMLDivElement>(null);
+    const previousChatRef = useRef(chatId);
+
+    // Телефон: після виходу з розмови фокус — на рядку щойно закритого чату, щоб клавіатура й читач екрана
+    // не губили місце в списку (список уже не inert, розмова ще від'їжджає поверх нього)
+    useEffect(() => {
+        const previous = previousChatRef.current;
+
+        previousChatRef.current = chatId;
+
+        if (!isDesktop && previous !== null && chatId === null) {
+            listRef.current?.querySelector<HTMLElement>(`a[href="/chat/${ previous }"]`)?.focus();
+        }
+    }, [ chatId, isDesktop ]);
+
     if (isDesktop) {
         return (
             <div className={ classes.layout }>
@@ -51,6 +66,7 @@ const ChatLayout: FC = () => {
     return (
         <div className={ classes.phone }>
             <div
+                ref={ listRef }
                 className={ classes.sidebar }
                 inert={ chatId !== null }
                 data-chat-list

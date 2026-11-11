@@ -353,3 +353,23 @@ test('the sticky date chip leaves the unread divider visible when a chat opens',
 
     await bob.context().close();
 });
+
+// Рев'ю етапу 5: вкладки категорій спираються на DOM frimousse — перевіряємо зі справжньою бібліотекою
+test('an emoji category tab scrolls the picker to its category', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await bob.context().close();
+    await addContact(page, bobEmail);
+    await page.getByRole('button', { name: 'Emoji' }).click();
+
+    const flags = page.getByRole('button', { name: 'Flags' });
+
+    await expect(page.getByRole('gridcell').first()).toBeVisible();
+    await flags.click();
+    await expect(flags).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('gridcell', { name: /flag/i }).first()).toBeInViewport();
+});

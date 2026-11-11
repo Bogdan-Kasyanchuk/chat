@@ -114,3 +114,11 @@ test('toSections gives every day its own section so its date chip sticks only ov
     expect(toSections(buildRows(messages, 'a' as MessageView[ 'id' ], now)).map(section => section.label))
         .toEqual([ null, 'October 16', 'Yesterday', 'Today' ]);
 });
+
+// Рев'ю етапу 5: старіша сторінка того ж дня не змінює ключ секції, тож React не перемонтовує весь день
+test('a day section keeps its key when older messages of that day load', () => {
+    const recent = [ message('d', at(18, 8), true), message('e', at(18, 9)) ];
+    const keys = (list: MessageView[]) => toSections(buildRows(list, null, now)).map(section => section.key);
+
+    expect(keys([ message('c', at(18, 7)), ...recent ])).toEqual(keys(recent));
+});

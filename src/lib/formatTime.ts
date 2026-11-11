@@ -3,7 +3,8 @@ const MONTHS = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July',
 
 const pad = (value: number): string => String(value).padStart(2, '0');
 
-const startOfDay = (ts: number): number => {
+// Початок календарного дня (локальний час); ним же ключуються секції днів у стрічці
+export const startOfDay = (ts: number): number => {
     const date = new Date(ts);
 
     return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
