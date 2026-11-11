@@ -3,3 +3,7 @@
     flex-direction: column;
     height: 100%;
 }
+
+.bottom {
+    flex-shrink: 0;
+}

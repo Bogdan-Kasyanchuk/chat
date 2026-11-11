@@ -220,7 +220,7 @@ Add contact
 <a class="ib" href="MobileChats.dc.html" aria-label="Back to chats, 1 unread" style="height: 44px; display: flex; align-items: center; gap: 4px; padding: 0 6px; border-radius: 22px; color: {{c.accentText}}; text-decoration: none"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg><span style="min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; background: {{c.badge}}; color: {{c.badgeText}}; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box">1</span></a>
 <span style="position: relative; width: 44px; height: 44px; flex: none; border-radius: 22px; background: #2F74B5; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px">MS<span style="position: absolute; right: 1px; bottom: 1px; width: 14px; height: 14px; border-radius: 7px; background: {{c.online}}; border: 2.5px solid {{c.bg}}; box-sizing: border-box"></span></span>
 <span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Marko Shevchuk</span><span style="font-size: 14px; color: {{c.accentText}}">online</span></span>
-<button class="ib" type="button" aria-label="Chat settings" aria-expanded="{{ovChatMenu}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: {{menuBtnBg}}; color: {{c.muted}}; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="12" cy="19" r="1.8"></circle></svg></button>
+<button class="ib" type="button" aria-label="Chat settings" aria-haspopup="menu" aria-expanded="{{ovChatMenu}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: {{menuBtnBg}}; color: {{c.muted}}; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="12" cy="19" r="1.8"></circle></svg></button>
 </header>
 </sc-if>
 <sc-if value="{{selecting}}" hint-placeholder-val="{{ false }}">
@@ -240,7 +240,7 @@ Add contact
 <sc-if value="{{m.isMsg}}" hint-placeholder-val="{{ true }}">
 <div style="display: flex; align-items: center; gap: 12px; margin: {{m.margin}}; padding: 0; border-radius: 12px; background: {{m.rowBg}}; opacity: {{m.opacity}}">
 <sc-if value="{{selecting}}" hint-placeholder-val="{{ false }}">
-<span style="width: 22px; height: 22px; flex: none; border-radius: 11px; border: 2px solid {{m.checkBorder}}; background: {{m.checkBg}}; color: {{c.onAccent}}; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><sc-if value="{{m.selected}}" hint-placeholder-val="{{ false }}"><svg style="display: block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12l5 5 10-10"></path></svg></sc-if></span>
+<span role="checkbox" aria-checked="{{m.selected}}" aria-label="{{m.body}}" tabindex="0" style="width: 22px; height: 22px; flex: none; border-radius: 11px; border: 2px solid {{m.checkBorder}}; background: {{m.checkBg}}; color: {{c.onAccent}}; display: flex; align-items: center; justify-content: center; box-sizing: border-box"><sc-if value="{{m.selected}}" hint-placeholder-val="{{ false }}"><svg style="display: block" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12l5 5 10-10"></path></svg></sc-if></span>
 </sc-if>
 <div style="flex: 1; min-width: 0; display: flex; justify-content: {{m.justify}}">
 <div style="max-width: 82%; display: flex; flex-wrap: wrap; align-items: flex-end; column-gap: 12px; row-gap: 2px; padding: 6px 12px; border-radius: {{m.radius}}; background: {{m.bg}}; color: {{m.color}}; box-shadow: {{m.shadow}}; line-height: 1.35; user-select: none">
@@ -362,10 +362,10 @@ Add contact
 </label>
 <div style="display: flex; flex-direction: column; gap: 4px; margin: 0 -10px">
 <sc-for list="{{forwardList}}" as="item" hint-placeholder-count="7">
-<sc-if value="{{item.isHeading}}" hint-placeholder-val="{{ false }}"><p style="margin: {{item.hm}}; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: {{c.accentText}}; line-height: 1.2">{{item.name}}</p></sc-if>
+<sc-if value="{{item.isHeading}}" hint-placeholder-val="{{ false }}"><h3 style="margin: {{item.hm}}; font-size: 14px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: {{c.accentText}}; line-height: 1.2">{{item.name}}</h3></sc-if>
 <sc-if value="{{item.isRow}}" hint-placeholder-val="{{ true }}">
 <button class="row" type="button" style="display: flex; align-items: center; gap: 8px; padding: 10px; border: 0; border-radius: 12px; background: transparent; color: {{c.text}}; text-align: left">
-<span style="width: 44px; height: 44px; flex: none; border-radius: 22px; background: {{item.col}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font: 600 16px 'Onest', sans-serif">{{item.ini}}</span>
+<span style="position: relative; width: 44px; height: 44px; flex: none; border-radius: 22px; background: {{item.col}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font: 600 16px 'Onest', sans-serif">{{item.ini}}<sc-if value="{{item.online}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 1px; bottom: 1px; width: 14px; height: 14px; border-radius: 7px; background: {{c.online}}; border: 2.5px solid {{c.popover}}; box-sizing: border-box"></span></sc-if></span>
 <span style="display: flex; flex-direction: column; gap: 2px"><span style="font: 600 16px 'Onest', sans-serif">{{item.name}}</span><span style="font: 400 14px 'Onest', sans-serif; color: {{item.statusColor}}">{{item.status}}</span></span>
 </button>
 </sc-if>
@@ -405,7 +405,7 @@ Also delete for Marko Shevchuk
 </label>
 <div style="display: flex; flex-direction: column; gap: 8px">
 <button class="btn-danger" type="button" style="height: 44px; border: 0; border-radius: 12px; background: {{c.dangerSolid}}; color: {{c.onDanger}}; font: 600 18px 'Onest', sans-serif">Delete chat</button>
-<button class="btn-secondary" type="button" style="height: 44px; border: 0; border-radius: 12px; background: {{c.field}}; color: {{c.text}}; font: 600 18px 'Onest', sans-serif">Cancel</button>
+<button class="btn-secondary" type="button" style="height: 44px; border: 0; border-radius: 12px; background: {{c.field}}; color: {{c.text}}; font: 600 18px 'Onest', sans-serif; box-shadow: 0 0 0 3px {{c.ringSoft}}">Cancel</button>
 </div>
 </div>
 </div>
@@ -490,7 +490,7 @@ const msgs = MSGS.map((x) => {
     quoteBg: out ? c.quoteOut : c.quoteIn,
     margin: prevLast ? '12px 0 0' : '4px 0 0',
     rowBg: (selected || (editing && x.target)) ? c.selectRow : 'transparent',
-    opacity: overlay === 'actions' && x.target ? '0' : '1',
+    opacity: '1',
     selected,
     checkBorder: selected ? c.accent : c.muted,
     checkBg: selected ? c.accent : 'transparent'
@@ -558,7 +558,7 @@ const forwardList = [
   { name: 'Ostap Savchenko', ini: 'OS', col: '#9C6A0E', status: 'last seen 2 hours ago' },
   { heading: 'Contacts', hm: '20px 10px 4px' },
   { name: 'Anna Tkachuk', ini: 'AT', col: '#1F7F7C', status: 'last seen yesterday at 22:10' }
-].map((x) => ({ ...x, name: x.heading ?? x.name, isHeading: !!x.heading, isRow: !x.heading, statusColor: x.online ? c.accentText : c.muted }));
+].map((x) => ({ ...x, name: x.heading ?? x.name, isHeading: !!x.heading, isRow: !x.heading, online: !!x.online, statusColor: x.online ? c.accentText : c.muted }));
 const emojiTabs = [
   { e: '🕘', label: 'Recently used' }, { e: '😀', label: 'Smileys and people', active: true }, { e: '🐻', label: 'Animals and nature' }, { e: '🍔', label: 'Food and drink' },
   { e: '⚽', label: 'Activities' }, { e: '🚗', label: 'Travel and places' }, { e: '💡', label: 'Objects' }, { e: '🏳️', label: 'Flags' }

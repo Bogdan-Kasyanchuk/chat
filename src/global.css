@@ -69,3 +69,34 @@ fieldset:disabled .chat-active:active {
         background: transparent;
     }
 }
+
+/* Toast-и: на 90 над нижнім краєм, посередині над розмовою (Components → Toasts), завширшки за вмістом.
+   У відкритій розмові — на 20 над її нижньою смугою (--chat-toast-offset ставить useToastOffset), щоб не лягати
+   на поле, панель відповіді чи емодзі. На десктопі розмова — праворуч від бічної панелі 380, тож центр зсунуто */
+.mantine-Notifications-root[data-position='bottom-center'] {
+    bottom: var(--chat-toast-offset, calc(90px + env(safe-area-inset-bottom)));
+
+    @mixin larger-than $mantine-breakpoint-md {
+        left: calc(50% + 190px);
+        max-width: min(var(--notifications-container-width), calc(100% - 380px - 2 * var(--mantine-spacing-md)));
+    }
+}
+
+/* Не ширший за 340 (Components → Toasts · more): довга помилка переноситься */
+.mantine-Notifications-root .mantine-Notification-root {
+    width: fit-content;
+    max-width: min(340px, 100%);
+    margin-inline: auto;
+}
+
+/* Toast без власної іконки — це помилка: замість смужки Mantine — коло зі знаком оклику 18 кольору toast danger */
+.mantine-Notification-root:not([data-with-icon])::before {
+    position: static;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-inline-end: 12px;
+    border-radius: 0;
+    background-color: var(--notification-color);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 8v5M12 16.5v.01'/%3E%3C/svg%3E") center / contain no-repeat;
+}

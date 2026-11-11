@@ -302,7 +302,8 @@ test('Copy text puts the message on the clipboard', async () => {
     await user.click(screen.getByRole('button', { name: 'Copy text' }));
 
     expect(await navigator.clipboard.readText()).toBe('Lunch?');
-    expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Copied' }));
+    // Артборд ToastCopied: «Text copied» з галочкою
+    expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Text copied', icon: expect.anything() }));
 });
 
 test('Select mode toggles messages and Delete removes them for me', async () => {
@@ -407,7 +408,7 @@ test('Delete chat goes home without the Chat not found toast', async () => {
 
     await user.click(screen.getByRole('button', { name: 'Chat settings' }));
     await user.click(await screen.findByRole('menuitem', { name: 'Delete chat' }));
-    await user.click(within(screen.getByRole('dialog', { name: 'Delete chat?' })).getByRole('button', { name: 'Delete' }));
+    await user.click(within(screen.getByRole('dialog', { name: 'Delete chat?' })).getByRole('button', { name: 'Delete chat' }));
 
     expect(removeChat).toHaveBeenCalledWith({ chatId: 'c1', forEveryone: false });
     expect(await screen.findByText('home page')).toBeTruthy();
@@ -593,4 +594,40 @@ test('on a phone Back to chats has no count when the other chats are read', () =
     renderPage();
 
     expect(screen.getByRole('link', { name: 'Back to chats' })).toBeTruthy();
+});
+
+test('on a phone the selection actions replace the composer at the bottom and keep its draft', async () => {
+    chat = makeChat();
+    messages = [ message('a', 'First', true, 30) ];
+    renderPage();
+
+    const user = userEvent.setup();
+
+    await user.type(screen.getByRole('textbox', { name: 'Message' }), 'Draft');
+    fireEvent.contextMenu(screen.getByText('First'));
+    await user.click(screen.getByRole('button', { name: 'Select' }));
+
+    expect(screen.getByRole('toolbar', { name: 'Selected messages' })).toBeTruthy();
+    expect(screen.queryByRole('textbox', { name: 'Message' })).toBeNull();
+
+    await user.click(screen.getByRole('button', { name: 'Cancel selection' }));
+
+    expect(screen.queryByRole('toolbar', { name: 'Selected messages' })).toBeNull();
+    expect((screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement).value).toBe('Draft');
+});
+
+test('on a desktop the composer stays during selection', async () => {
+    mockViewport(true);
+    chat = makeChat();
+    messages = [ message('a', 'First', true, 30) ];
+    renderPage();
+
+    const user = userEvent.setup();
+
+    fireEvent.contextMenu(screen.getByText('First'));
+    await user.click(screen.getByRole('button', { name: 'Select' }));
+
+    expect(screen.getByText('1 selected')).toBeTruthy();
+    expect(screen.queryByRole('toolbar', { name: 'Selected messages' })).toBeNull();
+    expect(screen.getByRole('textbox', { name: 'Message' })).toBeTruthy();
 });

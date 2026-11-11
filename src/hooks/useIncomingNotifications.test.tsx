@@ -47,6 +47,46 @@ test('shows one toast per incoming chat and plays the sound once', () => {
     expect(playSound).toHaveBeenCalledWith('pop');
 });
 
+test('a new message toast shows the avatar and the name and opens the chat', () => {
+    const { rerender } = renderHook(({ chats }) => {
+        useIncomingNotifications(chats, null);
+    }, {
+        initialProps: { chats: [ chat('a', '1') ] }
+    });
+
+    rerender({ chats: [ chat('a', '2') ] });
+
+    const toast = vi.mocked(notifications.show).mock.calls[ 0 ][ 0 ];
+
+    expect(toast.title).toBe('Partner a');
+    expect(toast.message).toBe('text 2');
+    // Components → Toasts · more: аватар 40 з іменем людини
+    expect((toast.icon as { props: { size: number, name: string } }).props).toMatchObject({ size: 40, name: 'Partner a' });
+
+    toast.onClick?.({} as never);
+
+    expect(navigate).toHaveBeenCalledWith('/chat/a');
+});
+
+test('opening a chat hides its new message toast', () => {
+    const { rerender } = renderHook(({ chats, active }) => {
+        useIncomingNotifications(chats, active);
+    }, {
+        initialProps: { chats: [ chat('a', '1') ], active: null as string | null }
+    });
+
+    rerender({ chats: [ chat('a', '2') ], active: null });
+
+    const { id } = vi.mocked(notifications.show).mock.calls[ 0 ][ 0 ];
+
+    expect(notifications.hide).not.toHaveBeenCalled();
+
+    // Toast на телефоні стоїть над композером і закрив би щойно відкриту розмову
+    rerender({ chats: [ chat('a', '2') ], active: 'a' });
+
+    expect(notifications.hide).toHaveBeenCalledWith(id);
+});
+
 test('toast click hides it and opens the chat', () => {
     const { rerender } = renderHook(({ chats }) => {
         useIncomingNotifications(chats, null);

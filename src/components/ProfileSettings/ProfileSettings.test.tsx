@@ -1,3 +1,4 @@
+import { notifications } from '@mantine/notifications';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -31,6 +32,25 @@ test('ProfileSettings saves a trimmed name', async () => {
     await waitFor(() => {
         expect(updateName).toHaveBeenCalledWith({ name: 'Bob' });
     });
+});
+
+// Toast без власної іконки global.css малює як помилку («!»): успіх приносить свою галочку
+test('saving the name shows Profile updated with a success icon', async () => {
+    updateName.mockResolvedValue(null);
+
+    const show = vi.spyOn(notifications, 'show');
+
+    renderWithProviders(<ProfileSettings name="Alice" />);
+
+    const user = userEvent.setup();
+
+    await user.type(screen.getByLabelText('Name'), 'x');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => {
+        expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Profile updated', icon: expect.anything() }));
+    });
+    show.mockRestore();
 });
 
 test('ProfileSettings rejects an empty name without saving', async () => {

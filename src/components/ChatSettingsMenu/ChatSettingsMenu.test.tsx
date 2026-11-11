@@ -1,9 +1,10 @@
-import { cleanup, screen } from '@testing-library/react';
+import { cleanup, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
 import { afterEach, expect, test, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
+import { mockViewport } from '@/test/viewport';
 import type { ChatView } from '@/types/chat';
 
 import ChatSettingsMenu from './ChatSettingsMenu';
@@ -86,4 +87,41 @@ test('ChatSettingsMenu has no contact item for a deleted account and opens the d
     expect(await screen.findByRole('dialog', { name: 'Delete chat?' })).toBeTruthy();
     // Співрозмовника немає — видаляти «і для нього» нікому
     expect(screen.queryByRole('checkbox')).toBeNull();
+});
+
+// Пункти й розділювачі в порядку показу: розділювач — «—»
+const menuLayout = (menu: HTMLElement) => Array.from(menu.querySelectorAll('[role="menuitem"], [role="separator"], .mantine-Menu-divider'))
+    .map(element => element.getAttribute('role') === 'menuitem' ? element.textContent : '—');
+
+test('on a desktop the chat menu separates Clear history and Delete chat from the rest', async () => {
+    mockViewport(true);
+    await openMenu(makeChat());
+
+    expect(menuLayout(await screen.findByRole('menu'))).toEqual([ 'Mute notifications', 'Remove from contacts', '—', 'Clear history', 'Delete chat' ]);
+});
+
+test('on a phone the chat menu is a bottom sheet with the same items', async () => {
+    const user = await openMenu(makeChat());
+    const sheet = await screen.findByRole('dialog', { name: 'Chat settings' });
+
+    expect(within(sheet).getByTestId('sheet-handle')).toBeTruthy();
+    expect(menuLayout(within(sheet).getByRole('menu'))).toEqual([ 'Mute notifications', 'Remove from contacts', '—', 'Clear history', 'Delete chat' ]);
+
+    await user.click(within(sheet).getByRole('menuitem', { name: 'Clear history' }));
+
+    expect(screen.queryByRole('dialog', { name: 'Chat settings' })).toBeNull();
+    expect(await screen.findByRole('dialog', { name: 'Clear history?' })).toBeTruthy();
+});
+
+test('on a phone the Chat settings button announces its menu and whether it is open', async () => {
+    renderWithProviders(<ChatSettingsMenu chat={ makeChat() } />);
+
+    const button = screen.getByRole('button', { name: 'Chat settings' });
+
+    expect(button.getAttribute('aria-haspopup')).toBe('menu');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+
+    await userEvent.setup().click(button);
+
+    expect(button.getAttribute('aria-expanded')).toBe('true');
 });

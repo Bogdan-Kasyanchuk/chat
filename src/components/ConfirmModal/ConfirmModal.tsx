@@ -1,10 +1,16 @@
-import { Button, Group, Modal } from '@mantine/core';
+import { Button, Text } from '@mantine/core';
 import type { FC, ReactNode } from 'react';
+
+import ResponsiveDialog, { DialogActions } from '@/components/ResponsiveDialog';
+
+import classes from './ConfirmModal.module.css';
 
 type ConfirmModalProps = {
     opened: boolean,
     title: string,
-    children: ReactNode,
+    text: string,
+    // Під текстом — наприклад, «Also delete for …»
+    children?: ReactNode,
     confirmLabel: string,
     danger?: boolean,
     loading?: boolean,
@@ -12,37 +18,44 @@ type ConfirmModalProps = {
     onClose: () => void
 };
 
-const ConfirmModal: FC<ConfirmModalProps> = ({ opened, title, children, confirmLabel, danger = false, loading = false, onConfirm, onClose }) => (
-    <Modal
+// Артборди DeleteDialog і MobileDelete: заголовок 28, текст 16 muted, «Cancel» і дія; на телефоні — нижня
+// панель, дія над «Cancel». Фокус спершу на «Cancel», як у Log out / Delete account
+const ConfirmModal: FC<ConfirmModalProps> = ({ opened, title, text, children, confirmLabel, danger = false, loading = false, onConfirm, onClose }) => (
+    <ResponsiveDialog
         opened={ opened }
         title={ title }
-        closeOnClickOutside={ !loading }
-        closeOnEscape={ !loading }
-        withCloseButton={ !loading }
-        centered
+        busy={ loading }
         onClose={ onClose }
     >
-        { children }
-        <Group
-            justify="flex-end"
-            mt="lg"
+        <Text
+            size="md"
+            c="var(--chat-muted)"
         >
-            <Button
-                variant="default"
-                disabled={ loading }
-                onClick={ onClose }
-            >
-                Cancel
-            </Button>
-            <Button
-                color={ danger ? 'red' : undefined }
-                loading={ loading }
-                onClick={ onConfirm }
-            >
-                { confirmLabel }
-            </Button>
-        </Group>
-    </Modal>
+            { text }
+        </Text>
+        { children && <div className={ classes.extra }>{ children }</div> }
+        <DialogActions
+            cancel={ (
+                <Button
+                    variant="default"
+                    disabled={ loading }
+                    data-autofocus
+                    onClick={ onClose }
+                >
+                    Cancel
+                </Button>
+            ) }
+            confirm={ (
+                <Button
+                    color={ danger ? 'red' : undefined }
+                    loading={ loading }
+                    onClick={ onConfirm }
+                >
+                    { confirmLabel }
+                </Button>
+            ) }
+        />
+    </ResponsiveDialog>
 );
 
 export default ConfirmModal;

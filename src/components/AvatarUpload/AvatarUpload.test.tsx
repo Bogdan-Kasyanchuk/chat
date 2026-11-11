@@ -1,4 +1,5 @@
 import { rem } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
@@ -58,12 +59,19 @@ test('AvatarUpload uploads and saves the storage id', async () => {
     fetchMock.mockResolvedValue({ ok: true, json: () => Promise.resolve({ storageId: 's1' }) });
     setAvatar.mockResolvedValue(null);
 
+    const show = vi.spyOn(notifications, 'show');
+
     await pick(new File([ 'x' ], 'a.png', { type: 'image/png' }));
 
     await waitFor(() => {
         expect(setAvatar).toHaveBeenCalledWith({ storageId: 's1' });
     });
     expect(fetchMock).toHaveBeenCalledWith('https://upload.test/u', expect.objectContaining({ method: 'POST', headers: { 'Content-Type': 'image/png' } }));
+    // Toast без власної іконки global.css малює як помилку («!»): успіх приносить свою галочку
+    await waitFor(() => {
+        expect(show).toHaveBeenCalledWith(expect.objectContaining({ message: 'Photo updated', icon: expect.anything() }));
+    });
+    show.mockRestore();
 });
 
 test('AvatarUpload removes the photo', async () => {

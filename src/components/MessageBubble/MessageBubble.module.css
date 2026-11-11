@@ -15,6 +15,8 @@
     }
 
     &[data-selectable] {
+        align-items: center;
+        gap: 12px;
         cursor: pointer;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
@@ -26,6 +28,35 @@
 
     &[data-flash] {
         animation: flash 1.2s ease-out;
+    }
+}
+
+/* Кружечок вибору: рамка 2 muted, вибраний — заливка акценту з галочкою on-accent; свою бульбашку
+   відсуває праворуч, чужа стоїть поруч */
+.check {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 22px;
+    height: 22px;
+    color: var(--chat-on-accent);
+    border: 2px solid var(--chat-muted);
+    border-radius: 50%;
+
+    &[data-checked] {
+        border-color: var(--chat-accent);
+        background-color: var(--chat-accent);
+    }
+
+    &:focus-visible {
+        outline: 2px solid var(--chat-accent);
+        outline-offset: 2px;
+    }
+
+    .row[data-mine] & {
+        margin-inline-end: auto;
     }
 }
 

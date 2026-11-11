@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { type FunctionReference, getFunctionName } from 'convex/server';
 import { Route, Routes } from 'react-router';
@@ -60,10 +60,13 @@ test('Delete chat for everyone calls remove and goes home', async () => {
     const { onLeave } = renderModal('delete');
     const user = userEvent.setup();
 
-    expect(screen.getByRole('dialog', { name: 'Delete chat?' })).toBeTruthy();
+    const dialog = screen.getByRole('dialog', { name: 'Delete chat?' });
 
-    await user.click(screen.getByRole('checkbox', { name: 'Also for Bob' }));
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    // Тексти MobileDelete
+    expect(within(dialog).getByText('The chat with Bob and its history will be removed from your list.')).toBeTruthy();
+
+    await user.click(within(dialog).getByRole('checkbox', { name: 'Also delete for Bob' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Delete chat' }));
 
     expect(onLeave).toHaveBeenCalled();
     expect(removeChat).toHaveBeenCalledWith({ chatId: 'c1', forEveryone: true });
@@ -75,7 +78,10 @@ test('Clear history for me keeps the chat open', async () => {
 
     const { onDone, onLeave } = renderModal('clear');
 
-    expect(screen.getByRole('dialog', { name: 'Clear history?' })).toBeTruthy();
+    const dialog = screen.getByRole('dialog', { name: 'Clear history?' });
+
+    expect(within(dialog).getByText('All messages in this chat will be deleted. This can\'t be undone.')).toBeTruthy();
+    expect(within(dialog).getByRole('checkbox', { name: 'Also clear for Bob' })).toBeTruthy();
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Clear' }));
 

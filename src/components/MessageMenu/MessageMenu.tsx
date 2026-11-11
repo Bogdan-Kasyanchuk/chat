@@ -1,15 +1,19 @@
 import { useLongPress } from '@mantine/hooks';
-import { IconArrowBackUp, IconArrowForwardUp, IconCircleCheck, IconCopy, IconPencil, IconTrash } from '@tabler/icons-react';
-import { type ContextMenuItemOptions, useContextMenu } from 'mantine-contextmenu';
-import type { FC, MouseEvent, ReactNode } from 'react';
+import { useContextMenu } from 'mantine-contextmenu';
+import { type FC, type MouseEvent, type ReactNode, useState } from 'react';
 
+import MessageActionsSheet from '@/components/MessageActionsSheet';
 import type { MessageView } from '@/types/chat';
 
-import messageActions, { type MessageAction } from './messageActions';
+import ACTION_ITEMS from './actionItems';
+import { type MessageAction, availableActions } from './messageActions';
 import classes from './MessageMenu.module.css';
 
 type MessageMenuProps = {
     message: MessageView,
+    // Десктоп (від md): контекстне меню, інакше — нижня панель. Рахує MessageList раз на стрічку,
+    // а не кожен рядок своїм слухачем matchMedia
+    desktop: boolean,
     // Чат, куди не можна писати (видалений акаунт): без «Reply» і «Edit»
     canSend: boolean,
     // Режим вибору: меню не відкривається
@@ -18,16 +22,8 @@ type MessageMenuProps = {
     children: ReactNode
 };
 
-const ITEMS: Record<MessageAction, Pick<ContextMenuItemOptions, 'title' | 'icon' | 'color'>> = {
-    reply: { title: 'Reply', icon: <IconArrowBackUp size={ 16 } /> },
-    edit: { title: 'Edit', icon: <IconPencil size={ 16 } /> },
-    copy: { title: 'Copy text', icon: <IconCopy size={ 16 } /> },
-    forward: { title: 'Forward', icon: <IconArrowForwardUp size={ 16 } /> },
-    select: { title: 'Select', icon: <IconCircleCheck size={ 16 } /> },
-    delete: { title: 'Delete', icon: <IconTrash size={ 16 } />, color: 'red' }
-};
-
-const SEND_ACTIONS: MessageAction[] = [ 'reply', 'edit' ];
+// closing — панель ще від'їжджає: лишається змонтованою до кінця анімації
+type SheetState = 'closed' | 'open' | 'closing';
 
 // Android після довгого натискання ще й шле contextmenu — на оверлей меню, яке від нього закрилося б
 const swallowNextContextMenu = () => {
@@ -47,24 +43,39 @@ const preventNativeMenu = (event: MouseEvent) => {
     event.preventDefault();
 };
 
-// Меню повідомлення: правий клік на десктопі, довге натискання на телефоні
-const MessageMenu: FC<MessageMenuProps> = ({ message, canSend, disabled = false, onAction, children }) => {
+// Меню повідомлення. На десктопі — контекстне меню (правий клік, довге натискання на сенсорному екрані),
+// на телефоні — нижня панель MessageActionsSheet. Панель монтується лише відкритою: вікно з keydown-слухачем
+// на кожне повідомлення стрічці ні до чого
+const MessageMenu: FC<MessageMenuProps> = ({ message, desktop: isDesktop, canSend, disabled = false, onAction, children }) => {
     const { showContextMenu } = useContextMenu();
-    const items = messageActions(message)
-        .filter(action => canSend || !SEND_ACTIONS.includes(action))
-        .map(action => ({
-            key: action,
-            ...ITEMS[ action ],
-            onClick: () => {
-                onAction(action);
-            }
-        }));
-    const open = showContextMenu(items);
+    const [ sheet, setSheet ] = useState<SheetState>('closed');
+    const items = availableActions(message, canSend).map(action => ({
+        key: action,
+        title: ACTION_ITEMS[ action ].title,
+        icon: ACTION_ITEMS[ action ].icon,
+        className: ACTION_ITEMS[ action ].danger ? classes.danger : undefined,
+        onClick: () => {
+            onAction(action);
+        }
+    }));
+    const showMenu = showContextMenu(items, { className: classes.menu, classNames: { item: classes.item } });
+
+    const openSheet = (event: { preventDefault: () => void }) => {
+        event.preventDefault();
+        setSheet('open');
+    };
+
+    const open = isDesktop ? showMenu : openSheet;
     const longPress = useLongPress(event => {
         // Слухаємо лише дотики (events: [ 'touch' ]), мишу обслуговує правий клік
         if ('touches' in event) {
             swallowNextContextMenu();
-            open(event);
+
+            if (isDesktop) {
+                showMenu(event);
+            } else {
+                setSheet('open');
+            }
         }
     }, {
         threshold: 400,
@@ -76,14 +87,32 @@ const MessageMenu: FC<MessageMenuProps> = ({ message, canSend, disabled = false,
         }
     });
 
+    // Панель — поза обгорткою: дотики й правий клік у ній (React піднімає їх і крізь портал) не мають
+    // запускати довге натискання повідомлення
     return (
-        <div
-            className={ classes.trigger }
-            onContextMenu={ disabled ? preventNativeMenu : open }
-            { ...!disabled && longPress }
-        >
-            { children }
-        </div>
+        <>
+            <div
+                className={ classes.trigger }
+                onContextMenu={ disabled ? preventNativeMenu : open }
+                { ...!disabled && longPress }
+            >
+                { children }
+            </div>
+            { sheet !== 'closed' && (
+                <MessageActionsSheet
+                    message={ message }
+                    opened={ sheet === 'open' }
+                    canSend={ canSend }
+                    onAction={ onAction }
+                    onClose={ () => {
+                        setSheet('closing');
+                    } }
+                    onExited={ () => {
+                        setSheet('closed');
+                    } }
+                />
+            ) }
+        </>
     );
 };
 

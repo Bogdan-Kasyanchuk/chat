@@ -1,5 +1,6 @@
-import { Checkbox, Stack, Text } from '@mantine/core';
+import { Checkbox } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { IconTrash } from '@tabler/icons-react';
 import { useMutation } from 'convex/react';
 import { type FC, useState } from 'react';
 
@@ -32,6 +33,12 @@ const DeleteMessagesModal: FC<DeleteMessagesModalProps> = ({ messages, partnerNa
                 messageIds: messages.map(message => message.id),
                 forEveryone: canDeleteForEveryone && forEveryone
             });
+            // Артборд ToastDeleted: без Undo (рішення власника 2026-11-09), іконка кольору тексту toast
+            notifications.show({
+                color: 'gray',
+                icon: <IconTrash size={ 18 } />,
+                message: single ? 'Message deleted' : `${ messages.length } messages deleted`
+            });
             onDone(true);
         } catch (error) {
             notifications.show({ color: 'red', message: errorMessage(error) });
@@ -42,6 +49,7 @@ const DeleteMessagesModal: FC<DeleteMessagesModalProps> = ({ messages, partnerNa
     return (
         <ConfirmModal
             title={ single ? 'Delete message?' : `Delete ${ messages.length } messages?` }
+            text="This can't be undone."
             confirmLabel="Delete"
             loading={ loading }
             opened
@@ -53,20 +61,15 @@ const DeleteMessagesModal: FC<DeleteMessagesModalProps> = ({ messages, partnerNa
                 onDone(false);
             } }
         >
-            <Stack>
-                <Text size="sm">
-                    { single ? 'This message will be deleted.' : 'These messages will be deleted.' } You can&apos;t undo this.
-                </Text>
-                { canDeleteForEveryone && (
-                    <Checkbox
-                        label={ `Also delete for ${ partnerName }` }
-                        checked={ forEveryone }
-                        onChange={ event => {
-                            setForEveryone(event.currentTarget.checked);
-                        } }
-                    />
-                ) }
-            </Stack>
+            { canDeleteForEveryone && (
+                <Checkbox
+                    label={ `Also delete for ${ partnerName }` }
+                    checked={ forEveryone }
+                    onChange={ event => {
+                        setForEveryone(event.currentTarget.checked);
+                    } }
+                />
+            ) }
         </ConfirmModal>
     );
 };
