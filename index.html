@@ -2,7 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/favicon.ico" />
+    <!-- Іконки — знак Logo (бірюзовий квадрат з бульбашкою); SVG для сучасних браузерів, ICO і PNG — для решти -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="application-name" content="Chat" />
     <meta name="description" content="Online chat" />
@@ -19,7 +21,11 @@
     <!-- Статичний аналог ColorSchemeScript: тема ставиться до першого кадру, без мерехтіння. Ключ — COLOR_SCHEME_KEY з src/theme.ts -->
     <script>
       try {
-        var scheme = localStorage.getItem('chat-color-scheme');
+        var scheme = null;
+        // Заблоковані дані сайту: localStorage кидає, і тоді тема — за системою
+        try {
+          scheme = localStorage.getItem('chat-color-scheme');
+        } catch (e) {}
         if (scheme !== 'light' && scheme !== 'dark') {
           scheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
