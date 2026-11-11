@@ -1,5 +1,7 @@
 import { expect, test } from 'vitest';
 
+import { TOKENS } from '@/theme';
+
 import avatarColor, { AVATAR_COLORS, AVATAR_NEUTRAL } from './avatarColor';
 import contrastRatio from './contrast';
 
@@ -24,10 +26,14 @@ test('avatarColor of a deleted account is neutral', () => {
     expect(avatarColor(null)).toBe(AVATAR_NEUTRAL);
 });
 
-// Ініціали білі 16 / 600 — це звичайний текст, тож потрібно 4.5:1
-test('white initials keep 4.5:1 on every avatar colour', () => {
+// Ініціали білі 16 / 600 — це звичайний текст, тож потрібно 4.5:1. Кольори аватарів однакові в обох темах, тож і ініціали
+test.each([ 'light', 'dark' ] as const)('%s initials (--chat-on-avatar) keep 4.5:1 on every avatar colour', scheme => {
+    const initials = TOKENS[ scheme ][ '--chat-on-avatar' ];
+
+    expect(initials).toBe('#FFFFFF');
+
     for (const color of AVATAR_COLORS) {
-        expect(contrastRatio('#FFFFFF', color), color).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(initials, color), color).toBeGreaterThanOrEqual(4.5);
     }
 });
 

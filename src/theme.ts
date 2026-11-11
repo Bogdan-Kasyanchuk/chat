@@ -47,6 +47,7 @@ const light = {
     '--chat-accent': '#0B7A75',
     '--chat-accent-text': '#0B7A75',
     '--chat-on-accent': '#FFFFFF',
+    '--chat-on-avatar': '#FFFFFF',
     '--chat-hover': '#F1F5F4',
     '--chat-pressed': '#E6ECEA',
     '--chat-active': '#0B7A75',
@@ -109,6 +110,7 @@ const dark: Record<ChatToken, string> = {
     '--chat-accent': '#3CC4B8',
     '--chat-accent-text': '#4FD1C5',
     '--chat-on-accent': '#062220',
+    '--chat-on-avatar': '#FFFFFF',
     '--chat-hover': '#1B2425',
     '--chat-pressed': '#243032',
     '--chat-active': '#1F5551',
@@ -459,6 +461,8 @@ export const cssVariablesResolver: CSSVariablesResolver = () => ({
 // Тема за замовчуванням — системна; вибір System / Light / Dark зберігається на пристрої.
 // Той самий ключ читає скрипт проти мерехтіння в index.html
 export const COLOR_SCHEME_KEY = 'chat-color-scheme';
+// Смуга браузера (<meta name="theme-color">) — колір шапок у кожній схемі; index.html і site.webmanifest повторюють ці значення
+export const THEME_COLOR = { light: light[ '--chat-sidebar-bg' ], dark: dark[ '--chat-sidebar-bg' ] };
 export const colorSchemeManager = localStorageColorSchemeManager({ key: COLOR_SCHEME_KEY });
 
 export default theme;
