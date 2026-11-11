@@ -256,3 +256,28 @@ test('in select mode a message shows a round check, filled when selected', () =>
 
     expect(container.querySelector('[data-check]')?.hasAttribute('data-checked')).toBe(true);
 });
+
+test('in select mode the check is a checkbox named by the message, Space and Enter toggle it', async () => {
+    const onClick = vi.fn();
+
+    renderWithProviders(
+        <MessageBubble
+            message={ makeMessage() }
+            partnerName="Bob"
+            selected
+            onClick={ onClick }
+        />
+    );
+
+    const check = screen.getByRole('checkbox', { name: /^Hello\s+there$/ });
+
+    expect(check.getAttribute('aria-checked')).toBe('true');
+
+    const user = userEvent.setup();
+
+    check.focus();
+    await user.keyboard(' ');
+    await user.keyboard('{Enter}');
+
+    expect(onClick).toHaveBeenCalledTimes(2);
+});

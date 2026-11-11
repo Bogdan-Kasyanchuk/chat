@@ -171,6 +171,8 @@ export const openMessageMenu = async (page: Page, text: string) => {
     const menu = isPhone() ? page.getByRole('dialog', { name: 'Message actions' }) : page.locator('.mantine-contextmenu');
 
     if (isPhone()) {
+        // Панель попередньої дії ще може від'їжджати: довге натискання влучило б у її затемнення
+        await expect(menu).toHaveCount(0);
         await longPress(page, target, menu);
     } else {
         await target.click({ button: 'right' });

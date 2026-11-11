@@ -112,3 +112,16 @@ test('on a phone the chat menu is a bottom sheet with the same items', async () 
     expect(screen.queryByRole('dialog', { name: 'Chat settings' })).toBeNull();
     expect(await screen.findByRole('dialog', { name: 'Clear history?' })).toBeTruthy();
 });
+
+test('on a phone the Chat settings button announces its menu and whether it is open', async () => {
+    renderWithProviders(<ChatSettingsMenu chat={ makeChat() } />);
+
+    const button = screen.getByRole('button', { name: 'Chat settings' });
+
+    expect(button.getAttribute('aria-haspopup')).toBe('menu');
+    expect(button.getAttribute('aria-expanded')).toBe('false');
+
+    await userEvent.setup().click(button);
+
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+});

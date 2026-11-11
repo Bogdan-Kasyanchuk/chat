@@ -3,7 +3,6 @@ import { useContextMenu } from 'mantine-contextmenu';
 import { type FC, type MouseEvent, type ReactNode, useState } from 'react';
 
 import MessageActionsSheet from '@/components/MessageActionsSheet';
-import useIsDesktop from '@/hooks/useIsDesktop';
 import type { MessageView } from '@/types/chat';
 
 import ACTION_ITEMS from './actionItems';
@@ -12,6 +11,9 @@ import classes from './MessageMenu.module.css';
 
 type MessageMenuProps = {
     message: MessageView,
+    // Десктоп (від md): контекстне меню, інакше — нижня панель. Рахує MessageList раз на стрічку,
+    // а не кожен рядок своїм слухачем matchMedia
+    desktop: boolean,
     // Чат, куди не можна писати (видалений акаунт): без «Reply» і «Edit»
     canSend: boolean,
     // Режим вибору: меню не відкривається
@@ -44,8 +46,7 @@ const preventNativeMenu = (event: MouseEvent) => {
 // Меню повідомлення. На десктопі — контекстне меню (правий клік, довге натискання на сенсорному екрані),
 // на телефоні — нижня панель MessageActionsSheet. Панель монтується лише відкритою: вікно з keydown-слухачем
 // на кожне повідомлення стрічці ні до чого
-const MessageMenu: FC<MessageMenuProps> = ({ message, canSend, disabled = false, onAction, children }) => {
-    const isDesktop = useIsDesktop();
+const MessageMenu: FC<MessageMenuProps> = ({ message, desktop: isDesktop, canSend, disabled = false, onAction, children }) => {
     const { showContextMenu } = useContextMenu();
     const [ sheet, setSheet ] = useState<SheetState>('closed');
     const items = availableActions(message, canSend).map(action => ({

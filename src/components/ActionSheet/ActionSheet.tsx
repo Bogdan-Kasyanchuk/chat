@@ -1,5 +1,5 @@
 import { Drawer, UnstyledButton } from '@mantine/core';
-import type { FC, ReactNode } from 'react';
+import type { FC, KeyboardEvent, ReactNode } from 'react';
 
 import classes from './ActionSheet.module.css';
 
@@ -40,6 +40,24 @@ const STYLES = {
     }
 } as const;
 
+// role="menu" обіцяє стрілки: ↑ / ↓ по колу, Home / End — до першого й останнього пункту
+const moveFocus = (event: KeyboardEvent<HTMLDivElement>) => {
+    const menuItems = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]'));
+    const current = menuItems.indexOf(document.activeElement as HTMLElement);
+    const last = menuItems.length - 1;
+    const next = {
+        ArrowDown: current === last ? 0 : current + 1,
+        ArrowUp: current <= 0 ? last : current - 1,
+        Home: 0,
+        End: last
+    }[ event.key ];
+
+    if (next !== undefined) {
+        event.preventDefault();
+        menuItems[ next ]?.focus();
+    }
+};
+
 // Нижня панель дій на телефоні (Components → Bottom sheets): радіус 16 зверху, ручка, пункти 44 з іконками 22.
 // Пункт спершу закриває панель, потім виконує дію
 const ActionSheet: FC<ActionSheetProps> = ({ opened, title, items, above, asMenu = false, onClose, onExited }) => (
@@ -58,6 +76,7 @@ const ActionSheet: FC<ActionSheetProps> = ({ opened, title, items, above, asMenu
             className={ classes.sheet }
             role={ asMenu ? 'menu' : undefined }
             aria-label={ asMenu ? title : undefined }
+            onKeyDown={ asMenu ? moveFocus : undefined }
         >
             <span
                 className={ classes.handle }

@@ -54,8 +54,9 @@
     -webkit-tap-highlight-color: transparent;
     user-select: none;
 
+    /* pressed, а не hover: у темній hover майже збігається з тлом popover */
     &:active {
-        background-color: var(--chat-hover);
+        background-color: var(--chat-pressed);
     }
 
     &[data-danger] {

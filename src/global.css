@@ -71,9 +71,10 @@ fieldset:disabled .chat-active:active {
 }
 
 /* Toast-и: на 90 над нижнім краєм, посередині над розмовою (Components → Toasts), завширшки за вмістом.
-   На десктопі розмова — праворуч від бічної панелі 380, тож центр зсунуто на половину панелі */
+   У відкритій розмові — на 20 над її нижньою смугою (--chat-toast-offset ставить useToastOffset), щоб не лягати
+   на поле, панель відповіді чи емодзі. На десктопі розмова — праворуч від бічної панелі 380, тож центр зсунуто */
 .mantine-Notifications-root[data-position='bottom-center'] {
-    bottom: calc(90px + env(safe-area-inset-bottom));
+    bottom: var(--chat-toast-offset, calc(90px + env(safe-area-inset-bottom)));
 
     @mixin larger-than $mantine-breakpoint-md {
         left: calc(50% + 190px);

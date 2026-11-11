@@ -26,6 +26,7 @@ const renderMenu = (patch: Partial<Parameters<typeof MessageMenu>[ 0 ]> = {}) =>
     renderWithProviders(
         <MessageMenu
             message={ makeMessage() }
+            desktop={ false }
             canSend
             onAction={ onAction }
             { ...patch }
@@ -69,9 +70,7 @@ afterEach(() => {
 });
 
 test('MessageMenu opens on right click with every action for my message', async () => {
-    mockViewport(true);
-
-    const onAction = renderMenu();
+    const onAction = renderMenu({ desktop: true });
 
     fireEvent.contextMenu(screen.getByText('Hello'));
 
@@ -83,16 +82,14 @@ test('MessageMenu opens on right click with every action for my message', async 
 });
 
 test('MessageMenu hides Reply and Edit when the chat is read-only', () => {
-    mockViewport(true);
-    renderMenu({ canSend: false });
+    renderMenu({ desktop: true, canSend: false });
     fireEvent.contextMenu(screen.getByText('Hello'));
 
     expect(titles()).toEqual([ 'Copy text', 'Forward', 'Select', 'Delete' ]);
 });
 
 test('MessageMenu stays closed while disabled and keeps the browser menu away too', () => {
-    mockViewport(true);
-    renderMenu({ disabled: true });
+    renderMenu({ desktop: true, disabled: true });
 
     // fireEvent повертає false, якщо обробник викликав preventDefault
     expect(fireEvent.contextMenu(screen.getByText('Hello'))).toBe(false);
@@ -100,9 +97,8 @@ test('MessageMenu stays closed while disabled and keeps the browser menu away to
 });
 
 test('MessageMenu opens on a 400 ms long press and not when the finger moves', () => {
-    mockViewport(true);
     vi.useFakeTimers();
-    renderMenu();
+    renderMenu({ desktop: true });
 
     const target = screen.getByText('Hello');
 
@@ -156,15 +152,33 @@ test('on a phone a long press opens the bottom sheet instead of the context menu
 });
 
 test('the sheet offers the same actions as the desktop menu', async () => {
+    const message = makeMessage({ authorIsMe: false });
+    const { unmount } = renderWithProviders(
+        <MessageMenu
+            message={ message }
+            desktop
+            canSend
+            onAction={ vi.fn() }
+        >
+            <p>Hello</p>
+        </MessageMenu>
+    );
+
+    fireEvent.contextMenu(screen.getByText('Hello'));
+
+    const desktopTitles = titles();
+
+    unmount();
     vi.useFakeTimers();
 
-    const onAction = renderMenu();
+    const onAction = renderMenu({ message });
 
     longPress(screen.getByText('Hello'));
 
     const dialog = sheet()!;
 
-    expect(within(dialog).getAllByRole('button').map(button => button.textContent)).toEqual([ 'Reply', 'Edit', 'Copy text', 'Forward', 'Select', 'Delete' ]);
+    expect(desktopTitles.length).toBeGreaterThan(0);
+    expect(within(dialog).getAllByRole('button').map(button => button.textContent)).toEqual(desktopTitles);
 
     vi.runOnlyPendingTimers();
     vi.useRealTimers();
@@ -172,6 +186,16 @@ test('the sheet offers the same actions as the desktop menu', async () => {
 
     expect(onAction).toHaveBeenCalledWith('forward');
     expect(sheet()).toBeNull();
+});
+
+test('MessageMenu follows the desktop prop, not its own media query', () => {
+    // Медіа-запит каже «десктоп», а MessageList передав «телефон»: рахується раз на стрічку, не в кожному рядку
+    mockViewport(true);
+    renderMenu({ desktop: false });
+    fireEvent.contextMenu(screen.getByText('Hello'));
+
+    expect(sheet()).not.toBeNull();
+    expect(document.querySelector('.mantine-contextmenu')).toBeNull();
 });
 
 test('the sheet of a read-only chat has no Reply and Edit', () => {

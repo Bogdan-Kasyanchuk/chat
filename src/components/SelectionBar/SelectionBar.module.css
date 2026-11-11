@@ -40,8 +40,9 @@
     border-radius: 12px;
     -webkit-tap-highlight-color: transparent;
 
+    /* pressed, а не hover: у темній hover майже збігається з тлом popover */
     &:active {
-        background-color: var(--chat-hover);
+        background-color: var(--chat-pressed);
     }
 
     &[data-danger] {

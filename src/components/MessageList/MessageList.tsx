@@ -8,6 +8,7 @@ import type { MessageAction } from '@/components/MessageMenu/messageActions';
 import MessagesSkeleton from '@/components/MessagesSkeleton';
 import ScrollDownButton from '@/components/ScrollDownButton';
 import UnreadDivider from '@/components/UnreadDivider';
+import useIsDesktop from '@/hooks/useIsDesktop';
 import useMarkRead from '@/hooks/useMarkRead';
 import type { MessageHistory } from '@/hooks/useMessageHistory';
 import useNow from '@/hooks/useNow';
@@ -56,6 +57,8 @@ const MessageList: FC<MessageListProps> = ({ chatId, history, partnerName, canSe
     const { messages, status, loadMore } = history;
     const now = useNow();
     const selecting = selected.size > 0;
+    // Один слухач розміру екрана на всю стрічку, а не по одному в кожному меню повідомлення
+    const isDesktop = useIsDesktop();
     const oldest = messages.at(0);
     const newest = messages.at(-1);
 
@@ -252,6 +255,7 @@ const MessageList: FC<MessageListProps> = ({ chatId, history, partnerName, canSe
                                     <MessageMenu
                                         key={ row.key }
                                         message={ message }
+                                        desktop={ isDesktop }
                                         canSend={ canSend }
                                         disabled={ selecting }
                                         onAction={ action => {

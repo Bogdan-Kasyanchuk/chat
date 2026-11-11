@@ -1,6 +1,6 @@
 import { Text, UnstyledButton } from '@mantine/core';
 import { IconCheck, IconChecks } from '@tabler/icons-react';
-import type { FC } from 'react';
+import { type FC, type KeyboardEvent, useId } from 'react';
 
 import { emojiOnlyCount } from '@/lib/emoji';
 import { formatClock } from '@/lib/formatTime';
@@ -29,6 +29,15 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
     const emojiCount = emojiOnlyCount(message.body);
     const emojiOnly = emojiCount >= 1 && emojiCount <= 3 && !replyTo && !message.forwardedFrom;
     const quoteClick = onClick ? undefined : onQuoteClick;
+    const bodyId = useId();
+
+    // Кружечок вибору — checkbox для клавіатури й читача екрана: Space і Enter перемикають, як клік по рядку
+    const toggleByKey = (event: KeyboardEvent) => {
+        if (onClick && (event.key === ' ' || event.key === 'Enter')) {
+            event.preventDefault();
+            onClick();
+        }
+    };
     // span, а не p: цитата буває кнопкою, а в <button> блочним елементам не місце
     const quoteContent = replyTo && (
         <>
@@ -69,14 +78,19 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
             { onClick && (
                 <span
                     className={ classes.check }
+                    role="checkbox"
+                    tabIndex={ 0 }
+                    aria-checked={ selected }
+                    aria-labelledby={ bodyId }
                     data-checked={ selected || undefined }
                     data-check
-                    aria-hidden
+                    onKeyDown={ toggleByKey }
                 >
                     { selected && (
                         <IconCheck
                             size={ 14 }
                             stroke={ 3 }
+                            aria-hidden
                         />
                     ) }
                 </span>
@@ -116,7 +130,12 @@ const MessageBubble: FC<MessageBubbleProps> = ({ message, partnerName, selected 
                         </UnstyledButton>
                     )
                     : <div className={ classes.quote }>{ quoteContent }</div>) }
-                <Text className={ classes.body }>{ message.body }</Text>
+                <Text
+                    id={ bodyId }
+                    className={ classes.body }
+                >
+                    { message.body }
+                </Text>
                 { /* У повідомлення з 1–3 емодзі бульбашки немає: час і галочки — на плашці під ними */ }
                 <div
                     className={ classes.meta }

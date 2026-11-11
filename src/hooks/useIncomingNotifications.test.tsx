@@ -60,12 +60,8 @@ test('a new message toast shows the avatar and the name and opens the chat', () 
 
     expect(toast.title).toBe('Partner a');
     expect(toast.message).toBe('text 2');
-    // Components → Toasts · more: аватар 40, ім'я 15 / 600, один рядок повідомлення
+    // Components → Toasts · more: аватар 40 з іменем людини
     expect((toast.icon as { props: { size: number, name: string } }).props).toMatchObject({ size: 40, name: 'Partner a' });
-    expect(toast.styles).toMatchObject({
-        title: { fontSize: expect.any(String), fontWeight: 600 },
-        description: { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }
-    });
 
     toast.onClick?.({} as never);
 

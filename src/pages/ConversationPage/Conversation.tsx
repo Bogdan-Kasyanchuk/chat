@@ -1,7 +1,7 @@
 import { useHotkeys } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery } from 'convex/react';
-import { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import ChatSettingsMenu from '@/components/ChatSettingsMenu';
@@ -17,6 +17,7 @@ import useCopyText from '@/hooks/useCopyText';
 import useIsDesktop from '@/hooks/useIsDesktop';
 import useMessageHistory from '@/hooks/useMessageHistory';
 import useNow from '@/hooks/useNow';
+import useToastOffset from '@/hooks/useToastOffset';
 import errorMessage from '@/lib/errorMessage';
 import type { ChatView, MessageView } from '@/types/chat';
 import { api } from '@convex/_generated/api';
@@ -52,6 +53,9 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
     const history = useMessageHistory(chatId);
     const copyText = useCopyText();
     const isDesktop = useIsDesktop();
+    const bottomRef = useRef<HTMLDivElement>(null);
+
+    useToastOffset(bottomRef);
     // Знімок на момент відкриття: розділювач «Unread messages» не стрибає, коли спрацьовує markRead
     const [ lastReadAtOnOpen ] = useState(chat.lastReadAt);
     // У стані лише id; самі повідомлення беруться з завантаженої історії. Те, що зникло (видалене співрозмовником
@@ -233,20 +237,23 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
                 selected={ visibleSelection }
                 onAction={ onAction }
             />
-            { /* Прихований, а не демонтований: чернетка в композері переживає режим вибору */ }
+            { /* Нижня смуга: її висоту бачать toast-и. Композер прихований, а не демонтований: чернетка
+                переживає режим вибору */ }
             <div
-                className={ classes.composer }
-                hidden={ selectionBelow }
+                ref={ bottomRef }
+                className={ classes.bottom }
             >
-                <Composer
-                    disabled={ !chat.canSend }
-                    replyTo={ replyDraft }
-                    editing={ editing }
-                    onCancel={ cancel }
-                    onSubmit={ submit }
-                />
+                <div hidden={ selectionBelow }>
+                    <Composer
+                        disabled={ !chat.canSend }
+                        replyTo={ replyDraft }
+                        editing={ editing }
+                        onCancel={ cancel }
+                        onSubmit={ submit }
+                    />
+                </div>
+                { selectionBelow && <SelectionActions { ...selectionHandlers } /> }
             </div>
-            { selectionBelow && <SelectionActions { ...selectionHandlers } /> }
             { forwardMessages.length > 0 && (
                 <ForwardModal
                     messageIds={ forwardMessages.map(message => message.id) }

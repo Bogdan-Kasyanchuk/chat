@@ -91,6 +91,8 @@ const ChatSettingsMenu: FC<ChatSettingsMenuProps> = ({ chat, onLeave }) => {
             color="gray"
             size={ 44 }
             aria-label="Chat settings"
+            // На десктопі ці атрибути ставить Menu.Target
+            { ...!isDesktop && { 'aria-haspopup': 'menu', 'aria-expanded': sheetOpened } }
             onClick={ isDesktop
                 ? undefined
                 : () => {

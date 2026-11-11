@@ -471,6 +471,22 @@ test('Copy text shows Text copied centred over the conversation', async ({ page,
 
     await expect.poll(async () => (await offsets()).every(offset => Math.abs(offset) <= 4), { timeout: 2000 }).toBe(true);
 
+    // Панель відповіді піднімає композер — toast піднімається над нею, а не лягає на неї
+    await expect(toast).toHaveCount(0, { timeout: 6000 });
+    await messageMenu(page, 'Copy me', 'Reply');
+
+    const replyBar = page.getByText('Reply to Alice');
+
+    await expect(replyBar).toBeVisible();
+    await messageMenu(page, 'Copy me', 'Copy text');
+    await expect(toast).toBeVisible();
+    await expect.poll(async () => {
+        const toastBox = (await toast.boundingBox())!;
+        const barBox = (await replyBar.boundingBox())!;
+
+        return toastBox.y + toastBox.height <= barBox.y;
+    }, { timeout: 2000 }).toBe(true);
+
     await bob.context().close();
 });
 
@@ -499,6 +515,60 @@ test('Escape that closes a dialog keeps the selection', async ({ page, browser }
         await expect(page.getByRole('dialog', { name: dialog })).toHaveCount(0);
         await expect(page.getByText('1 selected')).toBeVisible();
     }
+
+    await bob.context().close();
+});
+
+// Натиснутий пункт нижньої панелі й панелі вибору — тло pressed (у темній hover майже не відрізняється від popover)
+test('a pressed item in the phone sheets gets the pressed background', async ({ page, browser }) => {
+    test.skip(!isPhone(), 'Bottom sheets are phone UI');
+
+    const bob = await newUserPage(browser);
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+    await sendMessage(page, 'Press me');
+
+    const pressed = await page.evaluate(() => {
+        const probe = document.createElement('div');
+
+        probe.style.backgroundColor = 'var(--chat-pressed)';
+        document.body.append(probe);
+
+        const color = getComputedStyle(probe).backgroundColor;
+
+        probe.remove();
+
+        return color;
+    });
+    // Палець тримається на пункті, а відпускається повз нього, щоб пункт не спрацював
+    const pressBackground = async (item: Locator) => {
+        const box = (await item.boundingBox())!;
+
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.down();
+
+        const color = await item.evaluate(element => getComputedStyle(element).backgroundColor);
+
+        await page.mouse.move(box.x + box.width / 2, 5);
+        await page.mouse.up();
+
+        return color;
+    };
+
+    const sheet = await openMessageMenu(page, 'Press me');
+
+    expect(await pressBackground(sheet.getByRole('button', { name: 'Forward' }))).toBe(pressed);
+
+    await sheet.getByRole('button', { name: 'Select' }).click();
+    await expect(page.getByRole('toolbar', { name: 'Selected messages' })).toBeVisible();
+    // Панель дій ще від'їжджає, і її затемнення перехопило б натискання
+    await expect(sheet).toHaveCount(0);
+    expect(await pressBackground(page.getByRole('toolbar', { name: 'Selected messages' }).getByRole('button', { name: 'Copy' }))).toBe(pressed);
 
     await bob.context().close();
 });
