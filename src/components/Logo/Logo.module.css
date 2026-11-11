@@ -8,13 +8,13 @@
     flex: none;
 }
 
-/* Квадрат знака лишається brand-7 і в темній темі, як на канвасі */
+/* Квадрат знака лишається brand-7 і в темній темі, як на канвасі; бульбашка на ньому — біла, як ініціали на кольоровому аватарі */
 .tile {
     fill: var(--mantine-color-brand-7);
 }
 
 .bubble {
-    fill: var(--mantine-color-white);
+    fill: var(--chat-on-avatar);
 }
 
 .reply {

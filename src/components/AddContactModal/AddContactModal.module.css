@@ -43,8 +43,13 @@
         min-width: 0;
     }
 
+    /* Стовпчиком кнопки мають висоту 44: flex: 1 у стовпчику дав би flex-basis 0 і стиснув їх до тексту */
     @mixin smaller-than $mantine-breakpoint-md {
         flex-direction: column;
+
+        & > * {
+            flex: none;
+        }
     }
 }
 

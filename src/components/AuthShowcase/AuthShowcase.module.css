@@ -133,7 +133,7 @@
     width: rem(44px);
     height: rem(44px);
     border-radius: 50%;
-    color: var(--mantine-color-white);
+    color: var(--chat-on-avatar);
     font-size: var(--mantine-font-size-md);
     font-weight: 600;
 }
