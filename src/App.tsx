@@ -4,6 +4,7 @@ import type { FC } from 'react';
 import { Route, Routes } from 'react-router';
 
 import ChatLayout from '@/components/ChatLayout';
+import useThemeColorMeta from '@/hooks/useThemeColorMeta';
 import ConversationPage from '@/pages/ConversationPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import SignInPage from '@/pages/SignInPage';
@@ -13,6 +14,8 @@ import PublicRoute from '@/routes/PublicRoute';
 
 const App: FC = () => {
     const { isLoading } = useConvexAuth();
+
+    useThemeColorMeta();
 
     if (isLoading) {
         return (

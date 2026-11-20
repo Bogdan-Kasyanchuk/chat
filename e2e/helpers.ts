@@ -23,9 +23,9 @@ export const signUp = async (page: Page, name: string, email = testEmail(name.to
     await page.getByLabel('Name').fill(name);
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
-    await page.getByLabel('Confirm password').fill(PASSWORD);
+    await page.getByLabel('Confirm password', { exact: true }).fill(PASSWORD);
     await page.getByRole('button', { name: 'Create account' }).click();
-    await expect(page.getByRole('button', { name: 'Account menu' })).toBeVisible();
+    await expect(searchbox(page, 'Search')).toBeVisible();
 
     return email;
 };
@@ -43,14 +43,54 @@ const showSidebar = async (page: Page) => {
     }
 };
 
-const sidebarTab = async (page: Page, tab: 'Chats' | 'Contacts') => {
+// Пошук розділу бічної панелі; exact — щоб «Search» не збігався з «Search contacts»
+const searchbox = (page: Page, name: 'Search' | 'Search contacts') => page.getByRole('searchbox', { name, exact: true });
+
+// Розділ бічної панелі: на десктопі — меню ☰ (з контактів назад веде стрілка), на телефоні — нижні вкладки.
+// Після кожного переходу чекаємо пошук потрібного розділу, а Settings — свою панель (її чекає openSettings)
+export const sidebarSection = async (page: Page, section: 'Chats' | 'Contacts' | 'Settings') => {
     await showSidebar(page);
-    await page.getByText(tab, { exact: true }).click();
+
+    if (isPhone()) {
+        await page.getByRole('navigation', { name: 'Sections' }).getByRole('button', { name: new RegExp(`^${ section }`) }).click();
+
+        if (section !== 'Settings') {
+            await expect(searchbox(page, section === 'Chats' ? 'Search' : 'Search contacts')).toBeVisible();
+        }
+
+        return;
+    }
+
+    // Панель показує чати, контакти чи налаштування: дочекатися, доки відмалюється одне з трьох
+    const settings = page.getByRole('region', { name: 'Settings', exact: true });
+
+    await expect(searchbox(page, 'Search').or(searchbox(page, 'Search contacts')).or(settings)).toBeVisible();
+
+    const contacts = await searchbox(page, 'Search contacts').isVisible() ? 'Contacts' : 'Chats';
+    const current = await settings.isVisible() ? 'Settings' : contacts;
+
+    if (current === section) {
+        return;
+    }
+
+    if (current !== 'Chats') {
+        await page.getByRole('button', { name: 'Back to chats', exact: true }).click();
+        await expect(searchbox(page, 'Search')).toBeVisible();
+    }
+
+    if (section !== 'Chats') {
+        await page.getByRole('button', { name: 'Open menu' }).click();
+        await page.getByRole('menuitem', { name: section }).click();
+
+        if (section === 'Contacts') {
+            await expect(searchbox(page, 'Search contacts')).toBeVisible();
+        }
+    }
 };
 
 // Додає людину в контакти за точною поштою і відкриває з нею чат (кнопка «Message»)
 export const addContact = async (page: Page, email: string) => {
-    await sidebarTab(page, 'Contacts');
+    await sidebarSection(page, 'Contacts');
     await page.getByRole('button', { name: 'Add contact' }).click();
 
     const dialog = page.getByRole('dialog', { name: 'Add contact' });
@@ -58,8 +98,8 @@ export const addContact = async (page: Page, email: string) => {
     await dialog.getByLabel('Email').fill(email);
     await dialog.getByRole('button', { name: 'Find' }).click();
     await dialog.getByRole('button', { name: 'Add to contacts' }).click();
-    await expect(dialog.getByRole('button', { name: 'In contacts' })).toBeVisible();
-    await dialog.getByRole('button', { name: 'Message' }).click();
+    await expect(dialog.getByText('Already in your contacts')).toBeVisible();
+    await dialog.getByRole('button', { name: 'Open chat' }).click();
     await expect(page).toHaveURL(/\/chat\//);
 };
 
@@ -67,14 +107,14 @@ export const addContact = async (page: Page, email: string) => {
 export const chatItem = (page: Page, name: string) => page.getByRole('link', { name: new RegExp(escapeRegExp(name)) });
 
 export const openChat = async (page: Page, name: string) => {
-    await sidebarTab(page, 'Chats');
+    await sidebarSection(page, 'Chats');
     await chatItem(page, name).click();
     await expect(page).toHaveURL(/\/chat\//);
 };
 
 // Клік по людині на вкладці контактів відкриває чат з нею
 export const openContact = async (page: Page, name: string) => {
-    await sidebarTab(page, 'Contacts');
+    await sidebarSection(page, 'Contacts');
     await page.getByRole('button', { name: new RegExp(escapeRegExp(name)) }).click();
     await expect(page).toHaveURL(/\/chat\//);
 };
@@ -100,12 +140,13 @@ export const message = (page: Page, text: string) => page.getByRole('article').f
 
 export const sendMessage = async (page: Page, text: string) => {
     await page.getByLabel('Message', { exact: true }).fill(text);
-    await page.getByRole('button', { name: 'Send' }).click();
+    // Під час редагування кнопка надсилання — «Save changes»
+    await page.getByRole('button', { name: /^(Send|Save changes)$/ }).click();
     await expect(message(page, text).last()).toBeVisible();
 };
 
 // Чесне довге натискання: палець тримається, доки не з'явиться меню, і лише тоді піднімається
-const longPress = async (page: Page, target: Locator, menu: Locator) => {
+export const longPress = async (page: Page, target: Locator, menu: Locator) => {
     await target.scrollIntoViewIfNeeded();
 
     const box = await target.boundingBox();
@@ -123,12 +164,15 @@ const longPress = async (page: Page, target: Locator, menu: Locator) => {
     await cdp.detach();
 };
 
-// Відкриває меню повідомлення: правий клік на десктопі, довге натискання на телефоні
+// Відкриває меню повідомлення: на десктопі — контекстне меню правим кліком, на телефоні — нижню панель
+// «Message actions» довгим натисканням
 export const openMessageMenu = async (page: Page, text: string) => {
     const target = message(page, text);
-    const menu = page.locator('.mantine-contextmenu');
+    const menu = isPhone() ? page.getByRole('dialog', { name: 'Message actions' }) : page.locator('.mantine-contextmenu');
 
     if (isPhone()) {
+        // Панель попередньої дії ще може від'їжджати: довге натискання влучило б у її затемнення
+        await expect(menu).toHaveCount(0);
         await longPress(page, target, menu);
     } else {
         await target.click({ button: 'right' });
@@ -143,11 +187,22 @@ export const messageMenu = async (page: Page, text: string, item: string) => {
     await menu.getByRole('button', { name: item, exact: true }).click();
 };
 
-// Відкриває налаштування через меню акаунта; на телефоні — зі списку чатів
+// Відкриває налаштування: на десктопі — з меню ☰, на телефоні — вкладкою Settings
 export const openSettings = async (page: Page) => {
-    await showSidebar(page);
-    await page.getByRole('button', { name: 'Account menu' }).click();
-    await page.getByRole('menuitem', { name: 'Settings' }).click();
+    await sidebarSection(page, 'Settings');
 
-    return page.getByRole('dialog', { name: 'Settings' });
+    const settings = page.getByRole('region', { name: 'Settings', exact: true });
+
+    await expect(settings.getByLabel('Name', { exact: true })).toBeVisible();
+
+    return settings;
+};
+
+// Вихід: Settings → Log out (розділ Account) і підтвердження
+export const logOut = async (page: Page) => {
+    const settings = await openSettings(page);
+
+    await settings.getByRole('button', { name: 'Log out' }).click();
+    await page.getByRole('dialog', { name: 'Log out?' }).getByRole('button', { name: 'Log out' }).click();
+    await expect(page).toHaveURL(/\/login$/);
 };

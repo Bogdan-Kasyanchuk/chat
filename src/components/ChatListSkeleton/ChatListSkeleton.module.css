@@ -1,0 +1,44 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4px);
+    padding: rem(6px) rem(10px) rem(10px);
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: rem(8px);
+    padding: rem(10px);
+}
+
+.avatar {
+    flex: none;
+    width: rem(44px);
+    height: rem(44px);
+    border-radius: 50%;
+    background-color: var(--chat-field);
+}
+
+.lines {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: rem(8px);
+}
+
+.name,
+.preview {
+    display: block;
+    background-color: var(--chat-field);
+}
+
+.name {
+    height: rem(12px);
+    border-radius: rem(6px);
+}
+
+.preview {
+    height: rem(10px);
+    border-radius: rem(5px);
+}

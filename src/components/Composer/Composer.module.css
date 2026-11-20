@@ -1,46 +1,141 @@
+/* Композер на тлі розмови: поле 50 з радіусом 16 і кругла кнопка 50 поруч (ChatEdit, MobileReply) */
 .composer {
     flex-shrink: 0;
-    padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
-    border-top: 1px solid var(--mantine-color-gray-3);
-    background-color: var(--mantine-color-white);
-
-    @mixin smaller-than $mantine-breakpoint-md {
-        padding-inline: var(--mantine-spacing-xs);
-    }
 }
 
+.row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 0 20px 20px;
+}
+
+.column {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* Панель відповіді чи редагування: над полем, лінія акценту 3 */
 .bar {
     display: flex;
     align-items: center;
-    gap: var(--mantine-spacing-sm);
-    margin-bottom: var(--mantine-spacing-xs);
-    padding-left: var(--mantine-spacing-xs);
-    border-left: 3px solid var(--mantine-color-dark-5);
+    gap: 12px;
+    padding: 8px 8px 8px 14px;
+    border-radius: var(--mantine-radius-lg) var(--mantine-radius-lg) 0 0;
+    background-color: var(--chat-sidebar-bg);
+
+    @mixin smaller-than $mantine-breakpoint-md {
+        padding: 4px 4px 4px 14px;
+    }
+}
+
+.barIcon {
+    display: flex;
+    color: var(--chat-accent-text);
+}
+
+.barLine {
+    flex: none;
+    align-self: stretch;
+    width: 3px;
+    border-radius: 2px;
+    background-color: var(--chat-accent-text);
 }
 
 .barText {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.barTitle {
+    color: var(--chat-accent-text);
+}
+
+.field {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 50px;
+    padding: 0 18px 0 4px;
+    border-radius: var(--mantine-radius-lg);
+    background-color: var(--chat-sidebar-bg);
+    box-shadow: var(--chat-bubble-shadow);
+
+    &[data-with-bar] {
+        border-radius: 0 0 var(--mantine-radius-lg) var(--mantine-radius-lg);
+    }
+}
+
+/* Відкрита панель емодзі: на десктопі кнопка на тлі field, на телефоні — клавіатура кольору акценту */
+.emoji {
+    flex: none;
+    align-self: flex-end;
+    margin-bottom: 3px;
+
+    &[data-open] {
+        color: var(--chat-accent-text);
+
+        @mixin larger-than $mantine-breakpoint-md {
+            background-color: var(--chat-field);
+        }
+    }
+}
+
+.textarea {
     flex: 1;
     min-width: 0;
 }
 
 .input {
-    display: flex;
-    align-items: flex-end;
-    gap: var(--mantine-spacing-xs);
+    min-height: 50px;
+    padding-block: 14px;
+    font-size: var(--mantine-font-size-md);
+    line-height: 1.35;
+    color: var(--chat-text);
 }
 
-.field {
-    flex: 1;
+/* Порожнє поле — кнопка неактивна: тло field і колір muted (MobileChats, sendDisabled) */
+.send {
+    flex: none;
+
+    &:disabled,
+    &[data-disabled] {
+        color: var(--chat-muted);
+        background-color: var(--chat-field);
+        opacity: 1;
+    }
 }
 
+.popover {
+    overflow: hidden;
+    border: 0;
+    background-color: var(--chat-popover);
+}
+
+/* Чат із видаленим акаунтом: плашка замість поля */
 .notice {
-    padding-block: var(--mantine-spacing-xs);
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 50px;
+    margin: 0 20px 20px;
+    padding: 0 16px;
+    font-size: var(--mantine-font-size-sm);
+    color: var(--chat-muted);
+    border-radius: var(--mantine-radius-lg);
+    background-color: var(--chat-sidebar-bg);
+    box-shadow: var(--chat-bubble-shadow);
 }
 
+/* Панель емодзі замість клавіатури на всю ширину */
 .panel {
     height: 300px;
-    margin-inline: calc(-1 * var(--mantine-spacing-xs));
-    margin-top: var(--mantine-spacing-xs);
-    border-top: 1px solid var(--mantine-color-gray-3);
+    border-top: 1px solid var(--chat-line);
+    background-color: var(--chat-sidebar-bg);
 }

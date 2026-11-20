@@ -1,0 +1,9 @@
+.field {
+    display: flex;
+    gap: rem(8px);
+}
+
+.input {
+    flex: 1;
+    min-width: 0;
+}

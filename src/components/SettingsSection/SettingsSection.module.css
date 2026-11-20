@@ -1,0 +1,15 @@
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: rem(4px);
+}
+
+.title {
+    margin: 0 0 rem(8px);
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--chat-accent-text);
+}

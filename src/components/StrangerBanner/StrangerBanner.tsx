@@ -1,5 +1,6 @@
 import { Button, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { IconUserPlus } from '@tabler/icons-react';
 import { useMutation } from 'convex/react';
 import { type FC, useState } from 'react';
 
@@ -37,16 +38,19 @@ const StrangerBanner: FC<StrangerBannerProps> = ({ chat }) => {
     };
 
     return (
-        <div className={ classes.banner }>
+        <div
+            className={ classes.banner }
+            role="region"
+            aria-label="Not in your contacts"
+        >
             <Text
+                className={ classes.text }
                 size="sm"
-                truncate
             >
-                { partner.name } is not in your contacts
+                { partner.name } is not in your contacts. Only you can see this.
             </Text>
             <Button
-                size="xs"
-                variant="default"
+                leftSection={ <IconUserPlus size={ 18 } /> }
                 loading={ loading }
                 onClick={ () => {
                     void add();

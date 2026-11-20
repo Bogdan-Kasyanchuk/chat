@@ -1,5 +1,5 @@
 import { ActionIcon, CloseButton, Popover, Text, Textarea } from '@mantine/core';
-import { IconArrowBackUp, IconKeyboard, IconMoodSmile, IconPencil, IconSend } from '@tabler/icons-react';
+import { IconArrowBackUp, IconCheck, IconKeyboard, IconLock, IconMoodSmile, IconPencil, IconSend } from '@tabler/icons-react';
 import { type FC, type KeyboardEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import EmojiPicker from '@/components/EmojiPicker';
@@ -75,21 +75,23 @@ const Composer: FC<ComposerProps> = ({ disabled, replyTo, editing, onCancel, onS
     if (disabled) {
         return (
             <div className={ classes.composer }>
-                <Text
-                    className={ classes.notice }
-                    c="dimmed"
-                    size="sm"
-                >
-                    You can&apos;t message a deleted account
-                </Text>
+                <div className={ classes.notice }>
+                    <IconLock
+                        size={ 18 }
+                        aria-hidden
+                    />
+                    You can’t message a deleted account
+                </div>
             </div>
         );
     }
 
+    const empty = value.trim() === '';
+
     const submit = async () => {
         const body = value;
 
-        if (!body.trim()) {
+        if (body.trim() === '') {
             return;
         }
 
@@ -134,8 +136,8 @@ const Composer: FC<ComposerProps> = ({ disabled, replyTo, editing, onCancel, onS
     };
 
     const bar = editing
-        ? { icon: <IconPencil size={ 18 } />, title: 'Edit message', text: editing.body, close: 'Cancel editing' }
-        : replyTo && { icon: <IconArrowBackUp size={ 18 } />, title: `Reply to ${ replyTo.authorName }`, text: replyTo.body, close: 'Cancel reply' };
+        ? { icon: <IconPencil size={ 20 } />, title: 'Edit message', text: editing.body, close: 'Cancel editing' }
+        : replyTo && { icon: <IconArrowBackUp size={ 20 } />, title: `Reply to ${ replyTo.authorName }`, text: replyTo.body, close: 'Cancel reply' };
 
     return (
         <div
@@ -149,101 +151,121 @@ const Composer: FC<ComposerProps> = ({ disabled, replyTo, editing, onCancel, onS
                 }
             } }
         >
-            { bar && (
-                <div className={ classes.bar }>
-                    { bar.icon }
-                    <div className={ classes.barText }>
-                        <Text
-                            size="sm"
-                            fw={ 600 }
-                            truncate
-                        >
-                            { bar.title }
-                        </Text>
-                        <Text
-                            size="sm"
-                            c="dimmed"
-                            truncate
-                        >
-                            { bar.text }
-                        </Text>
-                    </div>
-                    <CloseButton
-                        aria-label={ bar.close }
-                        onClick={ onCancel }
-                    />
-                </div>
-            ) }
-            <div className={ classes.input }>
-                { isDesktop
-                    ? (
-                        <Popover
-                            opened={ pickerOpen }
-                            position="top-start"
-                            shadow="md"
-                            withinPortal
-                            onChange={ setPickerOpen }
-                        >
-                            <Popover.Target>
+            <div className={ classes.row }>
+                <div className={ classes.column }>
+                    { bar && (
+                        <div className={ classes.bar }>
+                            <span className={ classes.barIcon }>{ bar.icon }</span>
+                            <span className={ classes.barLine } />
+                            <div className={ classes.barText }>
+                                <Text
+                                    className={ classes.barTitle }
+                                    size="sm"
+                                    fw={ 600 }
+                                    truncate
+                                >
+                                    { bar.title }
+                                </Text>
+                                <Text
+                                    size="sm"
+                                    c="dimmed"
+                                    truncate
+                                >
+                                    { bar.text }
+                                </Text>
+                            </div>
+                            <CloseButton
+                                aria-label={ bar.close }
+                                onClick={ onCancel }
+                            />
+                        </div>
+                    ) }
+                    <div
+                        className={ classes.field }
+                        data-with-bar={ bar ? true : undefined }
+                    >
+                        { isDesktop
+                            ? (
+                                <Popover
+                                    opened={ pickerOpen }
+                                    position="top-start"
+                                    offset={ 12 }
+                                    shadow="md"
+                                    radius="lg"
+                                    withinPortal
+                                    onChange={ setPickerOpen }
+                                >
+                                    <Popover.Target>
+                                        <ActionIcon
+                                            className={ classes.emoji }
+                                            aria-label="Emoji"
+                                            aria-expanded={ pickerOpen }
+                                            data-open={ pickerOpen || undefined }
+                                            variant="subtle"
+                                            color="gray"
+                                            onClick={ () => {
+                                                setPickerOpen(open => !open);
+                                            } }
+                                        >
+                                            <IconMoodSmile size={ 22 } />
+                                        </ActionIcon>
+                                    </Popover.Target>
+                                    <Popover.Dropdown
+                                        className={ classes.popover }
+                                        p={ 0 }
+                                    >
+                                        <EmojiPicker onSelect={ insertEmoji } />
+                                    </Popover.Dropdown>
+                                </Popover>
+                            )
+                            : (
                                 <ActionIcon
-                                    aria-label="Emoji"
+                                    className={ classes.emoji }
+                                    aria-label={ pickerOpen ? 'Show keyboard' : 'Emoji' }
                                     aria-expanded={ pickerOpen }
-                                    size="lg"
+                                    data-open={ pickerOpen || undefined }
                                     variant="subtle"
                                     color="gray"
-                                    onClick={ () => {
-                                        setPickerOpen(open => !open);
-                                    } }
+                                    onClick={ togglePhonePicker }
                                 >
-                                    <IconMoodSmile size={ 20 } />
+                                    { pickerOpen ? <IconKeyboard size={ 22 } /> : <IconMoodSmile size={ 22 } /> }
                                 </ActionIcon>
-                            </Popover.Target>
-                            <Popover.Dropdown p={ 0 }>
-                                <EmojiPicker onSelect={ insertEmoji } />
-                            </Popover.Dropdown>
-                        </Popover>
-                    )
-                    : (
-                        <ActionIcon
-                            aria-label={ pickerOpen ? 'Show keyboard' : 'Emoji' }
-                            aria-expanded={ pickerOpen }
-                            size="lg"
-                            variant="subtle"
-                            color="gray"
-                            onClick={ togglePhonePicker }
-                        >
-                            { pickerOpen ? <IconKeyboard size={ 20 } /> : <IconMoodSmile size={ 20 } /> }
-                        </ActionIcon>
-                    ) }
-                <Textarea
-                    ref={ fieldRef }
-                    className={ classes.field }
-                    aria-label="Message"
-                    placeholder="Write a message..."
-                    value={ value }
-                    maxLength={ MAX_MESSAGE_LENGTH }
-                    maxRows={ 6 }
-                    minRows={ 1 }
-                    autosize
-                    onChange={ event => {
-                        setValue(event.currentTarget.value);
-                    } }
-                    onKeyDown={ onKeyDown }
-                    onFocus={ () => {
-                        // На телефоні клавіатура й панель разом не показуються
-                        if (!isDesktop) {
-                            setPickerOpen(false);
-                        }
-                    } }
-                />
+                            ) }
+                        <Textarea
+                            ref={ fieldRef }
+                            className={ classes.textarea }
+                            classNames={ { input: classes.input } }
+                            variant="unstyled"
+                            aria-label="Message"
+                            placeholder="Message"
+                            value={ value }
+                            maxLength={ MAX_MESSAGE_LENGTH }
+                            maxRows={ 6 }
+                            minRows={ 1 }
+                            autosize
+                            onChange={ event => {
+                                setValue(event.currentTarget.value);
+                            } }
+                            onKeyDown={ onKeyDown }
+                            onFocus={ () => {
+                                // На телефоні клавіатура й панель разом не показуються
+                                if (!isDesktop) {
+                                    setPickerOpen(false);
+                                }
+                            } }
+                        />
+                    </div>
+                </div>
                 <ActionIcon
-                    aria-label="Send"
-                    size="lg"
+                    className={ classes.send }
+                    aria-label={ editing ? 'Save changes' : 'Send' }
+                    size={ 50 }
+                    disabled={ empty }
                     onClick={ () => {
                         void submit();
                     } }
                 >
-                    <IconSend size={ 18 } />
+                    { editing ? <IconCheck size={ 22 } /> : <IconSend size={ 22 } /> }
                 </ActionIcon>
             </div>
             { pickerOpen && !isDesktop && (

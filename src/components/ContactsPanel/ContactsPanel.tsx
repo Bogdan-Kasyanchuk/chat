@@ -1,85 +1,116 @@
-import { Button, Center, Loader, Text } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
-import { IconUserPlus } from '@tabler/icons-react';
-import { useMutation, useQuery } from 'convex/react';
-import { type FC, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { Text, UnstyledButton } from '@mantine/core';
+import { IconSearch, IconUserPlus, IconUsers } from '@tabler/icons-react';
+import { useQuery } from 'convex/react';
+import type { FC } from 'react';
 
-import AddContactModal from '@/components/AddContactModal';
+import ChatListSkeleton from '@/components/ChatListSkeleton';
 import ContactItem from '@/components/ContactItem';
+import EmptyState from '@/components/EmptyState';
 import useNow from '@/hooks/useNow';
-import errorMessage from '@/lib/errorMessage';
-import type { ContactView } from '@/types/chat';
+import useOpenChatWith from '@/hooks/useOpenChatWith';
 import { api } from '@convex/_generated/api';
 
+import classes from './ContactsPanel.module.css';
+
 type ContactsPanelProps = {
-    search: string
+    search: string,
+    onAddContact: () => void,
+    // Чат з контактом відкрито: панель повертається до списку чатів
+    onOpened?: () => void
 };
 
-const ContactsPanel: FC<ContactsPanelProps> = ({ search }) => {
+const countLabel = (count: number) => `${ count } ${ count === 1 ? 'contact' : 'contacts' }`;
+
+// Артборди Contacts і MobileContacts: рядок «Add contact», кількість контактів, список
+const ContactsPanel: FC<ContactsPanelProps> = ({ search, onAddContact, onOpened }) => {
     const contacts = useQuery(api.contacts.list);
-    const openChat = useMutation(api.chats.open);
-    const navigate = useNavigate();
+    const openChatWith = useOpenChatWith();
     const now = useNow();
-    const [ adding, setAdding ] = useState(false);
 
-    const open = async (contact: ContactView) => {
-        try {
-            // Завжди через open: чат може бути прихований для мене, і лише open повертає його в мій список
-            const chatId = await openChat({ userId: contact.userId });
+    const query = search.trim();
+    const visible = contacts?.filter(contact => contact.name.toLowerCase().includes(query.toLowerCase()));
 
-            await navigate(`/chat/${ chatId }`);
-        } catch (error) {
-            notifications.show({ color: 'red', message: errorMessage(error) });
+    const renderBody = () => {
+        if (!contacts || !visible) {
+            return <ChatListSkeleton label="Loading contacts" />;
         }
+
+        if (contacts.length === 0) {
+            return (
+                <EmptyState
+                    icon={
+                        <IconUsers
+                            size={ 36 }
+                            stroke={ 1.6 }
+                            aria-hidden
+                        />
+                    }
+                    title="No contacts yet"
+                />
+            );
+        }
+
+        if (visible.length === 0) {
+            return (
+                <EmptyState
+                    icon={
+                        <IconSearch
+                            size={ 36 }
+                            stroke={ 1.8 }
+                            color="var(--chat-muted)"
+                            aria-hidden
+                        />
+                    }
+                    title="No results"
+                    text={ `No contacts match “${ query }”.` }
+                />
+            );
+        }
+
+        return (
+            <>
+                <Text
+                    className={ classes.count }
+                    size="sm"
+                    fw={ 600 }
+                    c="dimmed"
+                >
+                    { countLabel(visible.length) }
+                </Text>
+                { visible.map(contact => (
+                    <ContactItem
+                        key={ contact.userId }
+                        contact={ contact }
+                        now={ now }
+                        onOpen={ item => {
+                            void openChatWith(item.userId).then(opened => {
+                                if (opened) {
+                                    onOpened?.();
+                                }
+                            });
+                        } }
+                    />
+                )) }
+            </>
+        );
     };
 
-    const query = search.trim().toLowerCase();
-    const visible = contacts?.filter(contact => contact.name.toLowerCase().includes(query));
-
     return (
-        <>
-            <Button
-                variant="default"
-                leftSection={ <IconUserPlus size={ 18 } /> }
-                m="md"
-                onClick={ () => {
-                    setAdding(true);
-                } }
+        <div className={ classes.list }>
+            <UnstyledButton
+                className={ classes.add }
+                onClick={ onAddContact }
             >
+                <span className={ classes.addIcon }>
+                    <IconUserPlus
+                        size={ 20 }
+                        aria-hidden
+                    />
+                </span>
                 Add contact
-            </Button>
-            { !visible && (
-                <Center p="md">
-                    <Loader size="sm" />
-                </Center>
-            ) }
-            { visible?.length === 0 && (
-                <Text
-                    c="dimmed"
-                    ta="center"
-                    p="md"
-                >
-                    { query ? 'No contacts found' : 'No contacts yet' }
-                </Text>
-            ) }
-            { visible?.map(contact => (
-                <ContactItem
-                    key={ contact.userId }
-                    contact={ contact }
-                    now={ now }
-                    onOpen={ item => {
-                        void open(item);
-                    } }
-                />
-            )) }
-            <AddContactModal
-                opened={ adding }
-                onClose={ () => {
-                    setAdding(false);
-                } }
-            />
-        </>
+            </UnstyledButton>
+            { renderBody() }
+        </div>
     );
 };
 

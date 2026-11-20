@@ -6,6 +6,8 @@
 
 Вхід — через Google або поштою з паролем.
 
+Світла й темна тема (за замовчуванням — як у системи), десктоп і телефон. Дизайн — канвас «Chat redesign», його копія з поясненнями лежить у `docs/design/`.
+
 ## Запуск
 
 1. `npm install`
@@ -18,7 +20,7 @@
 
 - `npm run dev` / `npm run dev:convex` — фронт / бекенд у режимі розробки
 - `npm run test:once` — Vitest одним прогоном (функції Convex через convex-test + фронтові тести в jsdom); `npm run test` — у режимі watch
-- `npm run test:e2e` — Playwright (десктоп і телефон, `workers: 2`); потрібен запущений Convex-бекенд (`npx convex dev`), Vite піднімає сам Playwright. Тестові користувачі `@e2e.test` прибираються після прогону
+- `npm run test:e2e` — Playwright (десктоп і телефон, `workers: 2`); потрібен запущений Convex-бекенд (`npx convex dev`), Vite піднімає сам Playwright. Тестові користувачі `@e2e.test` прибираються після прогону. `E2E_BASE_URL=<url>` — проти вже запущеного фронту (наприклад, свого Vite на іншому порту, коли 5173 зайнятий), `E2E_PROD=1` — teardown чистить prod
 - `npm run lint`, `npm run lint:fix`, `npm run typecheck`, `npm run build`
 
 ## Деплой

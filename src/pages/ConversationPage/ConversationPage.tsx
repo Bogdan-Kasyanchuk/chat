@@ -1,9 +1,10 @@
-import { Button, Center, Loader, Stack, Text } from '@mantine/core';
+import { Button, Center, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useQuery } from 'convex/react';
 import { type FC, useEffect, useState } from 'react';
 import { Link, Navigate, useParams } from 'react-router';
 
+import MessagesSkeleton from '@/components/MessagesSkeleton';
 import { api } from '@convex/_generated/api';
 import type { Id } from '@convex/_generated/dataModel';
 import { CHAT_NOT_FOUND } from '@convex/chatRules';
@@ -48,11 +49,7 @@ const ConversationLoader: FC<{ chatId: Id<'chats'> }> = ({ chatId }) => {
     const [ leaving, setLeaving ] = useState(false);
 
     if (chat === undefined) {
-        return (
-            <Center h="100%">
-                <Loader />
-            </Center>
-        );
+        return <MessagesSkeleton full />;
     }
 
     if (chat === null) {

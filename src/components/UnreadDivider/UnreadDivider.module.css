@@ -1,7 +1,11 @@
+/* На всю ширину стрічки, тло плашки дати */
 .divider {
-    margin-block: var(--mantine-spacing-xs);
-    padding: 4px 0;
+    margin-top: 12px;
+    padding: 6px 0;
+    font-size: var(--mantine-font-size-sm);
+    font-weight: 600;
+    line-height: 1.35;
     text-align: center;
-    color: var(--mantine-color-gray-7);
-    background-color: var(--mantine-color-gray-2);
+    color: var(--chat-date-chip-text);
+    background-color: var(--chat-date-chip);
 }

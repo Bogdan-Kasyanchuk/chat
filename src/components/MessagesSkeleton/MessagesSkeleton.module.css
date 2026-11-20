@@ -1,0 +1,85 @@
+/* Артборд Loading: блоки тла 70% непрозорості на візерунку розмови */
+.root {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+}
+
+.header {
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--chat-line);
+    background-color: var(--chat-sidebar-bg);
+}
+
+.avatar {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background-color: var(--chat-field);
+}
+
+.lines {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.name,
+.status {
+    display: block;
+    background-color: var(--chat-field);
+}
+
+.name {
+    width: 140px;
+    height: 12px;
+    border-radius: 6px;
+}
+
+.status {
+    width: 80px;
+    height: 10px;
+    border-radius: 5px;
+}
+
+.feed {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px;
+}
+
+.bubble {
+    display: block;
+    align-self: flex-start;
+    height: 36px;
+    border-radius: var(--mantine-radius-md);
+    background-color: var(--chat-sidebar-bg);
+    opacity: 0.7;
+
+    &[data-side='out'] {
+        align-self: flex-end;
+    }
+}
+
+.composer {
+    flex: none;
+    padding: 0 20px 20px;
+
+    span {
+        display: block;
+        height: 50px;
+        border-radius: var(--mantine-radius-lg);
+        background-color: var(--chat-sidebar-bg);
+        opacity: 0.7;
+    }
+}

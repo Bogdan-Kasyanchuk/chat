@@ -1,7 +1,7 @@
 import { useHotkeys } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useMutation, useQuery } from 'convex/react';
-import { type FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import ChatSettingsMenu from '@/components/ChatSettingsMenu';
@@ -11,11 +11,13 @@ import DeleteMessagesModal from '@/components/DeleteMessagesModal';
 import ForwardModal from '@/components/ForwardModal';
 import MessageList from '@/components/MessageList';
 import type { MessageAction } from '@/components/MessageMenu/messageActions';
-import SelectionBar from '@/components/SelectionBar';
+import SelectionBar, { SelectionActions } from '@/components/SelectionBar';
 import StrangerBanner from '@/components/StrangerBanner';
 import useCopyText from '@/hooks/useCopyText';
+import useIsDesktop from '@/hooks/useIsDesktop';
 import useMessageHistory from '@/hooks/useMessageHistory';
 import useNow from '@/hooks/useNow';
+import useToastOffset from '@/hooks/useToastOffset';
 import errorMessage from '@/lib/errorMessage';
 import type { ChatView, MessageView } from '@/types/chat';
 import { api } from '@convex/_generated/api';
@@ -30,8 +32,12 @@ type ConversationProps = {
     onLeave: () => void
 };
 
-// Escape не чіпає розмову, поки відкрите модальне вікно чи меню: воно закривається само
-const overlayOpen = () => document.querySelector('[role="dialog"], [role="menu"], .mantine-contextmenu') !== null;
+const OVERLAY = '[role="dialog"], [role="menu"], .mantine-contextmenu';
+
+// Escape не чіпає розмову, поки відкрите модальне вікно чи меню: воно закривається само. Escape зсередини
+// діалогу теж його: Mantine закриває діалог раніше, і в браузері той зникає ще до цього обробника
+const overlayOpen = (event: KeyboardEvent) => document.querySelector(OVERLAY) !== null
+    || (event.target instanceof Element && event.target.closest(OVERLAY) !== null);
 
 const NONE: ReadonlySet<Id<'messages'>> = new Set();
 
@@ -46,6 +52,10 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
     const edit = useMutation(api.messages.edit);
     const history = useMessageHistory(chatId);
     const copyText = useCopyText();
+    const isDesktop = useIsDesktop();
+    const bottomRef = useRef<HTMLDivElement>(null);
+
+    useToastOffset(bottomRef);
     // Знімок на момент відкриття: розділювач «Unread messages» не стрибає, коли спрацьовує markRead
     const [ lastReadAtOnOpen ] = useState(chat.lastReadAt);
     // У стані лише id; самі повідомлення беруться з завантаженої історії. Те, що зникло (видалене співрозмовником
@@ -106,8 +116,8 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
     };
 
     // INPUT ігноруємо (пошук у боковій панелі), TEXTAREA — ні: Escape у композері скасовує відповідь
-    useHotkeys([ [ 'Escape', () => {
-        if (overlayOpen()) {
+    useHotkeys([ [ 'Escape', event => {
+        if (overlayOpen(event)) {
             return;
         }
 
@@ -179,23 +189,29 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
         }
     };
 
+    const selectionHandlers = {
+        onForward: () => {
+            setForwarding(visibleSelection);
+        },
+        onCopy: () => {
+            copyText(selectedMessages.map(message => message.body).join('\n\n'));
+            clearSelection();
+        },
+        onDelete: () => {
+            setDeleting(visibleSelection);
+        }
+    };
+    // На телефоні дії вибору — панель унизу замість композера (MobileSelection)
+    const selectionBelow = selecting && !isDesktop;
+
     return (
         <div className={ classes.page }>
             { selecting
                 ? (
                     <SelectionBar
                         count={ selectedMessages.length }
-                        onForward={ () => {
-                            setForwarding(visibleSelection);
-                        } }
-                        onCopy={ () => {
-                            copyText(selectedMessages.map(message => message.body).join('\n\n'));
-                            clearSelection();
-                        } }
-                        onDelete={ () => {
-                            setDeleting(visibleSelection);
-                        } }
                         onCancel={ clearSelection }
+                        { ...selectionHandlers }
                     />
                 )
                 : (
@@ -221,13 +237,23 @@ const Conversation: FC<ConversationProps> = ({ chat, onLeave }) => {
                 selected={ visibleSelection }
                 onAction={ onAction }
             />
-            <Composer
-                disabled={ !chat.canSend }
-                replyTo={ replyDraft }
-                editing={ editing }
-                onCancel={ cancel }
-                onSubmit={ submit }
-            />
+            { /* Нижня смуга: її висоту бачать toast-и. Композер прихований, а не демонтований: чернетка
+                переживає режим вибору */ }
+            <div
+                ref={ bottomRef }
+                className={ classes.bottom }
+            >
+                <div hidden={ selectionBelow }>
+                    <Composer
+                        disabled={ !chat.canSend }
+                        replyTo={ replyDraft }
+                        editing={ editing }
+                        onCancel={ cancel }
+                        onSubmit={ submit }
+                    />
+                </div>
+                { selectionBelow && <SelectionActions { ...selectionHandlers } /> }
+            </div>
             { forwardMessages.length > 0 && (
                 <ForwardModal
                     messageIds={ forwardMessages.map(message => message.id) }

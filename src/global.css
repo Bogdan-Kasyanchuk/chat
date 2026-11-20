@@ -5,7 +5,55 @@ body,
 }
 
 body {
-    background-color: var(--mantine-color-gray-2);
+    background-color: var(--chat-bg);
+}
+
+/* Стани з артборду Components, яких не задати пропсами теми */
+
+/* Натиснута кнопка зменшується до 98% (theme.activeClassName) */
+@media (prefers-reduced-motion: no-preference) {
+    .chat-active:active {
+        transform: scale(0.98);
+    }
+}
+
+fieldset:disabled .chat-active:active {
+    transform: none;
+}
+
+/* Поле: рамка темнішає під курсором, у фокусі — м'яке кільце 3px.
+   PasswordInput малює поле як div з <input> усередині, тож фокус ловимо й через :focus-within */
+.mantine-Input-wrapper[data-variant='default']:not([data-error]) .mantine-Input-input:hover:not(:focus, :focus-within, :disabled, [data-disabled]) {
+    border-color: var(--chat-border-hover);
+}
+
+.mantine-Input-input:is(:focus, :focus-within) {
+    box-shadow: 0 0 0 3px var(--chat-ring-soft);
+}
+
+/* Поле з помилкою у фокусі: рамку danger лишає Mantine, кільце — danger ring (dangerRing на канвасі) */
+.mantine-Input-input[data-error]:is(:focus, :focus-within) {
+    box-shadow: 0 0 0 3px var(--chat-danger-ring);
+}
+
+/* Чекбокс і радіо без вибору — кільце 2px кольору muted (вимкнені й з помилкою лишаються як у Mantine) */
+.mantine-Checkbox-input:not(:checked, :indeterminate, :disabled, [data-error]),
+.mantine-Radio-radio:not(:checked, :disabled, [data-error]) {
+    border: 2px solid var(--chat-muted);
+}
+
+/* Радіо на прозорому тлі, вибране — кільце 2px акценту (колір і крапку дає variant outline) */
+.mantine-Radio-radio:not(:disabled, [data-error]) {
+    background-color: transparent;
+}
+
+.mantine-Radio-radio:checked:not(:disabled, [data-error]) {
+    border-width: 2px;
+}
+
+/* Скелетони — колір поля, як рядки-заглушки на канвасі */
+.mantine-Skeleton-root[data-visible]::after {
+    background-color: var(--chat-field);
 }
 
 /* Меню повідомлення відкривається під пальцем, і довге натискання на Android виділяло слово пункту під ним */
@@ -20,4 +68,35 @@ body {
     [data-mantine-color-scheme='dark'] .mantine-contextmenu-item-button:hover:not([disabled], :active) {
         background: transparent;
     }
+}
+
+/* Toast-и: на 90 над нижнім краєм, посередині над розмовою (Components → Toasts), завширшки за вмістом.
+   У відкритій розмові — на 20 над її нижньою смугою (--chat-toast-offset ставить useToastOffset), щоб не лягати
+   на поле, панель відповіді чи емодзі. На десктопі розмова — праворуч від бічної панелі 380, тож центр зсунуто */
+.mantine-Notifications-root[data-position='bottom-center'] {
+    bottom: var(--chat-toast-offset, calc(90px + env(safe-area-inset-bottom)));
+
+    @mixin larger-than $mantine-breakpoint-md {
+        left: calc(50% + 190px);
+        max-width: min(var(--notifications-container-width), calc(100% - 380px - 2 * var(--mantine-spacing-md)));
+    }
+}
+
+/* Не ширший за 340 (Components → Toasts · more): довга помилка переноситься */
+.mantine-Notifications-root .mantine-Notification-root {
+    width: fit-content;
+    max-width: min(340px, 100%);
+    margin-inline: auto;
+}
+
+/* Toast без власної іконки — це помилка: замість смужки Mantine — коло зі знаком оклику 18 кольору toast danger */
+.mantine-Notification-root:not([data-with-icon])::before {
+    position: static;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    margin-inline-end: 12px;
+    border-radius: 0;
+    background-color: var(--notification-color);
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 8v5M12 16.5v.01'/%3E%3C/svg%3E") center / contain no-repeat;
 }

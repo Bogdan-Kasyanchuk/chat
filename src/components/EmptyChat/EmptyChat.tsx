@@ -1,22 +1,12 @@
-import { Center, Text } from '@mantine/core';
-import { IconMessageCircle } from '@tabler/icons-react';
 import type { FC } from 'react';
 
+import classes from './EmptyChat.module.css';
+
+// Чат не відкрито (десктоп): плашка кольору chip посередині тла розмови, як плашка дати
 const EmptyChat: FC = () => (
-    <Center h="100%">
-        <Text
-            c="dimmed"
-            ta="center"
-            p="md"
-        >
-            <IconMessageCircle
-                size={ 40 }
-                stroke={ 1.5 }
-            />
-            <br />
-            Choose who you would like to write to
-        </Text>
-    </Center>
+    <div className={ classes.root }>
+        <p className={ classes.chip }>Select a chat to start messaging</p>
+    </div>
 );
 
 export default EmptyChat;

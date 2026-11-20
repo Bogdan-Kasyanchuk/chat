@@ -88,3 +88,42 @@ test('keeps the fields after a server error', async () => {
     expect((screen.getByLabelText('Email') as HTMLInputElement).value).toBe('alice@example.com');
     expect((screen.getByLabelText('Name') as HTMLInputElement).value).toBe('Alice');
 });
+
+// Тексти з артбордів SignUp і MobileSignUp
+test('explains the form with a subtitle, placeholders and a password hint', () => {
+    renderSignUp();
+
+    expect(screen.getByText('It takes less than a minute.')).toBeTruthy();
+    expect(screen.getByLabelText('Name').getAttribute('placeholder')).toBe('How contacts will see you');
+    expect(screen.getByLabelText('Email').getAttribute('placeholder')).toBe('you@example.com');
+    expect(screen.getByText('At least 8 characters')).toBeTruthy();
+});
+
+test('a server error is announced', async () => {
+    signIn.mockRejectedValue(new ConvexError(EMAIL_TAKEN));
+
+    renderSignUp();
+    await fill({ name: 'Alice', email: 'alice@example.com', password: 'secret123' });
+
+    expect((await screen.findByRole('alert')).textContent).toBe(EMAIL_TAKEN);
+});
+
+// Як на вході: помилка сервера стосується введеного, тож зникає, щойно людина щось змінює
+test('editing a field clears the server error', async () => {
+    signIn.mockRejectedValue(new ConvexError(EMAIL_TAKEN));
+
+    renderSignUp();
+    await fill({ name: 'Alice', email: 'alice@example.com', password: 'secret123' });
+    await screen.findByRole('alert');
+    await userEvent.setup().type(screen.getByLabelText('Email'), 'x');
+
+    expect(screen.queryByRole('alert')).toBeNull();
+});
+
+// Канвас SignUp: у двох полів різні підписи кнопки з оком, щоб читач екрана їх розрізняв
+test('the two eye buttons have different names', () => {
+    renderSignUp();
+
+    expect(screen.getByRole('button', { name: 'Show password' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Show confirm password' })).toBeTruthy();
+});

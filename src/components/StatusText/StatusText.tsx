@@ -9,10 +9,11 @@ type StatusTextProps = {
     now: number
 };
 
+// Статус 14: «online» — кольором акценту, «last seen …» — muted (Contacts, шапка розмови)
 const StatusText: FC<StatusTextProps> = ({ online, lastSeenAt, now }) => (
     <Text
-        size="xs"
-        c={ online ? 'green.8' : 'dimmed' }
+        size="sm"
+        c={ online ? 'var(--chat-accent-text)' : 'dimmed' }
         truncate
     >
         { lastSeenText({ online, lastSeenAt }, now) }

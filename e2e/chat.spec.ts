@@ -1,6 +1,6 @@
 import { type Locator, expect, test } from '@playwright/test';
 
-import { addContact, chatItem, isPhone, leaveChat, message, messageMenu, newUserPage, openChat, openContact, openMessageMenu, sendMessage, signUp } from './helpers';
+import { addContact, chatItem, isPhone, leaveChat, logOut, longPress, message, messageMenu, newUserPage, openChat, openContact, openMessageMenu, sendMessage, signUp, testEmail } from './helpers';
 
 test('two people add each other, talk, reply, edit, forward and delete', async ({ page, browser }) => {
     const bob = await newUserPage(browser);
@@ -44,6 +44,9 @@ test('two people add each other, talk, reply, edit, forward and delete', async (
 
     await confirm.getByLabel('Also delete for Bob').check();
     await confirm.getByRole('button', { name: 'Delete' }).click();
+    // Артборд ToastDeleted: без Undo
+    await expect(page.getByRole('alert').filter({ hasText: 'Message deleted' })).toBeVisible();
+    await expect(page.getByRole('alert').filter({ hasText: 'Message deleted' }).getByRole('button')).toHaveCount(0);
     await expect(message(page, 'Hi Bob!')).toHaveCount(0);
     await expect(message(bob, 'Hi Bob!')).toHaveCount(0);
 
@@ -64,17 +67,24 @@ test('an emoji from the picker lands at the caret and arrives large', async ({ p
     await field.fill('See you');
     await field.press('End');
     await page.getByRole('button', { name: 'Emoji' }).click();
-    await page.getByLabel('Search emoji').fill('raising hands');
-    await page.getByRole('gridcell', { name: 'raising hands' }).first().click();
-    await expect(field).toHaveValue('See you🙌');
+
+    // На телефоні панель без пошуку (MobileEmoji): емодзі — з першої категорії
+    const [ name, emoji ] = isPhone() ? [ 'grinning face', '😀' ] : [ 'raising hands', '🙌' ];
+
+    if (!isPhone()) {
+        await page.getByLabel('Search emoji').fill(name);
+    }
+
+    await page.getByRole('gridcell', { name }).first().click();
+    await expect(field).toHaveValue(`See you${ emoji }`);
 
     await page.getByRole('button', { name: 'Send' }).click();
-    await expect(message(page, 'See you🙌')).toBeVisible();
+    await expect(message(page, `See you${ emoji }`)).toBeVisible();
     await sendMessage(page, '🎉');
 
     await openChat(bob, 'Alice');
     await expect(message(bob, '🎉')).toHaveAttribute('data-emoji-only');
-    await expect(message(bob, 'See you🙌')).not.toHaveAttribute('data-emoji-only');
+    await expect(message(bob, `See you${ emoji }`)).not.toHaveAttribute('data-emoji-only');
 
     await bob.context().close();
 });
@@ -137,7 +147,7 @@ test('a chat deleted for me opens again from contacts, empty', async ({ page, br
 
     await page.getByRole('button', { name: 'Chat settings' }).click();
     await page.getByRole('menuitem', { name: 'Delete chat' }).click();
-    await page.getByRole('dialog', { name: 'Delete chat?' }).getByRole('button', { name: 'Delete' }).click();
+    await page.getByRole('dialog', { name: 'Delete chat?' }).getByRole('button', { name: 'Delete chat' }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(chatItem(page, 'Bob')).toHaveCount(0);
 
@@ -168,10 +178,7 @@ test('status shows online and switches to last seen after logout', async ({ page
 
     await expect(status).toHaveText('online');
 
-    await bob.getByRole('button', { name: 'Account menu' }).click();
-    await bob.getByRole('menuitem', { name: 'Logout' }).click();
-    await bob.getByRole('dialog', { name: 'Log out?' }).getByRole('button', { name: 'Log out' }).click();
-    await expect(bob).toHaveURL(/\/login$/);
+    await logOut(bob);
     await expect(bob.getByRole('heading', { name: 'Sign in' })).toBeVisible();
 
     await expect(status).toHaveText('last seen just now');
@@ -221,6 +228,353 @@ test('on a touch screen the menu item under the finger is not highlighted', asyn
     // Меню відкривається під пальцем, і мобільний браузер ставить :hover пунктові під ним
     await items.first().hover();
     expect(await background(items.first())).toBe(await background(items.nth(1)));
+
+    await bob.context().close();
+});
+
+// Артборди ChatsEmpty і AddContactNotFound: новий акаунт без чатів, пошта, якої ніхто не реєстрував
+test('a new account sees No chats yet and Add contact explains an unknown email', async ({ page }) => {
+    await signUp(page, 'Alice');
+
+    await expect(page.getByRole('heading', { name: 'No chats yet' })).toBeVisible();
+    await page.getByRole('button', { name: 'Add contact' }).click();
+
+    const dialog = page.getByRole('dialog', { name: 'Add contact' });
+
+    await dialog.getByLabel('Email').fill(testEmail('nobody'));
+    await dialog.getByRole('button', { name: 'Find' }).click();
+    await expect(dialog.getByRole('alert')).toHaveText('No one has signed up with this email. Check the spelling.');
+    await expect(dialog.getByRole('button', { name: 'Add to contacts' })).toBeDisabled();
+
+    // На телефоні кнопки стовпчиком: кожна 44, а не стиснута до тексту (flex-basis 0 у стовпчику)
+    for (const name of [ 'Add to contacts', 'Cancel' ]) {
+        expect((await dialog.getByRole('button', { name, exact: true }).boundingBox())?.height, name).toBeCloseTo(44, 0);
+    }
+
+    await dialog.getByRole('button', { name: isPhone() ? 'Back to chats' : 'Cancel' }).click();
+    await expect(dialog).toHaveCount(0);
+});
+
+// Review Focus 3: слово без пробілів не розпирає бульбашку й не дає горизонтальної прокрутки
+test('a 300-character word wraps inside the bubble without horizontal scroll', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await bob.context().close();
+    await addContact(page, bobEmail);
+
+    const word = 'w'.repeat(300);
+
+    await sendMessage(page, word);
+
+    const bubble = await message(page, word).boundingBox();
+    const main = await page.getByRole('main').boundingBox();
+
+    expect(bubble && main).toBeTruthy();
+    expect(bubble!.x).toBeGreaterThanOrEqual(main!.x);
+    expect(bubble!.x + bubble!.width).toBeLessThanOrEqual(main!.x + main!.width);
+    // Ні сторінка, ні стрічка не прокручуються вбік
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
+    expect(await message(page, word).evaluate(element => {
+        const feed = element.closest('[data-feed]') as HTMLElement;
+
+        return feed.scrollWidth <= feed.clientWidth;
+    })).toBe(true);
+});
+
+// Плашка дати липне до верху стрічки, поки видно її день
+test('the date chip sticks to the top of the feed while scrolling its day', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await bob.context().close();
+    await addContact(page, bobEmail);
+
+    // Три високі повідомлення — стрічка довша за екран
+    for (const n of [ 1, 2, 3 ]) {
+        await page.getByLabel('Message', { exact: true }).fill(Array.from({ length: 14 }, (_, i) => `${ n }.${ i }`).join('\n'));
+        await page.getByRole('button', { name: 'Send' }).click();
+    }
+
+    await expect(page.getByRole('article')).toHaveCount(3);
+
+    const feed = page.locator('[data-feed]');
+
+    await feed.evaluate(element => {
+        element.scrollTop = element.scrollHeight / 2;
+    });
+
+    const chip = page.getByText('Today', { exact: true });
+    const [ chipBox, feedBox ] = [ await chip.boundingBox(), await feed.boundingBox() ];
+
+    expect(chipBox && feedBox).toBeTruthy();
+    expect(Math.abs(chipBox!.y - (feedBox!.y + 8))).toBeLessThanOrEqual(2);
+
+    // Стрічка справді прокручена: верх дня вже за краєм
+    expect(await feed.evaluate(element => element.scrollTop)).toBeGreaterThan(0);
+});
+
+// Рев'ю етапу 5: чат відкривається на «Unread messages», і липка плашка дати його не накриває
+test('the sticky date chip leaves the unread divider visible when a chat opens', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+
+    const sendTall = async (n: number) => {
+        await page.getByLabel('Message', { exact: true }).fill(Array.from({ length: 14 }, (_, i) => `${ n }.${ i }`).join('\n'));
+        await page.getByRole('button', { name: 'Send' }).click();
+        await expect(page.getByRole('article')).toHaveCount(n);
+    };
+
+    for (const n of [ 1, 2, 3 ]) {
+        await sendTall(n);
+    }
+
+    // Bob читає все, виходить, і приходить ще стрічка — розділювач опиняється вгорі екрана
+    await openChat(bob, 'Alice');
+    await expect(bob.getByRole('article')).toHaveCount(3);
+    await leaveChat(bob);
+
+    for (const n of [ 4, 5, 6 ]) {
+        await sendTall(n);
+    }
+
+    await openChat(bob, 'Alice');
+
+    const divider = bob.getByText('Unread messages', { exact: true });
+
+    await expect(divider).toBeInViewport();
+
+    const [ dividerBox, chipBox ] = [ await divider.boundingBox(), await bob.getByText('Today', { exact: true }).boundingBox() ];
+
+    expect(dividerBox && chipBox).toBeTruthy();
+    expect(chipBox!.y + chipBox!.height).toBeLessThanOrEqual(dividerBox!.y);
+
+    await bob.context().close();
+});
+
+// Рев'ю етапу 5: вкладки категорій спираються на DOM frimousse — перевіряємо зі справжньою бібліотекою
+test('an emoji category tab scrolls the picker to its category', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await bob.context().close();
+    await addContact(page, bobEmail);
+    await page.getByRole('button', { name: 'Emoji' }).click();
+
+    const flags = page.getByRole('button', { name: 'Flags' });
+
+    await expect(page.getByRole('gridcell').first()).toBeVisible();
+    await flags.click();
+    await expect(flags).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('gridcell', { name: /flag/i }).first()).toBeInViewport();
+});
+
+// Review Focus 2: прокрутка стрічки пальцем не відкриває панель дій, довге натискання — відкриває
+test('on a phone scrolling the feed does not open the message actions, a long press does', async ({ page, browser }) => {
+    test.skip(!isPhone(), 'Long press is a phone gesture');
+
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+
+    // Стрічка має бути довшою за екран, щоб палець справді її гортав
+    for (let i = 1; i <= 30; i += 1) {
+        await sendMessage(page, `Line ${ i }`);
+    }
+
+    const sheet = page.getByRole('dialog', { name: 'Message actions' });
+    // Прокрутка стрічки — найближчий предок бульбашки з overflow-y: auto
+    const feedScrollTop = () => message(page, 'Line 30').evaluate(element => {
+        let node = element.parentElement;
+
+        while (node && getComputedStyle(node).overflowY !== 'auto') {
+            node = node.parentElement;
+        }
+
+        return node?.scrollTop ?? -1;
+    });
+    const before = await feedScrollTop();
+    const box = await message(page, 'Line 28').boundingBox();
+
+    if (!box) {
+        throw new Error('Message is not visible');
+    }
+
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    const cdp = await page.context().newCDPSession(page);
+
+    // Палець веде стрічку вниз (до старіших) і тримається довше за поріг довгого натискання
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [ { x, y } ] });
+
+    for (let step = 1; step <= 10; step += 1) {
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [ { x, y: y + step * 20 } ] });
+        await page.waitForTimeout(30);
+    }
+
+    await page.waitForTimeout(600);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await cdp.detach();
+    // Стрічка справді прокрутилась до старіших, а панель не відкрилась
+    expect(await feedScrollTop()).toBeLessThan(before);
+    await expect(sheet).toHaveCount(0);
+
+    await longPress(page, message(page, 'Line 20'), sheet);
+    await expect(sheet.getByText('Line 20')).toBeVisible();
+    await sheet.getByRole('button', { name: 'Select' }).click();
+    await expect(page.getByText('1 selected')).toBeVisible();
+    await expect(page.getByRole('toolbar', { name: 'Selected messages' })).toBeVisible();
+
+    await bob.context().close();
+});
+
+// Артборд ToastCopied: «Text copied» на 90 над нижнім краєм, посередині над розмовою
+test('Copy text shows Text copied centred over the conversation', async ({ page, browser }) => {
+    await page.context().grantPermissions([ 'clipboard-read', 'clipboard-write' ]);
+
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+    await sendMessage(page, 'Copy me');
+    await messageMenu(page, 'Copy me', 'Copy text');
+
+    const toast = page.getByRole('alert').filter({ hasText: 'Text copied' });
+
+    await expect(toast).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('Copy me');
+
+    const viewport = page.viewportSize()!;
+    // Розмова на десктопі — праворуч від бічної панелі 380
+    const centre = isPhone() ? viewport.width / 2 : 380 + (viewport.width - 380) / 2;
+    // Toast в'їжджає знизу: міряємо, коли анімація скінчилась
+    const offsets = async () => {
+        const box = (await toast.boundingBox())!;
+
+        return [ Math.round(box.x + box.width / 2 - centre), Math.round(viewport.height - (box.y + box.height) - 90) ];
+    };
+
+    await expect.poll(async () => (await offsets()).every(offset => Math.abs(offset) <= 4), { timeout: 2000 }).toBe(true);
+
+    // Панель відповіді піднімає композер — toast піднімається над нею, а не лягає на неї
+    await expect(toast).toHaveCount(0, { timeout: 6000 });
+    await messageMenu(page, 'Copy me', 'Reply');
+
+    const replyBar = page.getByText('Reply to Alice');
+
+    await expect(replyBar).toBeVisible();
+    await messageMenu(page, 'Copy me', 'Copy text');
+    await expect(toast).toBeVisible();
+    await expect.poll(async () => {
+        const toastBox = (await toast.boundingBox())!;
+        const barBox = (await replyBar.boundingBox())!;
+
+        return toastBox.y + toastBox.height <= barBox.y;
+    }, { timeout: 2000 }).toBe(true);
+
+    await bob.context().close();
+});
+
+// Escape закриває діалог, але не режим вибору: діалог зникає ще до того, як Escape дійде до розмови
+test('Escape that closes a dialog keeps the selection', async ({ page, browser }) => {
+    const bob = await newUserPage(browser);
+
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+    await sendMessage(page, 'Pick me');
+    await messageMenu(page, 'Pick me', 'Select');
+    await expect(page.getByText('1 selected')).toBeVisible();
+
+    // На телефоні дії — у нижній панелі вибору
+    const actions = isPhone() ? page.getByRole('toolbar', { name: 'Selected messages' }) : page.getByRole('main');
+
+    for (const [ button, dialog ] of [ [ 'Delete', 'Delete message?' ], [ 'Forward', 'Forward to' ] ]) {
+        await actions.getByRole('button', { name: button, exact: true }).click();
+        await expect(page.getByRole('dialog', { name: dialog })).toBeVisible();
+        // Фокус — на кнопці діалогу (Cancel чи хрестик), а не в полі
+        await page.getByRole('dialog', { name: dialog }).getByRole('button').first().focus();
+        await page.keyboard.press('Escape');
+        await expect(page.getByRole('dialog', { name: dialog })).toHaveCount(0);
+        await expect(page.getByText('1 selected')).toBeVisible();
+    }
+
+    await bob.context().close();
+});
+
+// Натиснутий пункт нижньої панелі й панелі вибору — тло pressed (у темній hover майже не відрізняється від popover)
+test('a pressed item in the phone sheets gets the pressed background', async ({ page, browser }) => {
+    test.skip(!isPhone(), 'Bottom sheets are phone UI');
+
+    const bob = await newUserPage(browser);
+
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await signUp(page, 'Alice');
+
+    const bobEmail = await signUp(bob, 'Bob');
+
+    await addContact(page, bobEmail);
+    await sendMessage(page, 'Press me');
+
+    const pressed = await page.evaluate(() => {
+        const probe = document.createElement('div');
+
+        probe.style.backgroundColor = 'var(--chat-pressed)';
+        document.body.append(probe);
+
+        const color = getComputedStyle(probe).backgroundColor;
+
+        probe.remove();
+
+        return color;
+    });
+    // Палець тримається на пункті, а відпускається повз нього, щоб пункт не спрацював
+    const pressBackground = async (item: Locator) => {
+        const box = (await item.boundingBox())!;
+
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.down();
+
+        const color = await item.evaluate(element => getComputedStyle(element).backgroundColor);
+
+        await page.mouse.move(box.x + box.width / 2, 5);
+        await page.mouse.up();
+
+        return color;
+    };
+
+    const sheet = await openMessageMenu(page, 'Press me');
+
+    expect(await pressBackground(sheet.getByRole('button', { name: 'Forward' }))).toBe(pressed);
+
+    await sheet.getByRole('button', { name: 'Select' }).click();
+    await expect(page.getByRole('toolbar', { name: 'Selected messages' })).toBeVisible();
+    // Панель дій ще від'їжджає, і її затемнення перехопило б натискання
+    await expect(sheet).toHaveCount(0);
+    expect(await pressBackground(page.getByRole('toolbar', { name: 'Selected messages' }).getByRole('button', { name: 'Copy' }))).toBe(pressed);
 
     await bob.context().close();
 });

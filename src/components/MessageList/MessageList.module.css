@@ -18,11 +18,17 @@
     flex-direction: column;
     justify-content: flex-end;
     min-height: 100%;
-    padding-block: var(--mantine-spacing-xs);
+    padding-block: 8px 20px;
 
     &[data-hidden] {
         visibility: hidden;
     }
+}
+
+/* Секція дня: її межі тримають липку плашку дати над своїм днем */
+.day {
+    display: flex;
+    flex-direction: column;
 }
 
 .empty {

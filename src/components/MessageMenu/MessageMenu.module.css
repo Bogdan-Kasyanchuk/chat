@@ -5,3 +5,41 @@
         -webkit-touch-callout: none;
     }
 }
+
+/* Артборд ContextMenu: 220, відступ 8, радіус 16, тло popover без рамки (Components → Menus) */
+.menu.menu {
+    width: 220px;
+    padding: 8px;
+    border: 0;
+    border-radius: 16px;
+    background-color: var(--chat-popover);
+    box-shadow: var(--chat-shadow);
+}
+
+/* Пункти 44, радіус 12, текст 16 / 600, іконка 22 на 8 від тексту */
+.item.item {
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 12px;
+    color: var(--chat-text);
+    border-radius: 12px;
+
+    & :global(.mantine-contextmenu-item-button-title) {
+        font-size: var(--mantine-font-size-md);
+        font-weight: 600;
+    }
+
+    @media (hover: hover) {
+        &:hover:not([disabled]) {
+            background-color: var(--chat-hover);
+        }
+    }
+
+    &:active:not([disabled]) {
+        background-color: var(--chat-pressed);
+    }
+
+    &.danger {
+        color: var(--chat-danger);
+    }
+}

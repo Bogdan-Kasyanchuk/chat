@@ -1,0 +1,8 @@
+/* Між текстом і галочкою — 24 на десктопі, 20 у нижній панелі (як між блоками діалогу) */
+.extra {
+    margin-top: rem(24px);
+
+    @mixin smaller-than $mantine-breakpoint-md {
+        margin-top: rem(20px);
+    }
+}
